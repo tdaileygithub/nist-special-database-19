@@ -8,17 +8,17 @@ set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_FLAGS "-Wall") 
 
 add_executable(showmis)
-target_sources(showmis PRIVATE "showmis.cpp")
+target_sources(showmis PRIVATE "showmis.cpp"  )
 
 add_executable(sd19test)
-target_sources(sd19test PRIVATE "sd19test.cpp")
+target_sources(sd19test PRIVATE "sd19test.cpp" )
 
 # Include sub-projects.
 add_subdirectory ("sd19")
 add_subdirectory ("sqlite3")
 add_subdirectory ("toojpeg")
 add_subdirectory ("doctest")
-add_subdirectory ("sqlite_orm")
+add_subdirectory ("sd19db")
 
 # Enable Hot Reload for MSVC compilers if supported.
 if (POLICY CMP0141)
