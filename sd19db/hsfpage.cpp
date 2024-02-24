@@ -34,8 +34,10 @@ namespace sdb19db
 
 		const std::string sql = R"SQL(
 			CREATE TABLE "hsf_page" (
-				"id"			INTEGER NOT NULL,
-				"ihead_id"		INTEGER NOT NULL,
+				"id"				INTEGER NOT NULL,
+				"ihead_id"			INTEGER NOT NULL,
+				"writer_num"		INTEGER NOT NULL,
+				"template_num"		INTEGER NOT NULL,
 				FOREIGN KEY (ihead_id) REFERENCES ihead (id),
 				PRIMARY KEY("id" AUTOINCREMENT)
 			);
@@ -54,7 +56,7 @@ namespace sdb19db
 
 	int HsfPage::Insert(const tables::hsfpage& table) const {
 		const std::string sql = R"SQL(
-			INSERT INTO hsf_page(ihead_id) VALUES (?);
+			INSERT INTO hsf_page(ihead_id,writer_num,template_num) VALUES (?,?,?);
 		)SQL";
 
 		sqlite3_stmt* stmt = nullptr;
@@ -64,6 +66,14 @@ namespace sdb19db
 			exit(1);
 		}
 		if (SQLITE_OK != sqlite3_bind_int(stmt, 1, table.ihead_id)) {
+			std::cerr << "yo2";
+			exit(1);
+		}
+		if (SQLITE_OK != sqlite3_bind_int(stmt, 2, table.writer_num)) {
+			std::cerr << "yo2";
+			exit(1);
+		}
+		if (SQLITE_OK != sqlite3_bind_int(stmt, 3, table.template_num)) {
 			std::cerr << "yo2";
 			exit(1);
 		}

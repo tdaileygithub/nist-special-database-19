@@ -3,6 +3,7 @@
 #include <cassert>
 #include <iostream>
 #include <memory>
+#include <stdlib.h>
 #include <string>
 
 #include "toojpeg/toojpeg.h"
@@ -63,6 +64,8 @@ TEST_CASE("toojpeg create file")
 
 TEST_CASE("ihead and hsfpage - can insert 100 rows")
 {
+    srand(time(NULL));
+
     using namespace sdb19db;
 
     std::remove("db.db3");
@@ -82,6 +85,8 @@ TEST_CASE("ihead and hsfpage - can insert 100 rows")
         
         tables::hsfpage hsfpage_row;
         hsfpage_row.ihead_id = ihead_id;
+        hsfpage_row.writer_num   = rand() % 4169 + 1;
+        hsfpage_row.template_num = rand() % 10 + 1;
 
         const int hsfpage_id = dbm.Insert(hsfpage_row);
         CHECK((i + 1) == hsfpage_id);
