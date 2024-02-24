@@ -4,6 +4,8 @@ target_sources(showmis PRIVATE
 	ihead.h
 	ihead.cpp
 	idbrepository.h
+	hsfpage.h
+	hsfpage.cpp
 )
 
 target_sources(sd19test PRIVATE 
@@ -12,4 +14,6 @@ target_sources(sd19test PRIVATE
 	ihead.h
 	ihead.cpp
 	idbrepository.h
+	hsfpage.h
+	hsfpage.cpp
 )

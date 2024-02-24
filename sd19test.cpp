@@ -61,7 +61,7 @@ TEST_CASE("toojpeg create file")
     delete[] image;
 }
 
-TEST_CASE("ihead table - can insert 100 rows")
+TEST_CASE("ihead and hsfpage - can insert 100 rows")
 {
     using namespace sdb19db;
 
@@ -72,12 +72,18 @@ TEST_CASE("ihead table - can insert 100 rows")
 
     for (int i = 0; i < 100; i++)
     {
-        tables::ihead data;        
-        data.created    = "hello";
-        data.par_x      = 2;
-        data.parent     = "asdfadsf";
+        tables::ihead ihead_row;        
+        ihead_row.created    = "hello";
+        ihead_row.par_x      = 2;
+        ihead_row.parent     = "asdfadsf";
+        
+        const int ihead_id = dbm.Insert(ihead_row);        
+        CHECK((i+1) == ihead_id);
+        
+        tables::hsfpage hsfpage_row;
+        hsfpage_row.ihead_id = ihead_id;
 
-        //check the auto pk id
-        CHECK((i+1) == dbm.Insert(data));
+        const int hsfpage_id = dbm.Insert(hsfpage_row);
+        CHECK((i + 1) == hsfpage_id);
     }
 }

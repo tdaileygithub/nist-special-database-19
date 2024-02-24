@@ -32,10 +32,6 @@ namespace sdb19db
 	class IHead : public IDbRepository<tables::ihead>
 	{
 	public:
-		int _a = 2;
-		//IHead(const IHead&) = default;
-		//IHead& operator=(const IHead&) = default;
-
 		~IHead() {}
 		IHead(const std::string& dbname) : IDbRepository(dbname) {}
 
