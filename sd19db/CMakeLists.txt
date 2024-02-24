@@ -1,9 +1,15 @@
 target_sources(showmis PRIVATE 
-	sd19db.h
-	sd19db.cpp
+	dbmanager.h
+	dbmanager.cpp
+	ihead.h
+	ihead.cpp
+	idbrepository.h
 )
 
 target_sources(sd19test PRIVATE 
-	sd19db.h
-	sd19db.cpp
+	dbmanager.h
+	dbmanager.cpp
+	ihead.h
+	ihead.cpp
+	idbrepository.h
 )

@@ -4,15 +4,12 @@
 #include <iostream>
 #include <memory>
 #include <string>
-#include <vector>
 
 #include "toojpeg/toojpeg.h"
 
 #include "doctest/doctest.h"
 
-#include "sqlite3/sqlite3.h"
-
-#include "sd19db/sd19db.h"
+#include "sd19db/dbmanager.h"
 
 int factorial(int number) { return number <= 1 ? number : factorial(number - 1) * number; }
 
@@ -64,15 +61,23 @@ TEST_CASE("toojpeg create file")
     delete[] image;
 }
 
-TEST_CASE("zz")
+TEST_CASE("ihead table - can insert 100 rows")
 {
     using namespace sdb19db;
-    tables::ihead data;
-    data.id = 2;
 
-    IHead tbl(std::string_view{"db.db3"});
-    auto a = tbl.Insert(data);
+    std::remove("db.db3");
+    DbManager dbm("db.db3");
 
-    CHECK(a == 10);
+    dbm.Setup();
 
+    for (int i = 0; i < 100; i++)
+    {
+        tables::ihead data;        
+        data.created    = "hello";
+        data.par_x      = 2;
+        data.parent     = "asdfadsf";
+
+        //check the auto pk id
+        CHECK((i+1) == dbm.Insert(data));
+    }
 }
