@@ -30,3 +30,9 @@ typedef	unsigned long	u_long;
 #ifndef howmany
 #define	howmany(x, y)	(((x)+((y)-1))/(y))
 #endif
+
+#ifdef STAN
+#define Fatal(s)	fatalerr(s)
+#else
+#define Fatal(s)	fatalerr((s),(char *)NULL,(char *)NULL)
+#endif

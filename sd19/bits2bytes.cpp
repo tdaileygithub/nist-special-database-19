@@ -4,21 +4,11 @@
 */
 
 /* LINTLIBRARY */
-
 #include <stdio.h>
-#include "defs.h"
-//#include <sys/param.h>
-//#include <sys/types.h>
 
 #include "bits2bytes.h"
+#include "defs.h"
 #include "fatalerr.h"
-
-
-#ifdef STAN
-#define Fatal(s)	fatalerr(s)
-#else
-#define Fatal(s)	fatalerr((s),(char *)NULL,(char *)NULL)
-#endif
 
 void bits2bytes(u_char* p, u_char* q, unsigned int pixels)
 {

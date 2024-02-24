@@ -28,18 +28,18 @@
 /************************************************************/
 int find_first_thresh_forward(int* dat, int start, int datlen, int thresh, int* index, int* value)
 {
-    int i;
+	int i;
 
-    *value = -1;
-    *index = -1;
-    for (i = start; i < datlen; i++) {
-        if (dat[i] > thresh) {
-            *index = i;
-            *value = dat[i];
-            return(TRUE);
-        }
-    }
-    return(FALSE);
+	*value = -1;
+	*index = -1;
+	for (i = start; i < datlen; i++) {
+		if (dat[i] > thresh) {
+			*index = i;
+			*value = dat[i];
+			return(TRUE);
+		}
+	}
+	return(FALSE);
 }
 /************************************************************/
 /*         Routine:   Find_First_Thresh_Backward()          */
@@ -51,18 +51,18 @@ int find_first_thresh_forward(int* dat, int start, int datlen, int thresh, int* 
 /* value of 'thresh'starting at index 'datlen' and searching */
 /* backward up to 'start'.                                  */
 /************************************************************/
-int find_first_thresh_backward(int* dat, int start,int datlen,int thresh,int* index,int* value)
+int find_first_thresh_backward(int* dat, int start, int datlen, int thresh, int* index, int* value)
 {
-    int i;
+	int i;
 
-    *value = -1;
-    *index = -1;
-    for (i = datlen - 1; i > start; i--) {
-        if (dat[i] > thresh) {
-            *index = i;
-            *value = dat[i];
-            return(TRUE);
-        }
-    }
-    return(FALSE);
+	*value = -1;
+	*index = -1;
+	for (i = datlen - 1; i > start; i--) {
+		if (dat[i] > thresh) {
+			*index = i;
+			*value = dat[i];
+			return(TRUE);
+		}
+	}
+	return(FALSE);
 }

@@ -8,18 +8,15 @@
 /*         Author:    Michael D. Garris                     */
 /*         Date:      6/04/90                               */
 /************************************************************/
-#include <stdio.h>
-#include <string.h>
-#include <sys/types.h>
 #include <cassert>
 #include <cstring>
 #include <ctime>
 #include <iostream>
-
-//#include <sys/time.h>
+#include <stdio.h>
+#include <string.h>
+#include <sys/types.h>
 
 #include "time.h"
-
 
 /************************************************************/
 /* Current_Time() gets the time of day from the system and  */
@@ -35,12 +32,4 @@ char* current_time()
 
 	*(buffer + strlen(buffer) - 1) = '\0';
 	return(buffer);
-
-	//long tm;
-	//char* dptr;
-
-	//tm = time((long*)NULL);
-	//dptr = (char*)ctime(&tm);
-	//*(dptr + strlen(dptr) - 1) = '\0';
-	//return(dptr);
 }

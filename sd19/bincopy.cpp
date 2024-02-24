@@ -927,7 +927,7 @@ void binary_subimage_copy_eq(
 	u_char* dst, int dstw, int dsth,
 	int srcx, int srcy,
 	int cpw, int cph,
-	int dstx, int dsty)	
+	int dstx, int dsty)
 {
 	int i, j, i_inv, j_inv, cpbw, srcbw, dstbw, dx, dy;
 	u_char m0, m1, m2;

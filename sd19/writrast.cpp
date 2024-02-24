@@ -9,15 +9,15 @@
 /*                                                          */
 /*         Contents:  writeihdrfile()                       */
 /************************************************************/
-#include <stdio.h>
 #include <cstdlib>
+#include <stdio.h>
 
-#include "writrast.h"
-#include "syserr.h"
 #include "fatalerr.h"
-#include "imagutil.h"
-#include "writhdr.h"
 #include "grp4comp.h"
+#include "imagutil.h"
+#include "syserr.h"
+#include "writhdr.h"
+#include "writrast.h"
 
 /************************************************************/
 /*         Routine:   Writeihdrfile()                       */

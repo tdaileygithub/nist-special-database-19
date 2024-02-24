@@ -33,10 +33,6 @@
 *		crash_c()				  	    *
 *								    *
 ********************************************************************/
-
-//#ifdef TIME
-//#include <sys/time.h>
-//#endif
 #include <memory.h>
 #include <cstdlib>
 
@@ -47,17 +43,11 @@
 #define ALLOC	1
 int comp_alloc_flag = ALLOC;
 int comp_write_init_flag;
-//#ifdef TIME
-//struct timeval  t1, t2;
-//struct timezone tz;
-//#endif
 
 //#define Debug 1
 
 static FILE* bit_map_file;
 static FILE* compressed_file;
-
-
 
 /***********************************************************************
 *   grp4comp is the main routine of this file.  It does pre-           *
@@ -858,7 +848,7 @@ static const char* white_terminating_code[64] =
 };/* end array of white terminating code */
 
 
-static const char* black_terminating_code[64] = 
+static const char* black_terminating_code[64] =
 {
 	"0000110111",
 	"010",

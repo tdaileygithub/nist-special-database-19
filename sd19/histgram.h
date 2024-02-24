@@ -6,7 +6,7 @@
 #define BITLUT		"bitcount.lut"
 #define LUTLEN		256
 
-void compute_hist(unsigned char* data, int width, int height,int orient, int** bins, int* len);
+void compute_hist(unsigned char* data, int width, int height, int orient, int** bins, int* len);
 
 void compute_x_hist(unsigned char* data, int width, int height, int** bins, int* len);
 

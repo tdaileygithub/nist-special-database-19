@@ -16,28 +16,28 @@
 #include <stdio.h>
 #include <string.h>
 
-#include "newext.h"
 #include "fatalerr.h"
+#include "newext.h"
 
-void newext(char* file, int len,char* ext)
+void newext(char* file, int len, char* ext)
 {
-    char* cptr;
+	char* cptr;
 
-    cptr = file + strlen(file);
-    while ((cptr != file) && (*cptr != '.'))
-        cptr--;
-    if (cptr == file) {
-        if (strlen(file) == len)
-            fatalerr("newext", "File manipulation exceeds allocated memory", NULL);
-        cptr += strlen(file);
-        *cptr++ = '.';
-        *cptr = NULL;
-    }
-    else {
-        cptr++;
-        *cptr = NULL;
-    }
-    if ((strlen(file) + strlen(ext)) > len)
-        fatalerr("newext", "File manipulation exceeds allocated memory", NULL);
-    strcat(file, ext);
+	cptr = file + strlen(file);
+	while ((cptr != file) && (*cptr != '.'))
+		cptr--;
+	if (cptr == file) {
+		if (strlen(file) == len)
+			fatalerr("newext", "File manipulation exceeds allocated memory", NULL);
+		cptr += strlen(file);
+		*cptr++ = '.';
+		*cptr = NULL;
+	}
+	else {
+		cptr++;
+		*cptr = NULL;
+	}
+	if ((strlen(file) + strlen(ext)) > len)
+		fatalerr("newext", "File manipulation exceeds allocated memory", NULL);
+	strcat(file, ext);
 }

@@ -1,6 +1,3 @@
-//#include <values.h>
-//#include <sys/types.h>
-
 #include "defs.h"
 
 u_char mask_begin_1[BITSPERBYTE] = {

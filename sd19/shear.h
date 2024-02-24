@@ -1,6 +1,5 @@
 #pragma once
 
-#include "ihead.h"
 #include "mis.h"
 
 void shear_mis(MIS** smis, float** sfctr, MIS* imis);

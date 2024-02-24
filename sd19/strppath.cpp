@@ -15,12 +15,12 @@
 
 void strippath(char* imagefile, char** fptr)
 {
-    char* ptr;
+	char* ptr;
 
-    ptr = (char*)(imagefile + strlen(imagefile));
-    while ((ptr != imagefile) && (*ptr != '/'))
-        ptr--;
-    if (*ptr == '/')
-        ptr++;
-    *fptr = ptr;
+	ptr = (char*)(imagefile + strlen(imagefile));
+	while ((ptr != imagefile) && (*ptr != '/'))
+		ptr--;
+	if (*ptr == '/')
+		ptr++;
+	*fptr = ptr;
 }

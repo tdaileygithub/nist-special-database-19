@@ -15,14 +15,14 @@
 /*                    PixPerByte()                          */
 /*                    SizeFromDepth()                       */
 /************************************************************/
-#include <stdio.h>
-#include <memory.h>
-#include <math.h>
 #include <cstdlib>
+#include <math.h>
+#include <memory.h>
+#include <stdio.h>
 
 #include "fatalerr.h"
-#include "syserr.h"
 #include "imagutil.h"
+#include "syserr.h"
 
 /************************************************************/
 /*         Routine:   PixPerByte()                          */
@@ -38,33 +38,33 @@
 /************************************************************/
 float PixPerByte(int depth)
 {
-    float pixperbyte;
+	float pixperbyte;
 
-    switch (depth) {
-    case 1:
-        pixperbyte = 8.0;
-        break;
-    case 2:
-        pixperbyte = 4.0;
-        break;
-    case 4:
-        pixperbyte = 2.0;
-        break;
-    case 8:
-        pixperbyte = 1.0;
-        break;
-    case 16:
-        pixperbyte = 0.5;
-        break;
-    case 32:
-        pixperbyte = 0.25;
-        break;
-    default:
-        fatalerr("PixPerByte",
-            "depth is not a power of 2 between 1 and 32 (inclusive)",
-            NULL);
-    }
-    return pixperbyte;
+	switch (depth) {
+	case 1:
+		pixperbyte = 8.0;
+		break;
+	case 2:
+		pixperbyte = 4.0;
+		break;
+	case 4:
+		pixperbyte = 2.0;
+		break;
+	case 8:
+		pixperbyte = 1.0;
+		break;
+	case 16:
+		pixperbyte = 0.5;
+		break;
+	case 32:
+		pixperbyte = 0.25;
+		break;
+	default:
+		fatalerr("PixPerByte",
+			"depth is not a power of 2 between 1 and 32 (inclusive)",
+			NULL);
+	}
+	return pixperbyte;
 }
 
 /************************************************************/
@@ -83,12 +83,12 @@ float PixPerByte(int depth)
 /************************************************************/
 int SizeFromDepth(int pixwidth, int pixheight, int depth)
 {
-    int filesize;
-    float pixperbyte;//, PixPerByte();
+	int filesize;
+	float pixperbyte;//, PixPerByte();
 
-    pixperbyte = PixPerByte(depth);
-    filesize = ((int)ceil(pixwidth / pixperbyte) * pixheight);
-    return filesize;
+	pixperbyte = PixPerByte(depth);
+	filesize = ((int)ceil(pixwidth / pixperbyte) * pixheight);
+	return filesize;
 }
 
 /************************************************************/
@@ -105,24 +105,24 @@ int SizeFromDepth(int pixwidth, int pixheight, int depth)
 
 unsigned char* allocate_image(int width, int height, int depth)
 {
-    char error[2048];
-    unsigned char* image = NULL;
+	char error[2048];
+	unsigned char* image = NULL;
 
-    if (width < 1) {
-        sprintf(error, "width = %d", width);
-        fatalerr("allocate_image", "Invalid dimension", error);
-    }
-    if (height < 1) {
-        sprintf(error, "height = %d", height);
-        fatalerr("allocate_image", "Invalid dimension", error);
-    }
-    if (depth < 1) {
-        sprintf(error, "depth = %d", depth);
-        fatalerr("allocate_image", "Invalid dimension", error);
-    }
-    if ((image = (unsigned char*)calloc(SizeFromDepth(width, height, depth),
-        sizeof(unsigned char))) == NULL)
-        syserr("allocate_image", "calloc", "image");
-    return(image);
+	if (width < 1) {
+		sprintf(error, "width = %d", width);
+		fatalerr("allocate_image", "Invalid dimension", error);
+	}
+	if (height < 1) {
+		sprintf(error, "height = %d", height);
+		fatalerr("allocate_image", "Invalid dimension", error);
+	}
+	if (depth < 1) {
+		sprintf(error, "depth = %d", depth);
+		fatalerr("allocate_image", "Invalid dimension", error);
+	}
+	if ((image = (unsigned char*)calloc(SizeFromDepth(width, height, depth),
+		sizeof(unsigned char))) == NULL)
+		syserr("allocate_image", "calloc", "image");
+	return(image);
 }
 

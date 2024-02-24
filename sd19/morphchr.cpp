@@ -12,7 +12,6 @@
 # proc: get_west8  - return value of char image pixel 1 left  of current pixel
 # proc:              if defined else return (char)0
 */
-
 #include <memory.h>
 
 #include "morphchr.h"
@@ -27,27 +26,27 @@
 
 void erode_charimage(char* inp, char* out, int iw, int ih)
 {
-    int row, col;
-    char* itr = inp, * otr = out;
+	int row, col;
+	char* itr = inp, * otr = out;
 
-    memcpy(out, inp, iw * ih);
+	memcpy(out, inp, iw * ih);
 
-    /* for true pixels. kill pixel if there is at least one false neighbor */
-    for (row = 0; row < ih; row++)
-        for (col = 0; col < iw; col++)
-        {
-            if (*itr)      /* erode only operates on true pixels */
-            {
-                /* more efficient with C's left to right evaluation of     */
-                /* conjuctions. E N S functions not executed if W is false */
-                if (!(get_west8(itr, col) &&
-                    get_east8(itr, col, iw) &&
-                    get_north8(itr, row, iw) &&
-                    get_south8(itr, row, iw, ih)))
-                    *otr = 0;
-            }
-            itr++; otr++;
-        }
+	/* for true pixels. kill pixel if there is at least one false neighbor */
+	for (row = 0; row < ih; row++)
+		for (col = 0; col < iw; col++)
+		{
+			if (*itr)      /* erode only operates on true pixels */
+			{
+				/* more efficient with C's left to right evaluation of     */
+				/* conjuctions. E N S functions not executed if W is false */
+				if (!(get_west8(itr, col) &&
+					get_east8(itr, col, iw) &&
+					get_north8(itr, row, iw) &&
+					get_south8(itr, row, iw, ih)))
+					*otr = 0;
+			}
+			itr++; otr++;
+		}
 }
 
 /******************************************************************/
@@ -58,29 +57,29 @@ void erode_charimage(char* inp, char* out, int iw, int ih)
 /* and out point to iw*ih bytes                                   */
 /******************************************************************/
 
-void dilate_charimage(char* inp, char* out,int iw,int ih)
+void dilate_charimage(char* inp, char* out, int iw, int ih)
 {
-    int row, col;
-    char* itr = inp, * otr = out;
+	int row, col;
+	char* itr = inp, * otr = out;
 
-    memcpy(out, inp, iw * ih);
+	memcpy(out, inp, iw * ih);
 
-    /* for all pixels. set pixel if there is at least one true neighbor */
-    for (row = 0; row < ih; row++)
-        for (col = 0; col < iw; col++)
-        {
-            if (!*itr)     /* pixel is already true, neighbors irrelevant */
-            {
-                /* more efficient with C's left to right evaluation of     */
-                /* conjuctions. E N S functions not executed if W is false */
-                if (get_west8(itr, col) ||
-                    get_east8(itr, col, iw) ||
-                    get_north8(itr, row, iw) ||
-                    get_south8(itr, row, iw, ih))
-                    *otr = 1;
-            }
-            itr++; otr++;
-        }
+	/* for all pixels. set pixel if there is at least one true neighbor */
+	for (row = 0; row < ih; row++)
+		for (col = 0; col < iw; col++)
+		{
+			if (!*itr)     /* pixel is already true, neighbors irrelevant */
+			{
+				/* more efficient with C's left to right evaluation of     */
+				/* conjuctions. E N S functions not executed if W is false */
+				if (get_west8(itr, col) ||
+					get_east8(itr, col, iw) ||
+					get_north8(itr, row, iw) ||
+					get_south8(itr, row, iw, ih))
+					*otr = 1;
+			}
+			itr++; otr++;
+		}
 }
 
 /************************************************************************/
@@ -91,34 +90,34 @@ void dilate_charimage(char* inp, char* out,int iw,int ih)
 /* in the image. 							*/
 /************************************************************************/
 
-char get_south8(char* ptr, int row, int iw,int ih)
+char get_south8(char* ptr, int row, int iw, int ih)
 {
-    if (row >= ih - 1) /* catch case where image is undefined southwards   */
-        return 0;     /* use plane geometry and return false.             */
+	if (row >= ih - 1) /* catch case where image is undefined southwards   */
+		return 0;     /* use plane geometry and return false.             */
 
-    return *(ptr + iw);
+	return *(ptr + iw);
 }
 
-char get_north8(char* ptr,int row,int iw)
+char get_north8(char* ptr, int row, int iw)
 {
-    if (row < 1)     /* catch case where image is undefined northwards   */
-        return 0;     /* use plane geometry and return false.             */
+	if (row < 1)     /* catch case where image is undefined northwards   */
+		return 0;     /* use plane geometry and return false.             */
 
-    return *(ptr - iw);
+	return *(ptr - iw);
 }
 
 char get_east8(char* ptr, int col, int iw)
 {
-    if (col >= iw - 1) /* catch case where image is undefined eastwards    */
-        return 0;     /* use plane geometry and return false.             */
+	if (col >= iw - 1) /* catch case where image is undefined eastwards    */
+		return 0;     /* use plane geometry and return false.             */
 
-    return *(ptr + 1);
+	return *(ptr + 1);
 }
 
-char get_west8(char* ptr,int col)
+char get_west8(char* ptr, int col)
 {
-    if (col < 1)     /* catch case where image is undefined westwards     */
-        return 0;     /* use plane geometry and return false.              */
+	if (col < 1)     /* catch case where image is undefined westwards     */
+		return 0;     /* use plane geometry and return false.              */
 
-    return *(ptr - 1);
+	return *(ptr - 1);
 }

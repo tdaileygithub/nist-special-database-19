@@ -3,8 +3,9 @@
 # proc:            message to stderr and exits with a status of 1.
 */
 
-#include <stdio.h>
 #include <cstdlib>
+#include <stdio.h>
+
 #include "fatalerr.h"
 
 void fatalerr(const char* s1, const char* s2, const char* s3)

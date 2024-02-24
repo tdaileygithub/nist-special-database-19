@@ -343,7 +343,7 @@ void swap_the_reference_and_coding_lines(struct parameters* params)
 
 		forces the program to crash and create a core file
 
-******************************************************************************/	
+******************************************************************************/
 void crash_d()
 {
 	FILE* crash_program = NULL;
@@ -519,7 +519,7 @@ void pass_mode_d(struct parameters* params)
 			decompress a vertical mode code
 
 ******************************************************************************/
-void vertical_mode_d(struct parameters* params,short offset)
+void vertical_mode_d(struct parameters* params, short offset)
 {
 	short run_length;
 
@@ -689,7 +689,7 @@ void prepare_to_write_bits_d(char* output_pointer, short bytes_per_line)
   writes a number of bits of the same color to the memory buffer that holds
   the decompressed image.
 
-******************************************************************************/	
+******************************************************************************/
 void write_bits_d(unsigned short length, unsigned short color)
 {
 	static unsigned short	 write_on_this_bit = 0;
@@ -783,7 +783,7 @@ static char	read_bit_mask[Pixels_per_byte] =
 
 		 initialize a local, static variable, input_area
 
-******************************************************************************/	
+******************************************************************************/
 void prepare_to_read_bits(char* input_pointer)
 {
 	input_area = input_pointer;
@@ -1288,14 +1288,14 @@ struct node white_tree[] =
 		finds the length of the run in the compressed image
 		by traversing the above declared tree of run length codes.
 
-******************************************************************************/	
+******************************************************************************/
 short find_run_length_code(short unsigned color)
 {
 	if (color == White)
 		node_ptr = white_tree; /* point to root node */
 	else
 		node_ptr = black_tree; /* point to root node */
-	
+
 	while (node_ptr->value == Invalid) {  /* -1 */
 		if ((read_bit()) == 0)
 			node_ptr = node_ptr->child_zero;

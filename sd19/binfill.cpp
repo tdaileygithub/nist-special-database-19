@@ -71,7 +71,7 @@ void binary_fill_partial(int op, u_char* src, int i, u_char* dst, int j, int  bi
 			break;
 
 		default:
-			fatalerr("binary_fill_partial","", "bad operator");
+			fatalerr("binary_fill_partial", "", "bad operator");
 		} /* SWITCH */
 	} /* FOR */
 

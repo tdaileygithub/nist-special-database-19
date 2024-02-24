@@ -2,7 +2,6 @@
 # proc: writeihdr - writes the contents of an IHead structure to an open
 # proc:             file pointer.
 */
-
 #include <stdio.h>
 
 #include "writhdr.h"
@@ -18,15 +17,15 @@
 /************************************************************/
 void writeihdr(FILE* fp, IHEAD* ihead)
 {
-    int i;
-    char lenstr[SHORT_CHARS];
+	int i;
+	char lenstr[SHORT_CHARS];
 
-    for (i = 0; i < SHORT_CHARS; i++)
-        lenstr[i] = '\0';
-    /* creates a string from of header size */
-    sprintf(lenstr, "%d", sizeof(IHEAD));
-    /* writes the length string in headerto the file */
-    fwrite(lenstr, sizeof(char), SHORT_CHARS, fp);
-    /* writes the given header to the file */
-    fwrite(ihead, sizeof(IHEAD), 1, fp);
+	for (i = 0; i < SHORT_CHARS; i++)
+		lenstr[i] = '\0';
+	/* creates a string from of header size */
+	sprintf(lenstr, "%d", sizeof(IHEAD));
+	/* writes the length string in headerto the file */
+	fwrite(lenstr, sizeof(char), SHORT_CHARS, fp);
+	/* writes the given header to the file */
+	fwrite(ihead, sizeof(IHEAD), 1, fp);
 }

@@ -1,6 +1,5 @@
 #pragma once
 
-#include "ihead.h"
 #include "mis.h"
 
 #define NORM_W 32

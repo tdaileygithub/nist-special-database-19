@@ -3,14 +3,13 @@
 # proc:                a binary bitmap based on histograms and thresholds.
 */
 
-#include <stdio.h>
+#include <cstdlib>
 #include <math.h>
 #include <memory.h>
-#include <cstdlib>
+#include <stdio.h>
 
 #include "corners.h"
 #include "defs.h"
-
 #include "histgram.h"
 #include "thres.h"
 
@@ -23,7 +22,7 @@
 
 /* find corners of region. returns top left x and y and object w and h */
 
-void find_corners(int* tlx, int* tly, int* objw, int* objh, unsigned char* src_image, int width,int height, int thresh)
+void find_corners(int* tlx, int* tly, int* objw, int* objh, unsigned char* src_image, int width, int height, int thresh)
 {
 	int* xbins = NULL, num_x_bins = 0;
 	int* ybins = NULL, num_y_bins = 0;
