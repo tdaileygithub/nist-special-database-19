@@ -10,7 +10,13 @@ add_compile_definitions(SQLITE_DEFAULT_AUTOVACUUM=1)
 add_compile_definitions(SQLITE_DEFAULT_FOREIGN_KEYS=1)
 
 target_sources(showmis PRIVATE 
-sqlite3.h 
-sqlite3.c 
-sqlite3ext.h
+	sqlite3.h 
+	sqlite3.c 
+	sqlite3ext.h
+)
+
+target_sources(sd19test PRIVATE 
+	sqlite3.h 
+	sqlite3.c 
+	sqlite3ext.h
 )
