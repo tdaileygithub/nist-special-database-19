@@ -1,23 +1,4 @@
-﻿#include_directories(${CMAKE_SOURCE_DIR}/sqlite3) 
-#add_library(sqlite3 STATIC sqlite3/sqlite3.c sqlite3/sqlite3.h sqlite3/sqlite3ext.h)
-#add_executable(sqlite sqlite3/sqlite3.c sqlite3/shell.c sqlite3/sqlite3.h sqlite3/sqlite3ext.h)
-#set_target_properties(sqlite PROPERTIES OUTPUT_NAME sqlite3)
-
-add_definitions(-DSQLITE_ENABLE_RTREE)
-add_definitions(-DSQLITE_ENABLE_FTS4)
-add_definitions(-DSQLITE_ENABLE_FTS5)
-add_definitions(-DSQLITE_ENABLE_JSON1)
-add_definitions(-DSQLITE_ENABLE_RBU)
-add_definitions(-DSQLITE_ENABLE_STAT4)
-
-# Uncomment this for single-threaded variant (faster)
-add_definitions(-DSQLITE_THREADSAFE=0)
-
-# Add source to this project's executable.
-add_executable (
-showmis
-"showmis.cpp" 
-
+﻿target_sources(showmis PRIVATE 
 "ihead.h" 
 "mis.h" 
 "fatalerr.cpp" 
@@ -51,13 +32,6 @@ showmis
  "nullihdr.h" "strppath.cpp" "strppath.h" "bincopy.cpp" "bincopy.h" "bitmasks.h" "bitmasks.cpp" "morphchr.cpp" "morphchr.h" "zoom.cpp" "zoom.h" 
  "imageops.cpp" "imageops.h" "char2bin.cpp" "char2bin.h" "masks.cpp" "masks.h" "bits.h" "binops.h" "binfill.cpp" "binfill.h" "chrpixel.cpp" 
  "chrpixel.h" "corners.cpp" "corners.h" "histgram.cpp" "histgram.h" "thres.cpp" "thres.h" "newext.cpp" "newext.h" "writemis.cpp" "writemis.h" "writrast.cpp" "writrast.h" "writhdr.cpp" "writhdr.h" "grp4comp.h" "grp4comp.cpp" "shear.cpp" "shear.h"
-
- "toojpeg.cpp"
- "toojpeg.h"
-
- "sqlite3.c"  
- "sqlite3.h" 
- "sqlite3ext.h"
   ) 
     
 if (CMAKE_VERSION VERSION_GREATER 3.12)
