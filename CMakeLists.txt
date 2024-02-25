@@ -4,6 +4,8 @@
 cmake_minimum_required(VERSION 3.13.0)
 project(sd19)
 
+option(DR_MEMORY_LEAK_CHECK "Dr Memory Leak Check Build" OFF)
+
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_FLAGS "-Wall") 
 
@@ -12,6 +14,13 @@ target_sources(showmis PRIVATE "showmis.cpp"  )
 
 add_executable(sd19test)
 target_sources(sd19test PRIVATE "sd19test.cpp" )
+
+if(DR_MEMORY_LEAK_CHECK)
+  if(MSVC)
+    target_compile_options(sd19test PUBLIC /Zi /MT /EHsc /Oy- /Ob0 )
+    target_compile_options(showmis  PUBLIC /Zi /MT /EHsc /Oy- /Ob0 )
+  endif()
+endif()
 
 # Include sub-projects.
 add_subdirectory ("sd19")

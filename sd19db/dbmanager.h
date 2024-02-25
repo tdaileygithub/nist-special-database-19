@@ -3,10 +3,8 @@
 #include <memory>
 #include <string>
 
-#include "../sqlite3/sqlite3.h"
-
-#include "ihead.h"
 #include "hsfpage.h"
+#include "ihead.h"
 
 namespace sdb19db
 {
