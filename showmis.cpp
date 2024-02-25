@@ -32,7 +32,7 @@ using namespace std;
 
 void show_mis(char*);
 
-std::ofstream myFile; 
+std::ofstream temporaryJpegOfStream; 
 
 int main()
 {
@@ -43,7 +43,7 @@ int main()
 }
 void myOutput(unsigned char byte)
 {
-	myFile << byte;
+	temporaryJpegOfStream << byte;
 }
 
 void mis_to_jpegs(char* misfile)
@@ -150,7 +150,7 @@ void mis_to_jpegs(char* misfile)
 		oss << misfile << "_" << j << ".jpg";
 		//std::string var = oss.str();
 
-		myFile = std::ofstream(oss.str(), std::ios_base::out | std::ios_base::binary);
+		temporaryJpegOfStream = std::ofstream(oss.str(), std::ios_base::out | std::ios_base::binary);
 
 		//auto ok = TooJpeg::writeJpeg(myOutput, image, width, height, isRGB, quality, downsample, comment);
 		//delete[] image;
@@ -250,7 +250,7 @@ void show_mis(char* misfile)
 		oss << (char*)"f0017_07.pct" << ".jpg";
 		//std::string var = oss.str();
 
-		myFile = std::ofstream(oss.str(), std::ios_base::out | std::ios_base::binary);
+		temporaryJpegOfStream = std::ofstream(oss.str(), std::ios_base::out | std::ios_base::binary);
 
 		auto ok = TooJpeg::writeJpeg(myOutput, image, width, height, isRGB, quality, downsample, comment);
 		delete[] image;

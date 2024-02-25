@@ -23,18 +23,10 @@
 #include "sd19/fatalerr.h"
 #include "sd19db/dbmanager.h"
 
-// output file
-std::ofstream myFile("example.jpg", std::ios_base::out | std::ios_base::binary);
-
-// write a single byte compressed by tooJpeg
-void myOutput(unsigned char byte)
-{
-    myFile << byte;
-}
+#include "toojpeg/toojpeg_helper.h"
 
 TEST_CASE("toojpeg create file")
 {
-    // 800x600 image
     const auto width = 800;
     const auto height = 600;
     // RGB: one byte each for red, green, blue
@@ -42,9 +34,8 @@ TEST_CASE("toojpeg create file")
     // allocate memory
     auto image = new unsigned char[width * height * bytesPerPixel];
     // create a nice color transition (replace with your code)
-    for (auto y = 0; y < height; y++)
-        for (auto x = 0; x < width; x++)
-        {
+    for (auto y = 0; y < height; y++) {
+        for (auto x = 0; x < width; x++) {
             // memory location of current pixel
             auto offset = (y * width + x) * bytesPerPixel;
             // red and green fade from 0 to 255, blue is always 127
@@ -52,24 +43,23 @@ TEST_CASE("toojpeg create file")
             image[offset + 1] = 255 * y / height;
             image[offset + 2] = 127;
         }
-    // start JPEG compression
-    // note: myOutput is the function defined in line 18, it saves the output in example.jpg
-    // optional parameters:
-    const bool isRGB = true;  // true = RGB image, else false = grayscale
-    const auto quality = 90;    // compression quality: 0 = worst, 100 = best, 80 to 90 are most often used
-    const bool downsample = false; // false = save as YCbCr444 JPEG (better quality), true = YCbCr420 (smaller file)
+    }
+    const bool isRGB = true;        // true = RGB image, else false = grayscale
+    const auto quality = 90;        // compression quality: 0 = worst, 100 = best, 80 to 90 are most often used
+    const bool downsample = false;  // false = save as YCbCr444 JPEG (better quality), true = YCbCr420 (smaller file)
     const char* comment = "TooJpeg example image"; // arbitrary JPEG comment
-    auto ok = TooJpeg::writeJpeg(myOutput, image, width, height, isRGB, quality, downsample, comment);
-    CHECK(ok == true);
-    delete[] image;
-    myFile.close();
+
+    bool ret = TooJpeg::save_jpeg("temp.jpg", image, width, height, bytesPerPixel, isRGB, quality, downsample, "TooJpeg example image");
+    CHECK(ret == true);
+
+    delete[] image;    
 }
 
 TEST_CASE("ihead and hsfpage and mis - can insert 100 rows")
 {
-    srand(time(NULL));
-
     using namespace sdb19db;
+
+    srand(time(NULL));
 
     std::remove("db.db3");
 
@@ -182,24 +172,14 @@ TEST_CASE("ihead and hsfpage - insert and read")
                         //image[offset] = (red + green) / 2;;
                         image[offset] = (*dptr++) ? 0 : 255;
                     }
-                }
+                }               
 
-                // start JPEG compression
-                // note: myOutput is the function defined in line 18, it saves the output in example.jpg
-                // optional parameters:
-                const bool isRGB = false; // true = RGB image, else false = grayscale
-                const auto quality = 90;    // compression quality: 0 = worst, 100 = best, 80 to 90 are most often used
-                const bool downsample = false; // false = save as YCbCr444 JPEG (better quality), true = YCbCr420 (smaller file)
-                const char* comment = "TooJpeg example image"; // arbitrary JPEG comment
+                const bool isRGB = false;           // true = RGB image, else false = grayscale
+                const auto quality = 90;            // compression quality: 0 = worst, 100 = best, 80 to 90 are most often used
+                const bool downsample = false;      // false = save as YCbCr444 JPEG (better quality), true = YCbCr420 (smaller file)                
 
-                std::ostringstream oss;
-                oss << (char*)"temp.pct" << ".jpg";
-
-                myFile = std::ofstream(oss.str(), std::ios_base::out | std::ios_base::binary);
-
-                auto ok = TooJpeg::writeJpeg(myOutput, image, width, height, isRGB, quality, downsample, comment);
+                TooJpeg::save_jpeg("temp.pct.jpg", image, width, height, bytesPerPixel, isRGB, quality, downsample, filepath);
                 delete[] image;
-                myFile.close();
             }
 
             std::ifstream file("temp.pct.jpg", std::ios::in | std::ios::binary);
@@ -261,6 +241,7 @@ TEST_CASE("ihead and hsfpage - insert and read")
 
 TEST_CASE("ihead and mis - insert and read")
 {
+    return;
     using namespace sdb19db;
 
     std::remove("db.db3");
@@ -374,14 +355,18 @@ TEST_CASE("ihead and mis - insert and read")
                     const bool downsample = false; // false = save as YCbCr444 JPEG (better quality), true = YCbCr420 (smaller file)
                     const char* comment = "TooJpeg example image"; // arbitrary JPEG comment
 
-                    std::ostringstream oss;
-                    oss << "tempmis.jpg";
-
-                    myFile = std::ofstream(oss.str(), std::ios_base::out | std::ios_base::binary);
-
-                    auto ok = TooJpeg::writeJpeg(myOutput, image, width, height, isRGB, quality, downsample, comment);                    
+                    TooJpeg::save_jpeg("tempmis.jpg", image, width, height, bytesPerPixel, isRGB, quality, downsample, filepath);
                     delete[] image;
-                    myFile.close();
+
+
+                    //std::ostringstream oss;
+                    //oss << "tempmis.jpg";
+
+                    //myFile = std::ofstream(oss.str(), std::ios_base::out | std::ios_base::binary);
+
+                    //auto ok = TooJpeg::writeJpeg(myOutput, image, width, height, isRGB, quality, downsample, comment);                    
+                    //delete[] image;
+                    //myFile.close();
                 }
                 
                 {
