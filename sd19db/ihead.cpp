@@ -65,8 +65,6 @@ namespace sdb19db
 			std::cerr << "Error Create Table" << std::endl;
 			sqlite3_free(messaggeError);
 		}
-		else
-			std::cout << "Table created Successfully" << std::endl;
 
 		return SQLITE_OK;
 	}
@@ -79,73 +77,72 @@ namespace sdb19db
 		sqlite3_stmt* stmt = nullptr;		
 		if (SQLITE_OK != sqlite3_prepare_v2(_dbPtr, sql.c_str(), sql.size(), &stmt, nullptr)) {
 			sqlite3_close(_dbPtr);			
-			return 1;
+			exit(1);
 		}
 		if (SQLITE_OK != sqlite3_bind_text(stmt, 1, table.created.c_str(), table.created.size(), nullptr)) {
-			return 1;
+			exit(1);
 		}
 		if (SQLITE_OK != sqlite3_bind_int(stmt, 2, table.width)) {
-			return 1;
+			exit(1);
 		}
 		if (SQLITE_OK != sqlite3_bind_int(stmt, 3, table.height)) {
-			return 1;
+			exit(1);
 		}
 		if (SQLITE_OK != sqlite3_bind_int(stmt, 4, table.depth)) {
-			return 1;
+			exit(1);
 		}
 		if (SQLITE_OK != sqlite3_bind_int(stmt, 5, table.density)) {
-			return 1;
+			exit(1);
 		}
 		if (SQLITE_OK != sqlite3_bind_int(stmt, 6, table.compress)) {
-			return 1;
+			exit(1);
 		}
 		if (SQLITE_OK != sqlite3_bind_int(stmt, 7, table.complen)) {
-			return 1;
+			exit(1);
 		}
 		if (SQLITE_OK != sqlite3_bind_int(stmt, 8, table.align)) {
-			return 1;
+			exit(1);
 		}
 		if (SQLITE_OK != sqlite3_bind_int(stmt, 9, table.unitsize)) {
-			return 1;
+			exit(1);
 		}
 		if (SQLITE_OK != sqlite3_bind_int(stmt, 10, table.sigbit)) {
-			return 1;
+			exit(1);
 		}
 		if (SQLITE_OK != sqlite3_bind_int(stmt, 11, table.byte_order)) {
-			return 1;
+			exit(1);
 		}
 		if (SQLITE_OK != sqlite3_bind_int(stmt, 12, table.pix_offset)) {
-			return 1;
+			exit(1);
 		}
 		if (SQLITE_OK != sqlite3_bind_int(stmt, 13, table.whitepix)) {
-			return 1;
+			exit(1);
 		}
 		if (SQLITE_OK != sqlite3_bind_int(stmt, 14, table.issigned)) {
-			return 1;
+			exit(1);
 		}
 		if (SQLITE_OK != sqlite3_bind_int(stmt, 15, table.rm_cm)) {
-			return 1;
+			exit(1);
 		}
 		if (SQLITE_OK != sqlite3_bind_int(stmt, 16, table.tb_bt)) {
-			return 1;
+			exit(1);
 		}
 		if (SQLITE_OK != sqlite3_bind_int(stmt, 17, table.lr_rl)) {
-			return 1;
+			exit(1);
 		}
 		if (SQLITE_OK != sqlite3_bind_text(stmt, 18, table.parent.c_str(), table.parent.size(), nullptr)) {
-			return 1;
+			exit(1);
 		}
 		if (SQLITE_OK != sqlite3_bind_int(stmt, 19, table.par_x)) {
-			return 1;
+			exit(1);
 		}
 		if (SQLITE_OK != sqlite3_bind_int(stmt, 20, table.par_y)) {
-			return 1;
+			exit(1);
 		}
 		if (SQLITE_DONE != sqlite3_step(stmt)) {
-			return 1;
+			exit(1);
 		}
 		sqlite3_finalize(stmt);
-		//sqlite3_reset(stmt);
 
 		return LastRowId();
 	}

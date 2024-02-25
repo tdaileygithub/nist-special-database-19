@@ -64,38 +64,27 @@ namespace sdb19db
 
 		sqlite3_stmt* stmt = nullptr;
 		if (SQLITE_OK != sqlite3_prepare_v2(_dbPtr, sql.c_str(), sql.size(), &stmt, nullptr)) {
-			sqlite3_close(_dbPtr);
-			std::cerr << "yo";
 			exit(1);
 		}
 		if (SQLITE_OK != sqlite3_bind_int(stmt, 1, table.hsf_num)) {
-			std::cerr << "yo1";
 			exit(1);
 		}
 		if (SQLITE_OK != sqlite3_bind_int(stmt, 2, table.ihead_id)) {
-			std::cerr << "yo2";
 			exit(1);
 		}
 		if (SQLITE_OK != sqlite3_bind_int(stmt, 3, table.writer_num)) {
-			std::cerr << "yo3";
 			exit(1);
 		}
 		if (SQLITE_OK != sqlite3_bind_int(stmt, 4, table.template_num)) {
-			std::cerr << "yo4";
 			exit(1);
 		}
 		if (SQLITE_OK != sqlite3_bind_blob(stmt, 5, table.buffer, table.buffer_len_bytes, SQLITE_STATIC)) {
-			std::cerr << "yo5";
 			exit(1);
 		}
 		if (SQLITE_DONE != sqlite3_step(stmt)) {
-			std::cerr << "yo6";
 			exit(1);
 		}
-		//std::cerr << "ppp" <<std::endl;
 		sqlite3_finalize(stmt);
-		//std::cerr << "qqq" << std::endl;
-		//sqlite3_reset(stmt);
 		
 		return LastRowId();
 	}
