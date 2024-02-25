@@ -310,6 +310,8 @@ TEST_CASE("ihead and mis - insert and read")
                     // allocate memory
                     auto image = new unsigned char[width * height * bytesPerPixel];
 
+                    //TooJpeg::misdata_to_bwimage(dptr, image, mis->entw, mis->enth, 1);
+
                     for (int k = 0; k < mis->enth; k++)
                     {
                         for (int l = 0; l < mis->entw; l++)
@@ -333,16 +335,6 @@ TEST_CASE("ihead and mis - insert and read")
 
                     TooJpeg::save_jpeg("tempmis.jpg", image, width, height, bytesPerPixel, isRGB, quality, downsample, filepath);
                     delete[] image;
-
-
-                    //std::ostringstream oss;
-                    //oss << "tempmis.jpg";
-
-                    //myFile = std::ofstream(oss.str(), std::ios_base::out | std::ios_base::binary);
-
-                    //auto ok = TooJpeg::writeJpeg(myOutput, image, width, height, isRGB, quality, downsample, comment);                    
-                    //delete[] image;
-                    //myFile.close();
                 }
                 
                 {
