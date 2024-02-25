@@ -39,14 +39,14 @@ namespace TooJpeg
     }
 
 
-    void misdata_to_bwimage(unsigned char* src, unsigned char* dptr, int width, int height, int bytesPerPixel)
+    void misdata_to_bwimage(char* src, unsigned char* dptr, int width, int height, int bytesPerPixel)
     {
         //const auto width = misw;
         //const auto height = mish;
         // Grayscale: one byte per pixel
         //const auto bytesPerPixel = 1;
         // allocate memory
-        auto image = new unsigned char[width * height * bytesPerPixel];
+        //auto image = new unsigned char[width * height * bytesPerPixel];
 
         for (int k = 0; k < height; k++)
         {
@@ -56,7 +56,7 @@ namespace TooJpeg
                 // red and green fade from 0 to 255, blue is always 127
                 auto red = 255 * l / width;
                 auto green = 255 * k / height;                
-                image[offset] = (*dptr++) ? 0 : 255;
+                dptr[offset] = (*src++) ? 0 : 255;
             }
         }
     }

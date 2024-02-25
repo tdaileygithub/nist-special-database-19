@@ -9,7 +9,7 @@ namespace TooJpeg
 
     void write_single_jpeg_byte(unsigned char byte);
 
-    void misdata_to_bwimage(unsigned char* src, unsigned char* dptr, int width, int height, int bytesPerPixel);
+    void misdata_to_bwimage(char* src, unsigned char* dptr, int width, int height, int bytesPerPixel);
 
     bool save_jpeg(
         const std::string filename,

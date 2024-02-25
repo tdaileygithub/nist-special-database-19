@@ -152,33 +152,37 @@ TEST_CASE("ihead and hsfpage - insert and read")
 
             bits2bytes(buf, (u_char*)data8, misw * mish);
 
-            for (dptr = data8, j = 0; j < 1; j++)
-            {
-                const auto width = misw;
-                const auto height = mish;
-                // Grayscale: one byte per pixel
-                const auto bytesPerPixel = 1;
-                // allocate memory
-                auto image = new unsigned char[width * height * bytesPerPixel];
+            auto image = new unsigned char[misw * mish * 1];
+            TooJpeg::misdata_to_bwimage(data8, image, misw, mish, 1);
 
-                for (int k = 0; k < mish; k++)
-                {
-                    for (int l = 0; l < misw; l++)
-                    {
-                        auto offset = (k * width + l) * bytesPerPixel;
-                        // red and green fade from 0 to 255, blue is always 127
-                        auto red = 255 * l / width;
-                        auto green = 255 * k / height;
-                        //image[offset] = (red + green) / 2;;
-                        image[offset] = (*dptr++) ? 0 : 255;
-                    }
-                }               
+            //for (dptr = data8, j = 0; j < 1; j++)
+
+            {
+                //const auto width = misw;
+                //const auto height = mish;
+                //// Grayscale: one byte per pixel
+                //const auto bytesPerPixel = 1;
+                //// allocate memory
+                //auto image = new unsigned char[width * height * bytesPerPixel];
+
+                //for (int k = 0; k < mish; k++)
+                //{
+                //    for (int l = 0; l < misw; l++)
+                //    {
+                //        auto offset = (k * width + l) * bytesPerPixel;
+                //        // red and green fade from 0 to 255, blue is always 127
+                //        auto red = 255 * l / width;
+                //        auto green = 255 * k / height;
+                //        //image[offset] = (red + green) / 2;;
+                //        image[offset] = (*dptr++) ? 0 : 255;
+                //    }
+                //}               
 
                 const bool isRGB = false;           // true = RGB image, else false = grayscale
                 const auto quality = 90;            // compression quality: 0 = worst, 100 = best, 80 to 90 are most often used
                 const bool downsample = false;      // false = save as YCbCr444 JPEG (better quality), true = YCbCr420 (smaller file)                
 
-                TooJpeg::save_jpeg("temp.pct.jpg", image, width, height, bytesPerPixel, isRGB, quality, downsample, filepath);
+                TooJpeg::save_jpeg("temp.pct.jpg", image, misw, mish, 1, isRGB, quality, downsample, filepath);
                 delete[] image;
             }
 
@@ -232,7 +236,7 @@ TEST_CASE("ihead and hsfpage - insert and read")
             free(data8);
             free(head);
 
-            break;
+            //break;
         }
         //break;
     }
