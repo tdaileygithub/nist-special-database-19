@@ -16,13 +16,31 @@ namespace sdb19db
 		};
 	}
 
+
 	class Mis : public IDbRepository<tables::mis>
 	{
 	public:
 		~Mis() {}
-		Mis(const std::string& dbname) : IDbRepository(dbname) {}
-
-		int Create() const;
+		Mis(const std::string& dbname) : 
+			IDbRepository(dbname,
+				R"SQL(
+					CREATE TABLE "mis" (
+						"id"				INTEGER NOT NULL,
+						"hsf_num"			INTEGER NOT NULL,
+						"ihead_id"			INTEGER NOT NULL,
+						"writer_num"		INTEGER NOT NULL,
+						"template_num"		INTEGER NOT NULL,
+						"character"			TEXT NOT NULL,
+						"jpeg"				BLOB NOT NULL,
+						FOREIGN KEY (ihead_id) REFERENCES ihead (id),
+						PRIMARY KEY("id" AUTOINCREMENT)
+					);
+				)SQL",
+				R"SQL(
+					INSERT INTO mis(hsf_num,ihead_id,writer_num,template_num,character,jpeg) VALUES (?,?,?,?,?,?);
+				)SQL")
+		{
+		}		
 		int Insert(const tables::mis& table) const;
 		int LastRowId() const;
 	};

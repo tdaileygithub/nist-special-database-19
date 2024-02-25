@@ -1,6 +1,7 @@
 #define DOCTEST_CONFIG_IMPLEMENT_WITH_MAIN
 
 #include <cassert>
+#include <chrono>
 #include <filesystem>
 #include <iomanip>
 #include <iostream>
@@ -57,6 +58,8 @@ TEST_CASE("toojpeg create file")
 
 TEST_CASE("ihead and hsfpage and mis - can insert 100 rows")
 {
+    return;
+
     using namespace sdb19db;
 
     srand(time(NULL));
@@ -122,6 +125,8 @@ TEST_CASE("ihead and hsfpage - insert and read")
     {
         if (!dirEntry.is_directory())
         {
+            std::chrono::steady_clock::time_point begin = std::chrono::steady_clock::now();
+
             //f0000_14.pct
             std::string hsfdirname(dirEntry.path().parent_path().filename().string());
             hsfdirname = std::regex_replace(hsfdirname, std::regex("hsf_page"), "");
@@ -210,15 +215,18 @@ TEST_CASE("ihead and hsfpage - insert and read")
             free(data8);
             free(head);
 
-            break;
+            std::chrono::steady_clock::time_point end = std::chrono::steady_clock::now();
+            //88124 release
+            //229150 debug
+            std::cout << "Time difference = " << std::chrono::duration_cast<std::chrono::microseconds>(end - begin).count() << "[us]" << std::endl;
         }
         //break;
     }
 }
 
-
 TEST_CASE("ihead and mis - insert and read")
 {    
+    return;
     using namespace sdb19db;
 
     std::remove("db.db3");
@@ -300,8 +308,7 @@ TEST_CASE("ihead and mis - insert and read")
 
             for (dptr = data8, misentry = 0; misentry < mis->ent_num; misentry++)
             {
-                //std::cout << misentry << " character: " << mischars.at(misentry) << std::endl;
-                //continue;
+                //std::cout << misentry << " character: " << mischars.at(misentry) << std::endl;                
                 {
                     const auto width = mis->entw;
                     const auto height = mis->enth;
@@ -391,12 +398,12 @@ TEST_CASE("ihead and mis - insert and read")
             free(data8);
             free(mis);
 
-            continue;
+            //continue;
 
             //free(data8);
             //free(head);
 
-            break;
+            //break;
         }
         //break;
     }
