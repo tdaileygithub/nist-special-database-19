@@ -3,9 +3,6 @@
 namespace sdb19db
 {
 	void DbManager::Setup() {
-		//_ihead->Create();
-		//_hsfpage->Create();
-		//_mis->Create();
 	}
 
 	int DbManager::Insert(const tables::ihead& table) const

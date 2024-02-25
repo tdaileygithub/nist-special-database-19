@@ -16,7 +16,6 @@ namespace sdb19db
 		};
 	}
 
-
 	class Mis : public IDbRepository<tables::mis>
 	{
 	public:
@@ -40,8 +39,8 @@ namespace sdb19db
 					INSERT INTO mis(hsf_num,ihead_id,writer_num,template_num,character,jpeg) VALUES (?,?,?,?,?,?);
 				)SQL")
 		{
-		}		
+		}
+
 		int Insert(const tables::mis& table) const;
-		int LastRowId() const;
 	};
 }

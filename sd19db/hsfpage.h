@@ -39,7 +39,7 @@ namespace sdb19db
 		)
 		{
 		}
+
 		int Insert(const tables::hsfpage& table) const;
-		int LastRowId() const;
 	};
 }

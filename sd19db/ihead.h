@@ -66,8 +66,8 @@ namespace sdb19db
 			)SQL"
 		)
 		{
-		}		
-		int Insert(const tables::ihead& table) const;
-		int LastRowId() const;
+		}
+
+		int Insert(const tables::ihead& table) const;		
 	};
 }
