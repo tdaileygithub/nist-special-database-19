@@ -15,7 +15,6 @@ namespace sdb19db
 			exit(1);
 		}
 		int rc = sqlite3_step(stmt);
-
 		if (rc != SQLITE_ROW && rc != SQLITE_DONE) {
 			std::string errmsg(sqlite3_errmsg(_dbPtr));
 			sqlite3_finalize(stmt);
@@ -27,7 +26,9 @@ namespace sdb19db
 			sqlite3_finalize(stmt);
 			return -1;
 		}
-		return  sqlite3_column_int(stmt, 0);
+		rc = sqlite3_column_int(stmt, 0);
+		sqlite3_finalize(stmt);
+		return rc;
 	}
 
 	int HsfPage::Create() const {

@@ -15,7 +15,6 @@ namespace sdb19db
 			exit(1);			
 		}
 		int rc = sqlite3_step(stmt);
-
 		if (rc != SQLITE_ROW && rc != SQLITE_DONE) {
 			std::string errmsg(sqlite3_errmsg(_dbPtr));
 			sqlite3_finalize(stmt);
@@ -27,7 +26,9 @@ namespace sdb19db
 			sqlite3_finalize(stmt);
 			return -1;
 		}
-		return  sqlite3_column_int(stmt, 0);
+		rc = sqlite3_column_int(stmt, 0);
+		sqlite3_finalize(stmt);
+		return rc;
 	}
 
 	int IHead::Create() const {
@@ -79,7 +80,7 @@ namespace sdb19db
 		if (SQLITE_OK != sqlite3_prepare_v2(_dbPtr, sql.c_str(), sql.size(), &stmt, nullptr)) {
 			sqlite3_close(_dbPtr);			
 			return 1;
-		}		
+		}
 		if (SQLITE_OK != sqlite3_bind_text(stmt, 1, table.created.c_str(), table.created.size(), nullptr)) {
 			return 1;
 		}
@@ -143,7 +144,8 @@ namespace sdb19db
 		if (SQLITE_DONE != sqlite3_step(stmt)) {
 			return 1;
 		}
-		sqlite3_reset(stmt);
+		sqlite3_finalize(stmt);
+		//sqlite3_reset(stmt);
 
 		return LastRowId();
 	}
