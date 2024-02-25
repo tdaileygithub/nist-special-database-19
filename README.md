@@ -2,6 +2,25 @@
 
 NIST Special Database 19 Handprinted Forms and Characters Database
 
+
+# Dr. Memory
+
+https://drmemory.org/page_running.html
+
+Excellent tool for memory leak detection.  Install it and update compile flags.
+
+## MSVC Compile Flags
+
+https://learn.microsoft.com/en-us/cpp/build/reference/z7-zi-zi-debug-information-format?view=msvc-170
+
+```
+/Zi /MT /EHsc /Oy- /Ob0
+```
+
+```cmd
+"C:\Program Files (x86)\Dr. Memory\bin\drmemory.exe" -visual_studio -- C:\Users\tim\Documents\nist-special-database-19\out\build\x64-debug\sd19test.exe
+```
+
 # References
 
 - [Cold Case: the Lost MNIST Digits](docs/NeurIPS-2019-cold-case-the-lost-mnist-digits-Paper.pdf)

@@ -1,9 +1,5 @@
 #define DOCTEST_CONFIG_IMPLEMENT_WITH_MAIN
 
-#define _CRTDBG_MAP_ALLOC
-#include <crtdbg.h>
-#include <stdlib.h>
-
 #include <cassert>
 #include <filesystem>
 #include <iostream>
@@ -23,17 +19,6 @@
 #include "sd19/syserr.h"
 
 #include "sd19db/dbmanager.h"
-
-
-int factorial(int number) { return number <= 1 ? number : factorial(number - 1) * number; }
-
-TEST_CASE("testing the factorial function")
-{
-	CHECK(factorial(1) == 1);
-	CHECK(factorial(2) == 2);
-	CHECK(factorial(3) == 6);
-	CHECK(factorial(10) == 3628800);
-}
 
 // output file
 std::ofstream myFile("example.jpg", std::ios_base::out | std::ios_base::binary);
@@ -75,40 +60,44 @@ TEST_CASE("toojpeg create file")
     delete[] image;
 }
 
-//TEST_CASE("ihead and hsfpage - can insert 100 rows")
-//{
-//    srand(time(NULL));
-//
-//    using namespace sdb19db;
-//
-//    std::remove("db.db3");
-//    DbManager dbm("db.db3");
-//
-//    dbm.Setup();
-//
-//    for (int i = 0; i < 100; i++)
-//    {
-//        tables::ihead ihead_row;
-//        ihead_row.created    = "hello";
-//        ihead_row.par_x      = 2;
-//        ihead_row.parent     = "asdfadsf";
-//        
-//        const int ihead_id = dbm.Insert(ihead_row);        
-//        CHECK((i+1) == ihead_id);
-//        
-//        tables::hsfpage hsfpage_row;
-//        hsfpage_row.hsf_num      = rand() % 9;
-//        hsfpage_row.ihead_id     = ihead_id;
-//        hsfpage_row.writer_num   = rand() % 4170;
-//        hsfpage_row.template_num = rand() % 100;
-//        hsfpage_row.buffer_len_bytes = (i+1);
-//        hsfpage_row.buffer           = (char*)malloc(hsfpage_row.buffer_len_bytes);
-//        std::fill(hsfpage_row.buffer, hsfpage_row.buffer + hsfpage_row.buffer_len_bytes, (i+1));
-//
-//        const int hsfpage_id = dbm.Insert(hsfpage_row);
-//        CHECK((i + 1) == hsfpage_id);
-//    }
-//}
+TEST_CASE("ihead and hsfpage - can insert 100 rows")
+{
+    srand(time(NULL));
+
+    using namespace sdb19db;
+
+    std::remove("db.db3");
+
+    DbManager dbm("db.db3");
+    dbm.Setup();
+
+    for (int i = 0; i < 100; i++)
+    {
+        tables::ihead ihead_row;
+        ihead_row.created    = "hello";
+        ihead_row.par_x      = 2;
+        ihead_row.parent     = "asdfadsf";
+        
+        const int ihead_id = dbm.Insert(ihead_row);        
+        CHECK((i+1) == ihead_id);
+        
+        tables::hsfpage hsfpage_row;
+        hsfpage_row.hsf_num      = rand() % 9;
+        hsfpage_row.ihead_id     = ihead_id;
+        hsfpage_row.writer_num   = rand() % 4170;
+        hsfpage_row.template_num = rand() % 100;
+        hsfpage_row.buffer_len_bytes = (i+1);
+        //hsfpage_row.buffer           = (char*)malloc(hsfpage_row.buffer_len_bytes);
+        hsfpage_row.buffer           = new char[hsfpage_row.buffer_len_bytes];
+        std::fill(hsfpage_row.buffer, hsfpage_row.buffer + hsfpage_row.buffer_len_bytes, (i+1));
+
+        const int hsfpage_id = dbm.Insert(hsfpage_row);
+
+        delete[] hsfpage_row.buffer;
+
+        CHECK((i + 1) == hsfpage_id);
+    }
+}
 
 TEST_CASE("ihead and hsfpage - insert and read")
 {
@@ -187,7 +176,6 @@ TEST_CASE("ihead and hsfpage - insert and read")
 
                 std::ostringstream oss;
                 oss << (char*)"temp.pct" << ".jpg";
-                //std::string var = oss.str();
 
                 myFile = std::ofstream(oss.str(), std::ios_base::out | std::ios_base::binary);
 
@@ -204,8 +192,8 @@ TEST_CASE("ihead and hsfpage - insert and read")
             std::streampos jpeg_size_bytes = file.tellg();
             file.seekg(0);
 
-            char* buffer = new char[jpeg_size_bytes];
-            file.read(buffer, jpeg_size_bytes);
+            char* jpgbuffer = new char[jpeg_size_bytes];
+            file.read(jpgbuffer, jpeg_size_bytes);
 
             tables::ihead ihead_row;
             ihead_row.created       = get_created(head);
@@ -237,16 +225,16 @@ TEST_CASE("ihead and hsfpage - insert and read")
             hsfpage_row.writer_num          = std::stoi(writer);
             hsfpage_row.template_num        = std::stoi(templ);
             hsfpage_row.buffer_len_bytes    = jpeg_size_bytes;
-            hsfpage_row.buffer              = buffer;
+            hsfpage_row.buffer              = jpgbuffer;
 
             const int hsfpage_id = dbm.Insert(hsfpage_row);
+            delete[] jpgbuffer;
 
-            delete[] buffer;
             free(data8);
             free(head);
 
-            //break;
+            break;
         }
-        //_CrtDumpMemoryLeaks();
+        //break;
     }
 }
