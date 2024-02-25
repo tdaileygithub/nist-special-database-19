@@ -37,7 +37,8 @@ https://learn.microsoft.com/en-us/cpp/build/reference/z7-zi-zi-debug-information
 - [FACSIMILE CODING SCHEMES AND CODING CONTROL FUNCTIONS FOR GROUP 4 FACSIMILE APPARATUS](docs/T-REC-T.6-198811-I!!PDF-E.pdf)
 
 # Libraries + Tools Used
+
 - [Sqlite3](https://www.sqlite.org/download.html) - Single file c++ db
 - [toojpeg](https://create.stephan-brumme.com/toojpeg/) - Single file c++ file jpeg enocder 
 - [doctest](https://github.com/doctest/doctest) - Single file c++ test framework
-- [sqlite_orm_](https://github.com/fnc12/sqlite_orm/tree/v1.8.2) - Single file c++ wrapper for sqlite3
+- [pugixml](https://github.com/zeux/pugixml) - Two file c++ xml library

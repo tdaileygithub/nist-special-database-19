@@ -28,6 +28,7 @@ add_subdirectory ("sqlite3")
 add_subdirectory ("toojpeg")
 add_subdirectory ("doctest")
 add_subdirectory ("sd19db")
+add_subdirectory ("pugixml")
 
 # Enable Hot Reload for MSVC compilers if supported.
 if (POLICY CMP0141)
