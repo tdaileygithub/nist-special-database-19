@@ -6,6 +6,8 @@ target_sources(showmis PRIVATE
 	idbrepository.h
 	hsfpage.h
 	hsfpage.cpp
+	mis.h
+	mis.cpp
 )
 
 target_sources(sd19test PRIVATE 
@@ -16,4 +18,6 @@ target_sources(sd19test PRIVATE
 	idbrepository.h
 	hsfpage.h
 	hsfpage.cpp
+	mis.h
+	mis.cpp
 )
