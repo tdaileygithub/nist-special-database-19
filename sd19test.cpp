@@ -141,55 +141,29 @@ TEST_CASE("ihead and hsfpage - insert and read")
 
             IHEAD* head;
             unsigned char* buf;
-            int misw, mish, bpi, entw, enth, ent_num;
-            char* data8, * dptr;
-            int j = 0;
+            int width, height, bpi;
+            char* data8;            
 
-            ReadBinaryRaster((char*)filepath.c_str(), &head, &buf, &bpi, &misw, &mish);
+            ReadBinaryRaster((char*)filepath.c_str(), &head, &buf, &bpi, &width, &height);
 
-            if ((data8 = (char*)malloc(misw * mish * sizeof(char))) == NULL)
-                syserr("show_mis", "", "unable to allocate 8 bit space");
+            if ((data8 = (char*)malloc(width * height * sizeof(char))) == NULL)
+                syserr("show_mis", "show_mis", "unable to allocate 8 bit space");
 
-            bits2bytes(buf, (u_char*)data8, misw * mish);
+            bits2bytes(buf, (u_char*)data8, width * height);
 
-            auto image = new unsigned char[misw * mish * 1];
-            TooJpeg::misdata_to_bwimage(data8, image, misw, mish, 1);
+            auto image = new unsigned char[width * height * 1];
+            TooJpeg::misdata_to_bwimage(data8, image, width, height, 1);
 
-            //for (dptr = data8, j = 0; j < 1; j++)
+            const bool isRGB = false;           // true = RGB image, else false = grayscale
+            const auto quality = 90;            // compression quality: 0 = worst, 100 = best, 80 to 90 are most often used
+            const bool downsample = false;      // false = save as YCbCr444 JPEG (better quality), true = YCbCr420 (smaller file)                
 
-            {
-                //const auto width = misw;
-                //const auto height = mish;
-                //// Grayscale: one byte per pixel
-                //const auto bytesPerPixel = 1;
-                //// allocate memory
-                //auto image = new unsigned char[width * height * bytesPerPixel];
-
-                //for (int k = 0; k < mish; k++)
-                //{
-                //    for (int l = 0; l < misw; l++)
-                //    {
-                //        auto offset = (k * width + l) * bytesPerPixel;
-                //        // red and green fade from 0 to 255, blue is always 127
-                //        auto red = 255 * l / width;
-                //        auto green = 255 * k / height;
-                //        //image[offset] = (red + green) / 2;;
-                //        image[offset] = (*dptr++) ? 0 : 255;
-                //    }
-                //}               
-
-                const bool isRGB = false;           // true = RGB image, else false = grayscale
-                const auto quality = 90;            // compression quality: 0 = worst, 100 = best, 80 to 90 are most often used
-                const bool downsample = false;      // false = save as YCbCr444 JPEG (better quality), true = YCbCr420 (smaller file)                
-
-                TooJpeg::save_jpeg("temp.pct.jpg", image, misw, mish, 1, isRGB, quality, downsample, filepath);
-                delete[] image;
-            }
+            TooJpeg::save_jpeg("temp.pct.jpg", image, width, height, 1, isRGB, quality, downsample, filepath);
+            delete[] image;
 
             std::ifstream file("temp.pct.jpg", std::ios::in | std::ios::binary);
             if (!file) {
-                std::cerr << "An error occurred opening the file\n";
-                //return 12345;
+                std::cerr << "An error occurred opening the file\n";                
             }
             file.seekg(0, std::ifstream::end);
             std::streampos jpeg_size_bytes = file.tellg();
@@ -236,7 +210,7 @@ TEST_CASE("ihead and hsfpage - insert and read")
             free(data8);
             free(head);
 
-            //break;
+            break;
         }
         //break;
     }
@@ -244,8 +218,7 @@ TEST_CASE("ihead and hsfpage - insert and read")
 
 
 TEST_CASE("ihead and mis - insert and read")
-{
-    return;
+{    
     using namespace sdb19db;
 
     std::remove("db.db3");
@@ -275,7 +248,6 @@ TEST_CASE("ihead and mis - insert and read")
             std::string clsfilepath(filepath);
             clsfilepath = std::regex_replace(clsfilepath, std::regex(filename), clsfilename);
             
-
             const std::string writer(filename.substr(1, 4));
             const std::string templ(filename.substr(6, 2));
 
