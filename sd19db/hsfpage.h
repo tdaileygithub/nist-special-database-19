@@ -6,9 +6,12 @@ namespace sdb19db
 		class hsfpage {
 		public:
 			int id = 0;
+			int hsf_num = 0;
 			int ihead_id = 0;
 			int writer_num = 0;
 			int template_num = 0;
+			char* buffer = nullptr;
+			int buffer_len_bytes = 0;
 		};
 	}
 

@@ -23,6 +23,7 @@
 #include "sd19/normalize.h"
 #include "sd19/shear.h"
 #include "sd19/writemis.h"
+#include "sd19/readihdr.h"
 
 #define ES  	  32
 #define ES4     4*ES            /* always 4 ES          */
@@ -161,7 +162,115 @@ void mis_to_jpegs(char* misfile)
 
 void show_mis(char* misfile)
 {
-	mis_to_jpegs(misfile);
+	//MIS* mis = readmishdr((char*)"hsf_page\\hsf_0\\f0017_07.pct");
+
+	FILE* fp;
+	//fp = fopen((char*)"hsf_0.mis", "rb");
+	fp = fopen((char*)"hsf_page\\hsf_0\\f0017_07.pct", "rb");
+
+
+	if (fp == NULL)
+	{
+		std::cerr << "7777777777" << std::endl;
+		syserr("ReadBinaryRaster", "", "fopen");
+	}
+	else
+	{
+		//std::cerr << "asfadfs" << std::endl;
+		//IHEAD* ihead = readihdr(fp);
+		//std::cerr << "123321" << std::endl;
+		//std::cerr << ihead->id << std::endl;
+		//std::cerr << ihead->created << std::endl;
+		//std::cerr << ihead->parent << std::endl;
+		//std::cerr << ihead->width << std::endl;
+		//std::cerr << ihead->height << std::endl;
+		//std::cerr << ihead->depth << std::endl;
+		//std::cerr << ihead->density << std::endl;
+		//std::cerr << ihead->compress << std::endl;
+	}
+	fclose(fp);
+
+	//MIS* mis;
+	IHEAD* head;
+	unsigned char* buf;
+	int misw, mish, bpi, entw, enth, ent_num;
+
+
+
+	char* data8, * dptr;
+	int j = 0;
+	int k = 0;
+	int l = 0;
+
+
+
+	ReadBinaryRaster((char*)"hsf_page\\hsf_0\\f0017_07.pct", &head, &buf, &bpi, &misw, &mish);
+
+	if ((data8 = (char*)malloc(misw * mish * sizeof(char))) == NULL)
+		syserr("show_mis", misfile, "unable to allocate 8 bit space");
+
+	bits2bytes(buf, (u_char*)data8, misw * mish);
+
+	std::cerr << "asdfafds " << head->width << " " << head->height << std::endl;
+
+
+	for (dptr = data8, j = 0; j < 1; j++)
+	{
+		std::cerr << "asdfasdfadfsadsf";
+		// 800x600 image
+		const auto width = misw;
+		const auto height = mish;
+		// Grayscale: one byte per pixel
+		const auto bytesPerPixel = 1;
+		// allocate memory
+		auto image = new unsigned char[width * height * bytesPerPixel];
+
+		for (k = 0; k < mish; k++)
+		{
+			for (l = 0; l < misw; l++)
+			{
+				auto offset = (k * width + l) * bytesPerPixel;
+				// red and green fade from 0 to 255, blue is always 127
+				auto red = 255 * l / width;
+				auto green = 255 * k / height;
+				//image[offset] = (red + green) / 2;;
+				image[offset] = (*dptr++) ? 0: 255;
+			}
+		}
+
+		// start JPEG compression
+		// note: myOutput is the function defined in line 18, it saves the output in example.jpg
+		// optional parameters:
+		const bool isRGB = false; // true = RGB image, else false = grayscale
+		const auto quality = 90;    // compression quality: 0 = worst, 100 = best, 80 to 90 are most often used
+		const bool downsample = false; // false = save as YCbCr444 JPEG (better quality), true = YCbCr420 (smaller file)
+		const char* comment = "TooJpeg example image"; // arbitrary JPEG comment
+
+		std::ostringstream oss;
+		oss << (char*)"f0017_07.pct" << ".jpg";
+		//std::string var = oss.str();
+
+		myFile = std::ofstream(oss.str(), std::ios_base::out | std::ios_base::binary);
+
+		auto ok = TooJpeg::writeJpeg(myOutput, image, width, height, isRGB, quality, downsample, comment);
+		delete[] image;
+	}
+
+
+
+	free(data8);
+
+	//2560 3300
+
+	//1056000
+	//compreess len 46540
+	//for (int i = 0; i < 500; i++)
+	//{
+	//	std::cout << std::hex << (0xFF & buf[i]);
+	//}
+	//ReadBinaryRaster((char*)"hsf_page\\hsf_0\\f0017_07.pct", IHEAD ** head, unsigned char** data, int* bpi, int* width, int* height)
+
+	//mis_to_jpegs(misfile);
 
 	//int   j, k, l;
 	//MIS* mis;
