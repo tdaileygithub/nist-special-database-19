@@ -2,6 +2,12 @@
 
 NIST Special Database 19 Handprinted Forms and Characters Database
 
+| category      | number files  |
+| ------------- | ------------- |
+| by_write      | 24318         |
+| hsf_page      | 3669          |
+| by_field      | 1586          |
+| by_class      | 1426          |
 
 # Dr. Memory
 

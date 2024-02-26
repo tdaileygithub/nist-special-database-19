@@ -27,7 +27,7 @@ else()
   endif()
 
 # https://learn.microsoft.com/en-us/cpp/parallel/auto-parallelization-and-auto-vectorization?view=msvc-170
-#https://devblogs.microsoft.com/cppblog/using-c17-parallel-algorithms-for-better-performance/
+# https://devblogs.microsoft.com/cppblog/using-c17-parallel-algorithms-for-better-performance/
 # compile with:
 #  debug: cl /EHsc /W4 /WX /std:c++latest /Fedebug /MDd .\program.cpp
 #  release: cl /EHsc /W4 /WX /std:c++latest /Ferelease /MD /O2 .\program.cpp
