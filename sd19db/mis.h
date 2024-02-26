@@ -37,7 +37,7 @@ namespace sdb19db
 						"writer_num"		INTEGER NOT NULL,
 						"template_num"		INTEGER NOT NULL,
 						"character"			TEXT NOT NULL,
-						"image_sha256"		TEXT NOT NULL UNIQUE,
+						"image_sha256"		TEXT NOT NULL,
 						"image"				BLOB NOT NULL,
 						FOREIGN KEY (ihead_id) REFERENCES ihead (id),
 						PRIMARY KEY("id" AUTOINCREMENT)
