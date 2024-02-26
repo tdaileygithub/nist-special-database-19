@@ -32,6 +32,9 @@ namespace sdb19db
 		if (SQLITE_OK != sqlite3_bind_text(_insertStatement, 8, table.mis_sha256.c_str(), table.mis_sha256.size(), nullptr)) {
 			exit(1);
 		}
+		if (SQLITE_OK != sqlite3_bind_int(_insertStatement, 9, table.field_type)) {
+			exit(1);
+		}
 		if (SQLITE_DONE != sqlite3_step(_insertStatement)) {
 			exit(1);
 		}

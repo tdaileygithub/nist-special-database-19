@@ -94,6 +94,8 @@ TEST_CASE("ihead and hsfpage and mis - can insert 100 rows")
         hsfpage_row.image_len_bytes     = (i + 1);        
         hsfpage_row.image               = new char[hsfpage_row.image_len_bytes];
         std::fill(hsfpage_row.image, hsfpage_row.image + hsfpage_row.image_len_bytes, (i+1));
+        hsfpage_row.hsf_page_sha256     = std::to_string(i);
+        hsfpage_row.image_sha256        = std::to_string(i);
 
         const int hsfpage_id = dbm.Insert(hsfpage_row);
         CHECK((i + 1) == hsfpage_id);
@@ -101,6 +103,7 @@ TEST_CASE("ihead and hsfpage and mis - can insert 100 rows")
         delete[] hsfpage_row.image;
 
         tables::mis mis_row;
+        mis_row.field_type      = rand() % 4;
         mis_row.hsf_num         = rand() % 9;
         mis_row.ihead_id        = ihead_id;
         mis_row.writer_num      = rand() % 4170;
@@ -109,17 +112,18 @@ TEST_CASE("ihead and hsfpage and mis - can insert 100 rows")
         mis_row.image_len_bytes = (i + 1);
         mis_row.image           = new char[mis_row.image_len_bytes];
         std::fill(mis_row.image, mis_row.image + mis_row.image_len_bytes, (i + 1));
+        mis_row.image_sha256    = std::to_string(i);
+        mis_row.mis_sha256      = std::to_string(i);
 
         const int mis_id = dbm.Insert(mis_row);
         CHECK((i + 1) == mis_id);
-
+        
         delete[] mis_row.image;
     }
 }
 
 TEST_CASE("ihead and hsfpage - insert and read")
 {
-    return;
     using namespace sdb19db;
 
     DbManager dbm("db.db3");
@@ -240,8 +244,7 @@ TEST_CASE("ihead and hsfpage - insert and read")
 TEST_CASE("ihead and mis - insert and read")
 {    
     using namespace sdb19db;
-
-    //std::remove("db.db3");
+    
     DbManager dbm("db.db3");
 
     using recursive_directory_iterator = std::filesystem::recursive_directory_iterator;
@@ -256,7 +259,7 @@ TEST_CASE("ihead and mis - insert and read")
 
         // by_write\hsf_0\f0039_14\l0039_14.mis
         if (!dirEntry.is_directory() 
-            && (dirEntry.path().string().find("hsf_0") == std::string::npos)
+            && (dirEntry.path().string().find("hsf_2") != std::string::npos)
             && (0 == fileext.compare(".mis")))
         {
             const std::string filepath(dirEntry.path().string());
@@ -266,7 +269,8 @@ TEST_CASE("ihead and mis - insert and read")
             clsfilename = std::regex_replace(clsfilename, std::regex(".mis"), ".cls");
             std::string clsfilepath(filepath);
             clsfilepath = std::regex_replace(clsfilepath, std::regex(filename), clsfilename);
-            
+                        
+            const std::string field_type(filename.substr(0, 1));
             const std::string writer(filename.substr(1, 4));
             const std::string templ(filename.substr(6, 2));
 
@@ -319,6 +323,7 @@ TEST_CASE("ihead and mis - insert and read")
                 std::cout 
                     << " processing: "  << filepath 
                     << " writer: "      << writer
+                    << " field_type: "  << field_type
                     << " template: "    << templ
                     << " hsf_num: "     << hsf_num
                     << " clsfilepath: " << clsfilepath
@@ -384,6 +389,18 @@ TEST_CASE("ihead and mis - insert and read")
                     const int ihead_id      = dbm.Insert(ihead_row);            
 
                     tables::mis mis_row;
+                    if (0 == field_type.rfind("d", 0)) {
+                        mis_row.field_type = 0;
+                    }
+                    if (0 == field_type.rfind("u", 0)) {
+                        mis_row.field_type = 1;
+                    }
+                    if (0 == field_type.rfind("l", 0)) {
+                        mis_row.field_type = 2;
+                    }
+                    if (0 == field_type.rfind("c", 0)) {
+                        mis_row.field_type = 3;
+                    }
                     mis_row.mis_sha256          = mis_sha256;
                     mis_row.hsf_num             = std::stoi(hsf_num);
                     mis_row.ihead_id            = ihead_id;
