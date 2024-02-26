@@ -22,8 +22,8 @@ if(DR_MEMORY_LEAK_CHECK)
   endif()
 else()
   if(MSVC)
-    target_compile_options(sd19test PUBLIC /EHsc /W4 /std:c++latest /O2 /Qpar /openmp /fsanitize )
-    target_compile_options(showmis  PUBLIC /EHsc /W4 /std:c++latest /O2 /Qpar /openmp /fsanitize )
+    target_compile_options(sd19test PUBLIC /EHsc /W4 /std:c++latest /02 /Qpar /openmp /fsanitize )
+    target_compile_options(showmis  PUBLIC /EHsc /W4 /std:c++latest /02 /Qpar /openmp /fsanitize )
   endif()
 
 # https://learn.microsoft.com/en-us/cpp/parallel/auto-parallelization-and-auto-vectorization?view=msvc-170

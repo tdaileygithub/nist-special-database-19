@@ -248,7 +248,7 @@ TEST_CASE("ihead and mis - insert and read")
     DbManager dbm("db.db3");
 
     using recursive_directory_iterator = std::filesystem::recursive_directory_iterator;
-
+    
     for (const auto& dirEntry : recursive_directory_iterator("by_write"))
     {
         std::string hsf_num(dirEntry.path().parent_path().parent_path().string());
@@ -259,7 +259,7 @@ TEST_CASE("ihead and mis - insert and read")
 
         // by_write\hsf_0\f0039_14\l0039_14.mis
         if (!dirEntry.is_directory() 
-            && (dirEntry.path().string().find("hsf_2") != std::string::npos)
+            //&& (dirEntry.path().string().find("hsf_0") != std::string::npos)
             && (0 == fileext.compare(".mis")))
         {
             const std::string filepath(dirEntry.path().string());
