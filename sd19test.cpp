@@ -294,7 +294,7 @@ TEST_CASE("ihead and mis - insert and read")
             for (dptr = data8, misentry = 0; misentry < mis->ent_num; misentry++)
             {
                 //std::cout << misentry << " character: " << mischars.at(misentry) << std::endl;                
-                {
+                //{
                     const auto width = mis->entw;
                     const auto height = mis->enth;
                     // Grayscale: one byte per pixel
@@ -317,32 +317,38 @@ TEST_CASE("ihead and mis - insert and read")
                         }
                     }
 
-                    // start JPEG compression
-                    // note: myOutput is the function defined in line 18, it saves the output in example.jpg
-                    // optional parameters:
-                    const bool isRGB = false; // true = RGB image, else false = grayscale
-                    const auto quality = 90;    // compression quality: 0 = worst, 100 = best, 80 to 90 are most often used
-                    const bool downsample = false; // false = save as YCbCr444 JPEG (better quality), true = YCbCr420 (smaller file)
-                    const char* comment = "TooJpeg example image"; // arbitrary JPEG comment
 
-                    TooJpeg::save_jpeg("tempmis.jpg", image, width, height, bytesPerPixel, isRGB, quality, downsample, filepath);
-                    delete[] image;
-                }
+                    size_t png_data_size = 0;
+                    void* pPNG_data = tdefl_write_image_to_png_file_in_memory_ex(image, width, height, 1, &png_data_size, 6, MZ_FALSE);
+
+
+
+                    //// start JPEG compression
+                    //// note: myOutput is the function defined in line 18, it saves the output in example.jpg
+                    //// optional parameters:
+                    //const bool isRGB = false; // true = RGB image, else false = grayscale
+                    //const auto quality = 90;    // compression quality: 0 = worst, 100 = best, 80 to 90 are most often used
+                    //const bool downsample = false; // false = save as YCbCr444 JPEG (better quality), true = YCbCr420 (smaller file)
+                    //const char* comment = "TooJpeg example image"; // arbitrary JPEG comment
+
+                    //TooJpeg::save_jpeg("tempmis.jpg", image, width, height, bytesPerPixel, isRGB, quality, downsample, filepath);
+                    //delete[] image;
+                //}
                 
-                {
-                    std::ifstream misfile("tempmis.jpg", std::ios::in | std::ios::binary);
-                    if (!misfile) {
-                        std::cerr << "An error occurred opening the file\n";                
-                    }
-                    misfile.seekg(0, std::ifstream::end);
-                    std::streampos jpeg_size_bytes = misfile.tellg();
-                    misfile.seekg(0);
+                //{
+                    //std::ifstream misfile("tempmis.jpg", std::ios::in | std::ios::binary);
+                    //if (!misfile) {
+                    //    std::cerr << "An error occurred opening the file\n";                
+                    //}
+                    //misfile.seekg(0, std::ifstream::end);
+                    //std::streampos jpeg_size_bytes = misfile.tellg();
+                    //misfile.seekg(0);
 
-                    char* jpgbuffer = new char[jpeg_size_bytes];
-                    misfile.read(jpgbuffer, jpeg_size_bytes);
+                    //char* jpgbuffer = new char[jpeg_size_bytes];
+                    //misfile.read(jpgbuffer, jpeg_size_bytes);
 
                     SHA256 sha;
-                    sha.update((uint8_t*)jpgbuffer, jpeg_size_bytes);
+                    sha.update((uint8_t*)pPNG_data, png_data_size);
                     std::array<uint8_t, 32> digest = sha.digest();
 
                     tables::ihead ihead_row;
@@ -375,16 +381,18 @@ TEST_CASE("ihead and mis - insert and read")
                     mis_row.writer_num          = std::stoi(writer);
                     mis_row.template_num        = std::stoi(templ);
                     mis_row.character           = mischars.at(misentry);
-                    mis_row.image_len_bytes     = jpeg_size_bytes;
-                    mis_row.image               = jpgbuffer;
+                    mis_row.image_len_bytes     = png_data_size;
+                    mis_row.image               = (char*)pPNG_data;
                     mis_row.sha256              = SHA256::toString(digest);
                     
                     const int mis_id            = dbm.Insert(mis_row);
-                    delete[] jpgbuffer;
-                }
+                    //delete[] jpgbuffer;
+                    mz_free(pPNG_data);
+                //}
                 //exit(1);
             }
-
+            //outer loop
+            //data8 contains ALL the mis files
             free(data8);
             free(mis);
 
