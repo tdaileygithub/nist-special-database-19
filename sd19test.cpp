@@ -117,18 +117,19 @@ TEST_CASE("ihead and hsfpage and mis - can insert 100 rows")
 }
 
 TEST_CASE("ihead and hsfpage - insert and read")
-{    
-    //return;
+{
     using namespace sdb19db;
 
-    //std::remove("db.db3");
     DbManager dbm("db.db3");
 
     using recursive_directory_iterator = std::filesystem::recursive_directory_iterator;
 
     for (const auto& dirEntry : recursive_directory_iterator("hsf_page"))
     {
-        if (!dirEntry.is_directory())
+        if (!dirEntry.is_directory()
+            && (dirEntry.path().string().find("template") == std::string::npos)
+            && (dirEntry.path().string().find("truerefs") == std::string::npos)
+        )
         {
             std::chrono::steady_clock::time_point begin = std::chrono::steady_clock::now();
 
@@ -151,12 +152,11 @@ TEST_CASE("ihead and hsfpage - insert and read")
 
             if (!dbm.HsfPageProcessed(hsfpage_sha256)) 
             {
-                //exit(99);
                 std::cout
-                    << " processing: " << filepath
-                    << " writer: " << writer
-                    << " template: " << templ
-                    << " dirname: " << hsfdirname
+                    << " processing: "  << filepath
+                    << " writer: "      << writer
+                    << " template: "    << templ
+                    << " dirname: "     << hsfdirname
                     << std::endl;
 
                 IHEAD* head;
@@ -232,7 +232,6 @@ TEST_CASE("ihead and hsfpage - insert and read")
                     << std::endl;
             }
         }
-        //break;
     }
 }
 
@@ -281,122 +280,134 @@ TEST_CASE("ihead and mis - insert and read")
             //------------------------------------------------------------------------
             const std::string mis_sha256(get_file_sha256_checksum(filepath));
 
-            //read in the cls file
-            std::ifstream clsfile(clsfilepath);
-
-            std::vector<std::string> mischars = {};
-            if (clsfile.is_open()) {
-                std::string line;
-                std::getline(clsfile, line);
-                int lineint = std::stoi(line);
-                if (mis->ent_num != lineint) {
-                    std::cerr << ".mis and .cls counts do not match: " << filepath << " numcls: " << lineint << " nummis: " << mis->ent_num;
-                    exit(1);
-                }
-                //each line is a hex value represiting the ascii char
-                while (std::getline(clsfile, line)) {
-                    unsigned int i;                    
-                    std::istringstream iss(line);
-                    iss >> std::hex >> i;
-                    //null terminate the array or it will get garbage
-                    char s[] = { i, 0x00 };
-                    mischars.push_back(std::string(s));                    
-                }
-                clsfile.close();                
-            }
-
-            if (mis->misd != 1) {
-                fatalerr("show_mis", "", "incorrect entry size or depth");
-            }
-            if ((data8 = (char*)malloc(mis->misw * mis->mish * sizeof(char))) == NULL) {
-                syserr("show_mis", "malloc", "unable to allocate 8 bit space");
-            }
-
-            std::cout 
-                << " processing: "  << filepath 
-                << " writer: "      << writer
-                << " template: "    << templ
-                << " hsf_num: "     << hsf_num
-                << " clsfilepath: " << clsfilepath
-                << " characters: "  << mischars.size()
-                << std::endl;
-
-            // converts ALL of the mis data to bytes in one go
-            bits2bytes(mis->data, (u_char*)data8, mis->misw * mis->mish);
-
-            for (dptr = data8, misentry = 0; misentry < mis->ent_num; misentry++)
+            if (!dbm.MisProcessed(mis_sha256))
             {
-                //std::cout << misentry << " character: " << mischars.at(misentry) << std::endl;
-                
-                const auto width = mis->entw;
-                const auto height = mis->enth;                
-                const auto bytesPerPixel = 1;
-                auto image = new unsigned char[width * height * bytesPerPixel];
+                //read in the cls file
+                std::ifstream clsfile(clsfilepath);
 
-                //TooJpeg::misdata_to_bwimage(dptr, image, mis->entw, mis->enth, 1);
-
-                for (int k = 0; k < mis->enth; k++)
-                {
-                    for (int l = 0; l < mis->entw; l++)
-                    {
-                        auto offset = (k * width + l) * bytesPerPixel;
-                        // red and green fade from 0 to 255, blue is always 127
-                        auto red = 255 * l / width;
-                        auto green = 255 * k / height;
-                        //image[offset] = (red + green) / 2;;
-                        image[offset] = (*dptr++) ? 255 : 0;
+                std::vector<std::string> mischars = {};
+                if (clsfile.is_open()) {
+                    std::string line;
+                    std::getline(clsfile, line);
+                    int lineint = std::stoi(line);
+                    if (mis->ent_num != lineint) {
+                        std::cerr << ".mis and .cls counts do not match: " << filepath << " numcls: " << lineint << " nummis: " << mis->ent_num;
+                        exit(1);
                     }
+                    //each line is a hex value represiting the ascii char
+                    while (std::getline(clsfile, line)) {
+                        unsigned int i;                    
+                        std::istringstream iss(line);
+                        iss >> std::hex >> i;
+                        //null terminate the array or it will get garbage
+                        char s[] = { i, 0x00 };
+                        mischars.push_back(std::string(s));                    
+                    }
+                    clsfile.close();                
                 }
 
-                size_t png_data_size = 0;
-                void* pPNG_data = tdefl_write_image_to_png_file_in_memory_ex(image, width, height, 1, &png_data_size, 6, MZ_FALSE);
+                if (mis->misd != 1) {
+                    fatalerr("show_mis", "", "incorrect entry size or depth");
+                }
+                if ((data8 = (char*)malloc(mis->misw * mis->mish * sizeof(char))) == NULL) {
+                    syserr("show_mis", "malloc", "unable to allocate 8 bit space");
+                }
 
-                SHA256 sha;
-                sha.update((uint8_t*)pPNG_data, png_data_size);
-                std::array<uint8_t, 32> digest = sha.digest();
+                std::cout 
+                    << " processing: "  << filepath 
+                    << " writer: "      << writer
+                    << " template: "    << templ
+                    << " hsf_num: "     << hsf_num
+                    << " clsfilepath: " << clsfilepath
+                    << " characters: "  << mischars.size()
+                    << std::endl;
 
-                tables::ihead ihead_row;
-                ihead_row.created       = get_created(mis->head);
-                ihead_row.width         = get_width(mis->head);
-                ihead_row.height        = get_height(mis->head);
-                ihead_row.depth         = get_depth(mis->head);
-                ihead_row.density       = get_density(mis->head);
-                ihead_row.compress      = get_compression(mis->head);
-                ihead_row.complen       = get_complen(mis->head);
-                ihead_row.align         = get_align(mis->head);
-                ihead_row.unitsize      = get_unitsize(mis->head);
-                ihead_row.sigbit        = get_sigbit(mis->head);
-                ihead_row.byte_order    = get_byte_order(mis->head);
-                ihead_row.pix_offset    = get_pix_offset(mis->head);
-                ihead_row.whitepix      = get_whitepix(mis->head);
-                ihead_row.issigned      = get_issigned(mis->head);
-                ihead_row.rm_cm         = get_rm_cm(mis->head);
-                ihead_row.tb_bt         = get_tb_bt(mis->head);
-                ihead_row.lr_rl         = get_lr_rl(mis->head);
-                ihead_row.parent        = get_parent(mis->head);
-                ihead_row.par_x         = get_par_x(mis->head);
-                ihead_row.par_y         = get_par_y(mis->head);
+                // converts ALL of the mis data to bytes in one go
+                bits2bytes(mis->data, (u_char*)data8, mis->misw * mis->mish);
 
-                const int ihead_id      = dbm.Insert(ihead_row);            
+                for (dptr = data8, misentry = 0; misentry < mis->ent_num; misentry++)
+                {
+                    //std::cout << misentry << " character: " << mischars.at(misentry) << std::endl;
+                
+                    const auto width = mis->entw;
+                    const auto height = mis->enth;                
+                    const auto bytesPerPixel = 1;
+                    auto image = new unsigned char[width * height * bytesPerPixel];
 
-                tables::mis mis_row;
-                mis_row.mis_sha256          = mis_sha256;
-                mis_row.hsf_num             = std::stoi(hsf_num);
-                mis_row.ihead_id            = ihead_id;
-                mis_row.writer_num          = std::stoi(writer);
-                mis_row.template_num        = std::stoi(templ);
-                mis_row.character           = mischars.at(misentry);
-                mis_row.image_len_bytes     = png_data_size;
-                mis_row.image               = (char*)pPNG_data;
-                mis_row.image_sha256        = SHA256::toString(digest);
+                    //TooJpeg::misdata_to_bwimage(dptr, image, mis->entw, mis->enth, 1);
+
+                    for (int k = 0; k < mis->enth; k++)
+                    {
+                        for (int l = 0; l < mis->entw; l++)
+                        {
+                            auto offset = (k * width + l) * bytesPerPixel;
+                            // red and green fade from 0 to 255, blue is always 127
+                            auto red = 255 * l / width;
+                            auto green = 255 * k / height;
+                            //image[offset] = (red + green) / 2;;
+                            image[offset] = (*dptr++) ? 255 : 0;
+                        }
+                    }
+
+                    size_t png_data_size = 0;
+                    void* pPNG_data = tdefl_write_image_to_png_file_in_memory_ex(image, width, height, 1, &png_data_size, 6, MZ_FALSE);
+
+                    SHA256 sha;
+                    sha.update((uint8_t*)pPNG_data, png_data_size);
+                    std::array<uint8_t, 32> digest = sha.digest();
+
+                    tables::ihead ihead_row;
+                    ihead_row.created       = get_created(mis->head);
+                    ihead_row.width         = get_width(mis->head);
+                    ihead_row.height        = get_height(mis->head);
+                    ihead_row.depth         = get_depth(mis->head);
+                    ihead_row.density       = get_density(mis->head);
+                    ihead_row.compress      = get_compression(mis->head);
+                    ihead_row.complen       = get_complen(mis->head);
+                    ihead_row.align         = get_align(mis->head);
+                    ihead_row.unitsize      = get_unitsize(mis->head);
+                    ihead_row.sigbit        = get_sigbit(mis->head);
+                    ihead_row.byte_order    = get_byte_order(mis->head);
+                    ihead_row.pix_offset    = get_pix_offset(mis->head);
+                    ihead_row.whitepix      = get_whitepix(mis->head);
+                    ihead_row.issigned      = get_issigned(mis->head);
+                    ihead_row.rm_cm         = get_rm_cm(mis->head);
+                    ihead_row.tb_bt         = get_tb_bt(mis->head);
+                    ihead_row.lr_rl         = get_lr_rl(mis->head);
+                    ihead_row.parent        = get_parent(mis->head);
+                    ihead_row.par_x         = get_par_x(mis->head);
+                    ihead_row.par_y         = get_par_y(mis->head);
+
+                    const int ihead_id      = dbm.Insert(ihead_row);            
+
+                    tables::mis mis_row;
+                    mis_row.mis_sha256          = mis_sha256;
+                    mis_row.hsf_num             = std::stoi(hsf_num);
+                    mis_row.ihead_id            = ihead_id;
+                    mis_row.writer_num          = std::stoi(writer);
+                    mis_row.template_num        = std::stoi(templ);
+                    mis_row.character           = mischars.at(misentry);
+                    mis_row.image_len_bytes     = png_data_size;
+                    mis_row.image               = (char*)pPNG_data;
+                    mis_row.image_sha256        = SHA256::toString(digest);
                     
-                const int mis_id            = dbm.Insert(mis_row);
-                mz_free(pPNG_data);
+                    const int mis_id            = dbm.Insert(mis_row);
+                    mz_free(pPNG_data);
+                }
+                //outer loop
+                //data8 contains ALL the mis files
+                free(data8);
+                free(mis);
             }
-            //outer loop
-            //data8 contains ALL the mis files
-            free(data8);
-            free(mis);
+            else
+            {
+                std::cout
+                    << " skipping: "    << filepath 
+                    << " writer: "      << writer
+                    << " template: "    << templ
+                    << " hsf_num: "     << hsf_num
+                    << " clsfilepath: " << clsfilepath;                    
+            }
         }
     }
 }
