@@ -1,8 +1,8 @@
 #pragma once
 
+#include <iostream>
 #include <memory>
 #include <string>
-#include <iostream>
 
 #include "../sqlite3/sqlite3.h"
 
