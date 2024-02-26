@@ -9,6 +9,17 @@ NIST Special Database 19 Handprinted Forms and Characters Database
 | by_field      | 1586          |
 | by_class      | 1426          |
 
+# Field Information
+
+The HSFs were scanned at 11.8 dots per millimeter (300 dots per inch) and contain 34 fields: 
+
+- [Field 0] name occluded or left incomplete on all HSF images
+- [Field 1-2] city/state field. Have never been processed by NIST
+- [Field 3-30] 28 digit fields 
+- [Field 31] upper-case field
+- [Field 32] lower-case field
+- [Field 33] and an unconstrained Constitution text paragraph
+
 # Dr. Memory
 
 https://drmemory.org/page_running.html
