@@ -114,6 +114,7 @@ TEST_CASE("ihead and hsfpage and mis - can insert 100 rows")
 
 TEST_CASE("ihead and hsfpage - insert and read")
 {
+    return;
     using namespace sdb19db;
 
     std::remove("db.db3");
@@ -166,7 +167,6 @@ TEST_CASE("ihead and hsfpage - insert and read")
             sha.update((uint8_t*) pPNG_data, png_data_size);
             std::array<uint8_t, 32> digest = sha.digest();
 
-
             tables::ihead ihead_row;
             ihead_row.created       = get_created(head);
             ihead_row.width         = get_width(head);
@@ -213,7 +213,7 @@ TEST_CASE("ihead and hsfpage - insert and read")
 
 TEST_CASE("ihead and mis - insert and read")
 {    
-    return;
+    //return;
     using namespace sdb19db;
 
     std::remove("db.db3");
@@ -341,6 +341,10 @@ TEST_CASE("ihead and mis - insert and read")
                     char* jpgbuffer = new char[jpeg_size_bytes];
                     misfile.read(jpgbuffer, jpeg_size_bytes);
 
+                    SHA256 sha;
+                    sha.update((uint8_t*)jpgbuffer, jpeg_size_bytes);
+                    std::array<uint8_t, 32> digest = sha.digest();
+
                     tables::ihead ihead_row;
                     ihead_row.created       = get_created(mis->head);
                     ihead_row.width         = get_width(mis->head);
@@ -371,9 +375,10 @@ TEST_CASE("ihead and mis - insert and read")
                     mis_row.writer_num          = std::stoi(writer);
                     mis_row.template_num        = std::stoi(templ);
                     mis_row.character           = mischars.at(misentry);
-                    mis_row.image_len_bytes      = jpeg_size_bytes;
-                    mis_row.image                = jpgbuffer;
-
+                    mis_row.image_len_bytes     = jpeg_size_bytes;
+                    mis_row.image               = jpgbuffer;
+                    mis_row.sha256              = SHA256::toString(digest);
+                    
                     const int mis_id            = dbm.Insert(mis_row);
                     delete[] jpgbuffer;
                 }

@@ -13,6 +13,7 @@ namespace sdb19db
 			std::string character = "";
 			char* image = nullptr;
 			int image_len_bytes = 0;
+			std::string sha256 = "";
 		};
 	}
 
@@ -31,12 +32,13 @@ namespace sdb19db
 						"template_num"		INTEGER NOT NULL,
 						"character"			TEXT NOT NULL,
 						"image"				BLOB NOT NULL,
+						"sha256"			TEXT NOT NULL UNIQUE,
 						FOREIGN KEY (ihead_id) REFERENCES ihead (id),
 						PRIMARY KEY("id" AUTOINCREMENT)
 					);
 				)SQL",
 				R"SQL(
-					INSERT INTO mis(hsf_num,ihead_id,writer_num,template_num,character,image) VALUES (?,?,?,?,?,?);
+					INSERT INTO mis(hsf_num,ihead_id,writer_num,template_num,character,image,sha256) VALUES (?,?,?,?,?,?,?);
 				)SQL")
 		{
 		}
