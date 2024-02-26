@@ -3,6 +3,7 @@
 #include <iostream>
 #include <memory>
 #include <string>
+#include <vector>
 
 #include "../sqlite3/sqlite3.h"
 
@@ -35,18 +36,38 @@ namespace sdb19db
 
 			const std::string lastRowSql("SELECT last_insert_rowid();");
 			if (SQLITE_OK != sqlite3_prepare_v2(_dbPtr, lastRowSql.c_str(), lastRowSql.size(), &_lastRowStatement, nullptr)) {
-				std::cerr << lastRowSql << std::endl;
 				sqlite3_close(_dbPtr);
 				exit(1);
 			}
 			if (SQLITE_OK != sqlite3_prepare_v2(_dbPtr, insertSql.c_str(), insertSql.size(), &_insertStatement, nullptr)) {
-				std::cerr << insertSql << std::endl;
-				sqlite3_close(_dbPtr);			
+				sqlite3_close(_dbPtr);
 				exit(1);
 			}
 		}
 
 		virtual int Insert(const T& table) const = 0;
+
+		virtual std::vector<std::vector<std::string>> Query(const std::string sql) const
+		{
+			sqlite3_stmt* sqlstatement;			
+			if (SQLITE_OK != sqlite3_prepare(_dbPtr, sql.c_str(), -1, &sqlstatement, NULL)) {
+				sqlite3_close(_dbPtr);
+				exit(1);
+			}
+			std::vector<std::vector<std::string>> rows(0, std::vector<std::string>(0));
+			int ncols = sqlite3_column_count(sqlstatement);
+			while (sqlite3_step(sqlstatement) == SQLITE_ROW)
+			{
+				std::vector<std::string> cols;
+				for (int i = 0; i < ncols; i++)
+				{
+					cols.push_back(std::string(reinterpret_cast<const char*>(sqlite3_column_text(sqlstatement, i))));
+				}
+				rows.push_back(cols);
+			}
+			sqlite3_finalize(sqlstatement);
+			return rows;
+		};
 		
 		int LastRowId() const 
 		{			

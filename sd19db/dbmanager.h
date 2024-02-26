@@ -27,5 +27,9 @@ namespace sdb19db
 		int Insert(const tables::ihead& table) const;
 		int Insert(const tables::hsfpage& table) const;
 		int Insert(const tables::mis& table) const;
+
+		bool HsfPageProcessed(const std::string sha256) const;
+
+		bool MisProcessed(const std::string sha256) const;
 	};
 }
