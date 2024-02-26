@@ -358,7 +358,7 @@ TEST_CASE("ihead and mis - insert and read")
                 mis_row.character           = mischars.at(misentry);
                 mis_row.image_len_bytes     = png_data_size;
                 mis_row.image               = (char*)pPNG_data;
-                mis_row.sha256              = SHA256::toString(digest);
+                mis_row.image_sha256        = SHA256::toString(digest);
                     
                 const int mis_id            = dbm.Insert(mis_row);
                 mz_free(pPNG_data);
