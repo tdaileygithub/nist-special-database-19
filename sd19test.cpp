@@ -25,6 +25,7 @@
 #include "sd19db/dbmanager.h"
 
 #include "toojpeg/toojpeg_helper.h"
+#include "miniz/miniz.h"
 
 TEST_CASE("toojpeg create file")
 {
@@ -67,7 +68,6 @@ TEST_CASE("ihead and hsfpage and mis - can insert 100 rows")
     std::remove("db.db3");
 
     DbManager dbm("db.db3");
-    dbm.Setup();
 
     for (int i = 0; i < 100; i++)
     {
@@ -84,14 +84,14 @@ TEST_CASE("ihead and hsfpage and mis - can insert 100 rows")
         hsfpage_row.ihead_id            = ihead_id;
         hsfpage_row.writer_num          = rand() % 4170;
         hsfpage_row.template_num        = rand() % 100;        
-        hsfpage_row.buffer_len_bytes    = (i + 1);        
-        hsfpage_row.buffer              = new char[hsfpage_row.buffer_len_bytes];
-        std::fill(hsfpage_row.buffer, hsfpage_row.buffer + hsfpage_row.buffer_len_bytes, (i+1));
+        hsfpage_row.image_len_bytes    = (i + 1);        
+        hsfpage_row.image              = new char[hsfpage_row.image_len_bytes];
+        std::fill(hsfpage_row.image, hsfpage_row.image + hsfpage_row.image_len_bytes, (i+1));
 
         const int hsfpage_id = dbm.Insert(hsfpage_row);
         CHECK((i + 1) == hsfpage_id);
 
-        delete[] hsfpage_row.buffer;
+        delete[] hsfpage_row.image;
 
         tables::mis mis_row;
         mis_row.hsf_num         = rand() % 9;
@@ -99,14 +99,14 @@ TEST_CASE("ihead and hsfpage and mis - can insert 100 rows")
         mis_row.writer_num      = rand() % 4170;
         mis_row.template_num    = rand() % 100;
         mis_row.character       = char(rand() % 26 + 65);
-        mis_row.jpeg_len_bytes  = (i + 1);
-        mis_row.jpeg            = new char[mis_row.jpeg_len_bytes];
-        std::fill(mis_row.jpeg, mis_row.jpeg + mis_row.jpeg_len_bytes, (i + 1));
+        mis_row.image_len_bytes  = (i + 1);
+        mis_row.image            = new char[mis_row.image_len_bytes];
+        std::fill(mis_row.image, mis_row.image + mis_row.image_len_bytes, (i + 1));
 
         const int mis_id = dbm.Insert(mis_row);
         CHECK((i + 1) == mis_id);
 
-        delete[] mis_row.jpeg;
+        delete[] mis_row.image;
     }
 }
 
@@ -116,8 +116,6 @@ TEST_CASE("ihead and hsfpage - insert and read")
 
     std::remove("db.db3");
     DbManager dbm("db.db3");
-
-    dbm.Setup();
 
     using recursive_directory_iterator = std::filesystem::recursive_directory_iterator;
 
@@ -149,22 +147,68 @@ TEST_CASE("ihead and hsfpage - insert and read")
             int width, height, bpi;
             char* data8;            
 
+            // 6340[us]
             ReadBinaryRaster((char*)filepath.c_str(), &head, &buf, &bpi, &width, &height);
 
             if ((data8 = (char*)malloc(width * height * sizeof(char))) == NULL)
                 syserr("show_mis", "show_mis", "unable to allocate 8 bit space");
 
+            // 6447[us]
             bits2bytes(buf, (u_char*)data8, width * height);
 
+            // 10375 [us]
             auto image = new unsigned char[width * height * 1];
             TooJpeg::misdata_to_bwimage(data8, image, width, height, 1);
 
+            //quality   filesize kb
+            //90        1080
+            //10        312
             const bool isRGB = false;           // true = RGB image, else false = grayscale
-            const auto quality = 90;            // compression quality: 0 = worst, 100 = best, 80 to 90 are most often used
+            const auto quality = 10;            // compression quality: 0 = worst, 100 = best, 80 to 90 are most often used
             const bool downsample = false;      // false = save as YCbCr444 JPEG (better quality), true = YCbCr420 (smaller file)                
 
-            TooJpeg::save_jpeg("temp.pct.jpg", image, width, height, 1, isRGB, quality, downsample, filepath);
+            std::chrono::steady_clock::time_point beginjpeg = std::chrono::steady_clock::now();
+
+            // 97638 [us]
+            TooJpeg::save_jpeg("temp.pct.jpg", image, width, height, 1, isRGB, quality, downsample, filepath);            
+
+            std::chrono::steady_clock::time_point endjpeg = std::chrono::steady_clock::now();
+            std::cout << "save_jpeg Time difference = " << std::chrono::duration_cast<std::chrono::microseconds>(endjpeg - beginjpeg).count() << "[us]" << std::endl;
+
+            std::chrono::steady_clock::time_point beginpng = std::chrono::steady_clock::now();
+            // Now write the PNG image.
+            {
+                size_t png_data_size = 0;
+                void* pPNG_data = tdefl_write_image_to_png_file_in_memory_ex(image, width, height, 1, &png_data_size, 6, MZ_FALSE);
+
+                if (!pPNG_data)
+                    fprintf(stderr, "tdefl_write_image_to_png_file_in_memory_ex() failed!\n");
+                else
+                {
+                    FILE* pFile = fopen("temp.pct.png", "wb");
+                    fwrite(pPNG_data, 1, png_data_size, pFile);
+                    fclose(pFile);
+                    printf("Wrote %s\n", "temp.pct.png");
+                }
+
+                // mz_free() is by default just an alias to free() internally, but if you've overridden miniz's allocation funcs you'll probably need to call mz_free().
+                mz_free(pPNG_data);
+            }
+            std::chrono::steady_clock::time_point endpng = std::chrono::steady_clock::now();
+            std::cout << "png Time difference = " << std::chrono::duration_cast<std::chrono::microseconds>(endpng - beginpng).count() << "[us]" << std::endl;
+
+
             delete[] image;
+            exit(1);
+
+
+
+
+
+
+
+
+
 
             std::ifstream file("temp.pct.jpg", std::ios::in | std::ios::binary);
             if (!file) {
@@ -176,6 +220,12 @@ TEST_CASE("ihead and hsfpage - insert and read")
 
             char* jpgbuffer = new char[jpeg_size_bytes];
             file.read(jpgbuffer, jpeg_size_bytes);
+
+            //JPEG Time difference = 72270[us]
+            //     Time difference = 82867[us]
+
+            std::chrono::steady_clock::time_point end2 = std::chrono::steady_clock::now();
+            std::cout << "JPEG Time difference = " << std::chrono::duration_cast<std::chrono::microseconds>(end2 - begin).count() << "[us]" << std::endl;
 
             tables::ihead ihead_row;
             ihead_row.created       = get_created(head);
@@ -206,8 +256,8 @@ TEST_CASE("ihead and hsfpage - insert and read")
             hsfpage_row.ihead_id            = ihead_id;
             hsfpage_row.writer_num          = std::stoi(writer);
             hsfpage_row.template_num        = std::stoi(templ);
-            hsfpage_row.buffer_len_bytes    = jpeg_size_bytes;
-            hsfpage_row.buffer              = jpgbuffer;
+            hsfpage_row.image_len_bytes    = jpeg_size_bytes;
+            hsfpage_row.image              = jpgbuffer;
 
             const int hsfpage_id = dbm.Insert(hsfpage_row);
             delete[] jpgbuffer;
@@ -231,8 +281,6 @@ TEST_CASE("ihead and mis - insert and read")
 
     std::remove("db.db3");
     DbManager dbm("db.db3");
-
-    dbm.Setup();
 
     using recursive_directory_iterator = std::filesystem::recursive_directory_iterator;
 
@@ -386,8 +434,8 @@ TEST_CASE("ihead and mis - insert and read")
                     mis_row.writer_num          = std::stoi(writer);
                     mis_row.template_num        = std::stoi(templ);
                     mis_row.character           = mischars.at(misentry);
-                    mis_row.jpeg_len_bytes      = jpeg_size_bytes;
-                    mis_row.jpeg                = jpgbuffer;
+                    mis_row.image_len_bytes      = jpeg_size_bytes;
+                    mis_row.image                = jpgbuffer;
 
                     const int mis_id            = dbm.Insert(mis_row);
                     delete[] jpgbuffer;

@@ -11,8 +11,8 @@ namespace sdb19db
 			int writer_num = 0;
 			int template_num = 0;
 			std::string character = "";
-			char* jpeg = nullptr;
-			int jpeg_len_bytes = 0;
+			char* image = nullptr;
+			int image_len_bytes = 0;
 		};
 	}
 
@@ -30,13 +30,13 @@ namespace sdb19db
 						"writer_num"		INTEGER NOT NULL,
 						"template_num"		INTEGER NOT NULL,
 						"character"			TEXT NOT NULL,
-						"jpeg"				BLOB NOT NULL,
+						"image"				BLOB NOT NULL,
 						FOREIGN KEY (ihead_id) REFERENCES ihead (id),
 						PRIMARY KEY("id" AUTOINCREMENT)
 					);
 				)SQL",
 				R"SQL(
-					INSERT INTO mis(hsf_num,ihead_id,writer_num,template_num,character,jpeg) VALUES (?,?,?,?,?,?);
+					INSERT INTO mis(hsf_num,ihead_id,writer_num,template_num,character,image) VALUES (?,?,?,?,?,?);
 				)SQL")
 		{
 		}

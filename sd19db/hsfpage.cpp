@@ -20,7 +20,7 @@ namespace sdb19db
 		if (SQLITE_OK != sqlite3_bind_int(_insertStatement, 4, table.template_num)) {
 			exit(1);
 		}
-		if (SQLITE_OK != sqlite3_bind_blob(_insertStatement, 5, table.buffer, table.buffer_len_bytes, SQLITE_STATIC)) {
+		if (SQLITE_OK != sqlite3_bind_blob(_insertStatement, 5, table.image, table.image_len_bytes, SQLITE_STATIC)) {
 			exit(1);
 		}
 		if (SQLITE_DONE != sqlite3_step(_insertStatement)) {
