@@ -22,6 +22,7 @@
 #include "sha256/sha256_util.h"
 
 #include "sd19/bits2bytes.h"
+#include "sd19/freemis.h"
 #include "sd19/getnset.h"
 #include "sd19/readmis.h"
 #include "sd19/readrast.h"
@@ -31,7 +32,6 @@
 #include "sd19db/dbmanager.h"
 
 #include "toojpeg/toojpeg_helper.h"
-#include "sd19/freemis.h"
 
 TEST_CASE("toojpeg create file")
 {
@@ -338,7 +338,7 @@ TEST_CASE("ihead and mis - insert and read")
                     //std::cout << misentry << " character: " << mischars.at(misentry) << std::endl;
                 
                     const auto width = mis->entw;
-                    const auto height = mis->enth;                
+                    const auto height = mis->enth;
                     const auto bytesPerPixel = 1;
                     auto image = new unsigned char[width * height * bytesPerPixel];
 
@@ -350,10 +350,10 @@ TEST_CASE("ihead and mis - insert and read")
                         {
                             auto offset = (k * width + l) * bytesPerPixel;
                             // red and green fade from 0 to 255, blue is always 127
-                            auto red = 255 * l / width;
-                            auto green = 255 * k / height;
+                            //auto red = 255 * l / width;
+                            //auto green = 255 * k / height;
                             //image[offset] = (red + green) / 2;;
-                            image[offset] = (*dptr++) ? 255 : 0;
+                            image[offset] = (*dptr++) ? 0 : 255;
                         }
                     }
 
@@ -412,6 +412,7 @@ TEST_CASE("ihead and mis - insert and read")
                     mis_row.image_sha256        = SHA256::toString(digest);
                     
                     const int mis_id            = dbm.Insert(mis_row);
+                    delete[] image;
                     mz_free(pPNG_data);
                 }
                 //outer loop
