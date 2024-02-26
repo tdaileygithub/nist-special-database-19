@@ -3,9 +3,9 @@
 #include "toojpeg.h"
 
 #include <filesystem>
+#include <fstream>
 #include <iostream>
 #include <string>
-#include <fstream>
 
 namespace TooJpeg
 {
@@ -38,11 +38,10 @@ namespace TooJpeg
         return ret;        
     }
 
-
     void misdata_to_bwimage(char* src, unsigned char* dptr, int width, int height, int bytesPerPixel)
-    {
+    {        
         for (int k = 0; k < height; k++)
-        {
+        {            
             for (int l = 0; l < width; l++)
             {
                 auto offset = (k * width + l) * bytesPerPixel;

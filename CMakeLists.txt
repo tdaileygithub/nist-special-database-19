@@ -20,6 +20,18 @@ if(DR_MEMORY_LEAK_CHECK)
     target_compile_options(sd19test PUBLIC /Zi /MT /EHsc /Oy- /Ob0 )
     target_compile_options(showmis  PUBLIC /Zi /MT /EHsc /Oy- /Ob0 )
   endif()
+else()
+  if(MSVC)
+    target_compile_options(sd19test PUBLIC /EHsc /W4 /std:c++latest /O2 /Qpar /fsanitize )
+    target_compile_options(showmis  PUBLIC /EHsc /W4 /std:c++latest /O2 /Qpar /fsanitize )
+  endif()
+
+# https://learn.microsoft.com/en-us/cpp/parallel/auto-parallelization-and-auto-vectorization?view=msvc-170
+#https://devblogs.microsoft.com/cppblog/using-c17-parallel-algorithms-for-better-performance/
+# compile with:
+#  debug: cl /EHsc /W4 /WX /std:c++latest /Fedebug /MDd .\program.cpp
+#  release: cl /EHsc /W4 /WX /std:c++latest /Ferelease /MD /O2 .\program.cpp
+
 endif()
 
 # Include sub-projects.
@@ -29,6 +41,7 @@ add_subdirectory ("toojpeg")
 add_subdirectory ("doctest")
 add_subdirectory ("sd19db")
 add_subdirectory ("pugixml")
+add_subdirectory ("miniz")
 
 # Enable Hot Reload for MSVC compilers if supported.
 if (POLICY CMP0141)

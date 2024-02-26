@@ -23,7 +23,6 @@ namespace sdb19db
 			_hsfpage = std::make_unique<HsfPage>(dbname);
 			_mis = std::make_unique<Mis>(dbname);
 		}
-		void Setup();
 
 		int Insert(const tables::ihead& table) const;
 		int Insert(const tables::hsfpage& table) const;
