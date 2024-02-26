@@ -43,6 +43,7 @@ add_subdirectory ("sd19db")
 add_subdirectory ("pugixml")
 add_subdirectory ("miniz")
 add_subdirectory ("sha256")
+add_subdirectory ("ulog")
 
 # Enable Hot Reload for MSVC compilers if supported.
 if (POLICY CMP0141)
