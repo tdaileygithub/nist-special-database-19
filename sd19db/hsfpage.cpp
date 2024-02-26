@@ -23,7 +23,10 @@ namespace sdb19db
 		if (SQLITE_OK != sqlite3_bind_blob(_insertStatement, 5, table.image, table.image_len_bytes, SQLITE_STATIC)) {
 			exit(1);
 		}
-		if (SQLITE_OK != sqlite3_bind_text(_insertStatement, 6, table.sha256.c_str(), table.sha256.size(), nullptr)) {
+		if (SQLITE_OK != sqlite3_bind_text(_insertStatement, 6, table.image_sha256.c_str(), table.image_sha256.size(), nullptr)) {
+			exit(1);
+		}
+		if (SQLITE_OK != sqlite3_bind_text(_insertStatement, 7, table.hsf_page_sha256.c_str(), table.hsf_page_sha256.size(), nullptr)) {
 			exit(1);
 		}
 		if (SQLITE_DONE != sqlite3_step(_insertStatement)) {
