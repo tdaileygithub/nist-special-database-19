@@ -26,6 +26,8 @@
 
 #include "toojpeg/toojpeg_helper.h"
 #include "miniz/miniz.h"
+#include "sha256/SHA256.h"
+#include <cstdint>
 
 TEST_CASE("toojpeg create file")
 {
@@ -135,11 +137,11 @@ TEST_CASE("ihead and hsfpage - insert and read")
             const std::string writer(filename.substr(1, 4));
             const std::string templ(filename.substr(6, 2));
 
-            std::cout 
-                << " processing: "  << filepath 
-                << " writer: "      << writer
-                << " template: "    << templ
-                << " dirname: "     << hsfdirname
+            std::cout
+                << " processing: " << filepath
+                << " writer: " << writer
+                << " template: " << templ
+                << " dirname: " << hsfdirname
                 << std::endl;
 
             IHEAD* head;
@@ -147,56 +149,23 @@ TEST_CASE("ihead and hsfpage - insert and read")
             int width, height, bpi;
             char* data8;
             const std::string tempImageFileName("temp.pct.png");
-            
+
             ReadBinaryRaster((char*)filepath.c_str(), &head, &buf, &bpi, &width, &height);
 
-            if ((data8 = (char*)malloc(width * height * sizeof(char))) == NULL)
-                syserr("show_mis", "show_mis", "unable to allocate 8 bit space");
-
+            if ((data8 = (char*)malloc(width * height * sizeof(char))) == NULL) {
+                syserr("ReadBinaryRaster", "malloc", "unable to allocate 8 bit space");
+            }
             bits2bytes(buf, (u_char*)data8, width * height);
 
             auto image = new unsigned char[width * height * 1];
             TooJpeg::misdata_to_bwimage(data8, image, width, height, 1);
 
-            //std::chrono::steady_clock::time_point beginpng = std::chrono::steady_clock::now();
-            // Now write the PNG image.
-            {
-                size_t png_data_size = 0;
-                void* pPNG_data = tdefl_write_image_to_png_file_in_memory_ex(image, width, height, 1, &png_data_size, 6, MZ_FALSE);
+            size_t png_data_size = 0;
+            void* pPNG_data = tdefl_write_image_to_png_file_in_memory_ex(image, width, height, 1, &png_data_size, 6, MZ_FALSE);
+            SHA256 sha;
+            sha.update((uint8_t*) pPNG_data, png_data_size);
+            std::array<uint8_t, 32> digest = sha.digest();
 
-                if (!pPNG_data)
-                {   
-                    fprintf(stderr, "tdefl_write_image_to_png_file_in_memory_ex() failed!\n");
-                    exit(1);
-                }
-                else
-                {
-                    FILE* pFile = fopen(tempImageFileName.c_str(), "wb");
-                    fwrite(pPNG_data, 1, png_data_size, pFile);
-                    fclose(pFile);
-                }
-
-                // mz_free() is by default just an alias to free() internally, but if you've overridden miniz's allocation funcs you'll probably need to call mz_free().
-                mz_free(pPNG_data);
-            }
-            //std::chrono::steady_clock::time_point endpng = std::chrono::steady_clock::now();
-            //std::cout << "png Time difference = " << std::chrono::duration_cast<std::chrono::microseconds>(endpng - beginpng).count() << "[us]" << std::endl;
-
-            delete[] image;
-            //exit(1);
-
-
-
-            std::ifstream file(tempImageFileName, std::ios::in | std::ios::binary);
-            if (!file) {
-                exit(1);
-            }
-            file.seekg(0, std::ifstream::end);
-            std::streampos image_size_bytes = file.tellg();
-            file.seekg(0);
-
-            char* imgbuffer = new char[image_size_bytes];
-            file.read(imgbuffer, image_size_bytes);
 
             tables::ihead ihead_row;
             ihead_row.created       = get_created(head);
@@ -227,12 +196,14 @@ TEST_CASE("ihead and hsfpage - insert and read")
             hsfpage_row.ihead_id            = ihead_id;
             hsfpage_row.writer_num          = std::stoi(writer);
             hsfpage_row.template_num        = std::stoi(templ);
-            hsfpage_row.image_len_bytes     = image_size_bytes;
-            hsfpage_row.image               = imgbuffer;
+            hsfpage_row.image_len_bytes     = png_data_size;
+            hsfpage_row.image               = (char*)pPNG_data;
+            hsfpage_row.sha256              = SHA256::toString(digest);
 
             const int hsfpage_id = dbm.Insert(hsfpage_row);
-            delete[] imgbuffer;
 
+            delete[] image;
+            mz_free(pPNG_data);
             free(data8);
             free(head);
         }
