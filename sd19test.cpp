@@ -31,6 +31,7 @@
 #include "sd19db/dbmanager.h"
 
 #include "toojpeg/toojpeg_helper.h"
+#include "sd19/freemis.h"
 
 TEST_CASE("toojpeg create file")
 {
@@ -254,8 +255,9 @@ TEST_CASE("ihead and mis - insert and read")
         const std::string fileext (dirEntry.path().extension().string());
 
         // by_write\hsf_0\f0039_14\l0039_14.mis
-        if (!dirEntry.is_directory() && 
-            (0 == fileext.compare(".mis")))
+        if (!dirEntry.is_directory() 
+            && (dirEntry.path().string().find("hsf_0") == std::string::npos)
+            && (0 == fileext.compare(".mis")))
         {
             const std::string filepath(dirEntry.path().string());
             const std::string filename(dirEntry.path().filename().string());
@@ -268,20 +270,21 @@ TEST_CASE("ihead and mis - insert and read")
             const std::string writer(filename.substr(1, 4));
             const std::string templ(filename.substr(6, 2));
 
-            MIS* mis;
-            char* data8, * dptr;
-            int misentry = 0;
-
-            mis = readmisfile((char*)filepath.c_str());
             //------------------------------------------------------------------------
             //TODO: reading the MIS file twice.
-            //      1) readmisfile
-            //      2) get_file_sha256_checksum
+            //      1) get_file_sha256_checksum
+            //      2) readmisfile
             //------------------------------------------------------------------------
             const std::string mis_sha256(get_file_sha256_checksum(filepath));
 
             if (!dbm.MisProcessed(mis_sha256))
             {
+                MIS* mis;
+                char* data8, * dptr;
+                int misentry = 0;
+
+                mis = readmisfile((char*)filepath.c_str());
+
                 //read in the cls file
                 std::ifstream clsfile(clsfilepath);
 
@@ -395,9 +398,9 @@ TEST_CASE("ihead and mis - insert and read")
                     mz_free(pPNG_data);
                 }
                 //outer loop
-                //data8 contains ALL the mis files
+                //data8 contains ALL the mis files                
                 free(data8);
-                free(mis);
+                freemis(mis);
             }
             else
             {
