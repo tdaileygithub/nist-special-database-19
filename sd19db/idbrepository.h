@@ -7,6 +7,8 @@
 
 #include "../sqlite3/sqlite3.h"
 
+#include "../ulog/ulog.h"
+
 namespace sdb19db
 {
 	template<class T>
@@ -25,6 +27,11 @@ namespace sdb19db
 			std::cerr << std::endl << "ResultCode: " << ResultCode << " " << sqlite3_errstr(ResultCode) << std::endl;
 			exit(ResultCode);
 		}
+
+		void Log(const std::string& msg) const {
+			ulog.val("IDbRepository:", msg);
+		}
+
 	public:
 		IDbRepository(
 			const std::string& dbname, 

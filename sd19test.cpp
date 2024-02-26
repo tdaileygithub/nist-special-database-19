@@ -16,6 +16,8 @@
 
 #include "doctest/doctest.h"
 
+#include "ulog/ulog.h"
+
 #include "miniz/miniz.h"
 
 #include "sha256/SHA256.h"
@@ -259,7 +261,7 @@ TEST_CASE("ihead and mis - insert and read")
 
         // by_write\hsf_0\f0039_14\l0039_14.mis
         if (!dirEntry.is_directory() 
-            //&& (dirEntry.path().string().find("hsf_0") != std::string::npos)
+            && (dirEntry.path().string().find("hsf_2") != std::string::npos)
             && (0 == fileext.compare(".mis")))
         {
             const std::string filepath(dirEntry.path().string());

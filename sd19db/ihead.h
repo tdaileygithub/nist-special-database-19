@@ -1,5 +1,9 @@
 #include "idbrepository.h"
 
+#include <sstream>
+
+#include "../ulog/ulog.h"
+
 namespace sdb19db
 {
 	namespace tables {
@@ -68,6 +72,10 @@ namespace sdb19db
 		{
 		}
 
-		int Insert(const tables::ihead& table) const;		
+		int Insert(const tables::ihead& table) const;
 	};
+
+	std::ostream& operator<<(std::ostream& out, const tables::ihead& ihead_row);
+
+	std::string to_string(const tables::ihead& h);
 }

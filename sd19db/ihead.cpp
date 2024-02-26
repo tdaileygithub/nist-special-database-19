@@ -1,4 +1,7 @@
+#include <iomanip>
 #include <iostream>
+#include <ostream>
+#include <sstream>
 #include <string>
 
 #include "../sqlite3/sqlite3.h"
@@ -7,7 +10,10 @@
 
 namespace sdb19db
 {
-	int IHead::Insert(const tables::ihead& table) const {		
+	int IHead::Insert(const tables::ihead& table) const {
+
+		Log(sdb19db::to_string(table));
+
 		int rc = sqlite3_bind_text(_insertStatement, 1, table.created.c_str(), table.created.size(), nullptr);
 		if (SQLITE_OK != rc) {
 			HandleSqliteError(rc);
@@ -95,7 +101,23 @@ namespace sdb19db
 		rc = sqlite3_reset(_insertStatement);		
 		if (SQLITE_OK != rc) {			
 			HandleSqliteError(rc);
-		}
+		}		
 		return LastRowId();
+	}
+
+	std::ostream& operator<<(std::ostream& out, const tables::ihead& ihead_row)
+	{	
+		out << std::endl
+			<< std::setw(20) << "created:"	<< std::setw(65) << ihead_row.created	<< std::endl
+			<< std::setw(20) << "width:"	<< std::setw(65) << ihead_row.width		<< std::endl
+			<< std::setw(20) << "height:"	<< std::setw(65) << ihead_row.height	<< std::endl;
+		return out;
+	}
+
+	std::string to_string(const tables::ihead& h)
+	{
+		std::ostringstream ss;
+		ss << h;
+		return ss.str();
 	}
 }

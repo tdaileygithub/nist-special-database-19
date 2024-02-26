@@ -1,3 +1,5 @@
+#include <ostream>
+
 #include "idbrepository.h"
 
 namespace sdb19db
@@ -49,4 +51,8 @@ namespace sdb19db
 
 		int Insert(const tables::mis& table) const;
 	};
+
+	std::ostream& operator<<(std::ostream& out, const tables::mis& ihead_row);
+
+	std::string to_string(const tables::mis& h);
 }
