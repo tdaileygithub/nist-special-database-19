@@ -19,29 +19,39 @@ namespace sdb19db
 		std::shared_ptr<sqlite3> _db;
 		
 		sqlite3* _dbPtr = NULL;
+
+		void HandleSqliteError(const int ResultCode) const {
+			sqlite3_close(_dbPtr);
+			std::cerr << std::endl << "ResultCode: " << ResultCode << " " << sqlite3_errstr(ResultCode) << std::endl;
+			exit(ResultCode);
+		}
 	public:
 		IDbRepository(
 			const std::string& dbname, 
 			const std::string createSql,
 			const std::string insertSql)
 		{
-			sqlite3_open(dbname.c_str(), &_dbPtr);
+			int rc = sqlite3_open(dbname.c_str(), &_dbPtr);
+			if (SQLITE_OK != rc) {				
+				HandleSqliteError(rc);
+			}
 			_db.reset(_dbPtr, sqlite3_close);
 
 			char* messaggeError;
-			if (SQLITE_OK != sqlite3_exec(_dbPtr, createSql.c_str(), NULL, 0, &messaggeError)) {
+			rc = sqlite3_exec(_dbPtr, createSql.c_str(), NULL, 0, &messaggeError);
+			if (SQLITE_OK != rc) {
 				std::cerr << "Error Create Table" << std::endl;
 				sqlite3_free(messaggeError);
 			}
 
 			const std::string lastRowSql("SELECT last_insert_rowid();");
-			if (SQLITE_OK != sqlite3_prepare_v2(_dbPtr, lastRowSql.c_str(), lastRowSql.size(), &_lastRowStatement, nullptr)) {
-				sqlite3_close(_dbPtr);
-				exit(1);
+			rc = sqlite3_prepare_v2(_dbPtr, lastRowSql.c_str(), lastRowSql.size(), &_lastRowStatement, nullptr);
+			if (SQLITE_OK != rc) {				
+				HandleSqliteError(rc);
 			}
-			if (SQLITE_OK != sqlite3_prepare_v2(_dbPtr, insertSql.c_str(), insertSql.size(), &_insertStatement, nullptr)) {
-				sqlite3_close(_dbPtr);
-				exit(1);
+			rc = sqlite3_prepare_v2(_dbPtr, insertSql.c_str(), insertSql.size(), &_insertStatement, nullptr);
+			if (SQLITE_OK != rc) {				
+				HandleSqliteError(rc);
 			}
 		}
 
@@ -50,9 +60,9 @@ namespace sdb19db
 		virtual std::vector<std::vector<std::string>> Query(const std::string sql) const
 		{
 			sqlite3_stmt* sqlstatement;			
-			if (SQLITE_OK != sqlite3_prepare(_dbPtr, sql.c_str(), -1, &sqlstatement, NULL)) {
-				sqlite3_close(_dbPtr);
-				exit(1);
+			int rc = sqlite3_prepare(_dbPtr, sql.c_str(), -1, &sqlstatement, NULL);
+			if (SQLITE_OK != rc) {				
+				HandleSqliteError(rc);
 			}
 			std::vector<std::vector<std::string>> rows(0, std::vector<std::string>(0));
 			int ncols = sqlite3_column_count(sqlstatement);
@@ -65,7 +75,10 @@ namespace sdb19db
 				}
 				rows.push_back(cols);
 			}
-			sqlite3_finalize(sqlstatement);
+			rc = sqlite3_finalize(sqlstatement);
+			if (SQLITE_OK != rc) {				
+				HandleSqliteError(rc);
+			}
 			return rows;
 		};
 		
@@ -73,19 +86,19 @@ namespace sdb19db
 		{			
 			int rc = sqlite3_step(_lastRowStatement);
 			if (rc != SQLITE_ROW && rc != SQLITE_DONE) {
-				std::string errmsg(sqlite3_errmsg(_dbPtr));
-				sqlite3_finalize(_lastRowStatement);
-				std::cerr << errmsg;
-				exit(1);
+				HandleSqliteError(rc);
 			}
 			//completed but there was no row
 			if (rc == SQLITE_DONE) {
 				sqlite3_reset(_lastRowStatement);
 				return -1;
 			}
-			rc = sqlite3_column_int(_lastRowStatement, 0);
-			sqlite3_reset(_lastRowStatement);
-			return rc;
+			int ret = sqlite3_column_int(_lastRowStatement, 0);
+			rc = sqlite3_reset(_lastRowStatement);
+			if (SQLITE_OK != rc) {
+				HandleSqliteError(rc);
+			}
+			return ret;
 		};
 	};
 
