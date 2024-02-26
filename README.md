@@ -43,3 +43,4 @@ https://learn.microsoft.com/en-us/cpp/build/reference/z7-zi-zi-debug-information
 - [doctest](https://github.com/doctest/doctest) - Single file c++ test framework
 - [pugixml](https://github.com/zeux/pugixml) - Two file c++ xml library
 - [miniz](https://github.com/richgel999/miniz) - Single file zlib + png
+- [sha256](https://github.com/System-Glitch/SHA256) - Single file sha256
