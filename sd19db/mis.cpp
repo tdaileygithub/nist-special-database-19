@@ -69,9 +69,9 @@ namespace sdb19db
 			<< std::setw(20) << "writer_num:"	<< std::setw(65) << mis_row.writer_num		<< std::endl
 			<< std::setw(20) << "template_num:"	<< std::setw(65) << mis_row.template_num	<< std::endl
 			<< std::setw(20) << "character:"	<< std::setw(65) << mis_row.character		<< std::endl
+			<< std::setw(20) << "field_type:"	<< std::setw(65) << mis_row.field_type		<< std::endl
 			<< std::setw(20) << "image_sha256:"	<< std::setw(65) << mis_row.image_sha256	<< std::endl
-			<< std::setw(20) << "mis_sha256:"	<< std::setw(65) << mis_row.mis_sha256		<< std::endl
-			<< std::setw(20) << "field_type:"	<< std::setw(65) << mis_row.field_type		<< std::endl;
+			<< std::setw(20) << "mis_sha256:"	<< std::setw(65) << mis_row.mis_sha256		<< std::endl;
 		return out;
 	}
 

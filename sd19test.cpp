@@ -322,8 +322,9 @@ TEST_CASE("ihead and mis - insert and read")
                     syserr("show_mis", "malloc", "unable to allocate 8 bit space");
                 }
 
-                std::cout 
-                    << " processing: "  << filepath 
+                std::stringstream ss;
+
+                ss  << " processing: "  << filepath 
                     << " writer: "      << writer
                     << " field_type: "  << field_type
                     << " template: "    << templ
@@ -331,6 +332,9 @@ TEST_CASE("ihead and mis - insert and read")
                     << " clsfilepath: " << clsfilepath
                     << " characters: "  << mischars.size()
                     << std::endl;
+
+                std::cout << ss.str();
+                ulog(ss.str());
 
                 // converts ALL of the mis data to bytes in one go
                 bits2bytes(mis->data, (u_char*)data8, mis->misw * mis->mish);
