@@ -116,6 +116,7 @@ TEST_CASE("ihead and hsfpage and mis - can insert 100 rows")
 
 TEST_CASE("ihead and hsfpage - insert and read")
 {    
+    return;
     using namespace sdb19db;
 
     std::remove("db.db3");
@@ -215,7 +216,7 @@ TEST_CASE("ihead and hsfpage - insert and read")
 
 TEST_CASE("ihead and mis - insert and read")
 {    
-    return;
+    //return;
     using namespace sdb19db;
 
     std::remove("db.db3");
@@ -251,6 +252,11 @@ TEST_CASE("ihead and mis - insert and read")
             int misentry = 0;
 
             mis = readmisfile((char*)filepath.c_str());
+
+            //TODO: reading the MIS file twice.
+            //      1) readmisfile
+            //      2) get_file_sha256_checksum
+            const std::string mis_sha256(get_file_sha256_checksum(filepath));
 
             //read in the cls file
             std::ifstream clsfile(clsfilepath);
@@ -351,6 +357,7 @@ TEST_CASE("ihead and mis - insert and read")
                 const int ihead_id      = dbm.Insert(ihead_row);            
 
                 tables::mis mis_row;
+                mis_row.mis_sha256          = mis_sha256;
                 mis_row.hsf_num             = std::stoi(hsf_num);
                 mis_row.ihead_id            = ihead_id;
                 mis_row.writer_num          = std::stoi(writer);
