@@ -2,6 +2,7 @@
 
 #include <cassert>
 #include <chrono>
+#include <cstdint>
 #include <filesystem>
 #include <iomanip>
 #include <iostream>
@@ -15,6 +16,11 @@
 
 #include "doctest/doctest.h"
 
+#include "miniz/miniz.h"
+
+#include "sha256/SHA256.h"
+#include "sha256/sha256_util.h"
+
 #include "sd19/bits2bytes.h"
 #include "sd19/getnset.h"
 #include "sd19/readmis.h"
@@ -25,10 +31,6 @@
 #include "sd19db/dbmanager.h"
 
 #include "toojpeg/toojpeg_helper.h"
-#include "miniz/miniz.h"
-#include "sha256/SHA256.h"
-#include <cstdint>
-#include "sha256/sha256_util.h"
 
 TEST_CASE("toojpeg create file")
 {
@@ -88,8 +90,8 @@ TEST_CASE("ihead and hsfpage and mis - can insert 100 rows")
         hsfpage_row.ihead_id            = ihead_id;
         hsfpage_row.writer_num          = rand() % 4170;
         hsfpage_row.template_num        = rand() % 100;        
-        hsfpage_row.image_len_bytes    = (i + 1);        
-        hsfpage_row.image              = new char[hsfpage_row.image_len_bytes];
+        hsfpage_row.image_len_bytes     = (i + 1);        
+        hsfpage_row.image               = new char[hsfpage_row.image_len_bytes];
         std::fill(hsfpage_row.image, hsfpage_row.image + hsfpage_row.image_len_bytes, (i+1));
 
         const int hsfpage_id = dbm.Insert(hsfpage_row);
@@ -103,8 +105,8 @@ TEST_CASE("ihead and hsfpage and mis - can insert 100 rows")
         mis_row.writer_num      = rand() % 4170;
         mis_row.template_num    = rand() % 100;
         mis_row.character       = char(rand() % 26 + 65);
-        mis_row.image_len_bytes  = (i + 1);
-        mis_row.image            = new char[mis_row.image_len_bytes];
+        mis_row.image_len_bytes = (i + 1);
+        mis_row.image           = new char[mis_row.image_len_bytes];
         std::fill(mis_row.image, mis_row.image + mis_row.image_len_bytes, (i + 1));
 
         const int mis_id = dbm.Insert(mis_row);
@@ -252,10 +254,11 @@ TEST_CASE("ihead and mis - insert and read")
             int misentry = 0;
 
             mis = readmisfile((char*)filepath.c_str());
-
+            //------------------------------------------------------------------------
             //TODO: reading the MIS file twice.
             //      1) readmisfile
             //      2) get_file_sha256_checksum
+            //------------------------------------------------------------------------
             const std::string mis_sha256(get_file_sha256_checksum(filepath));
 
             //read in the cls file
