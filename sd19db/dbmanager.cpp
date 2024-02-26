@@ -33,6 +33,7 @@ namespace sdb19db
 	bool DbManager::MisProcessed(const std::string sha256) const {
 		const std::string sql(std::format("select id from mis where mis_sha256 = '{}';", sha256));
 		const auto ret = _hsfpage->Query(sql);
-		return (1 == ret.size());
+		//multiple mis images are present inside each mis file
+		return (ret.size() >= 1);
 	}
 }

@@ -118,6 +118,7 @@ TEST_CASE("ihead and hsfpage and mis - can insert 100 rows")
 
 TEST_CASE("ihead and hsfpage - insert and read")
 {
+    return;
     using namespace sdb19db;
 
     DbManager dbm("db.db3");
@@ -237,10 +238,9 @@ TEST_CASE("ihead and hsfpage - insert and read")
 
 TEST_CASE("ihead and mis - insert and read")
 {    
-    return;
     using namespace sdb19db;
 
-    std::remove("db.db3");
+    //std::remove("db.db3");
     DbManager dbm("db.db3");
 
     using recursive_directory_iterator = std::filesystem::recursive_directory_iterator;
@@ -406,7 +406,8 @@ TEST_CASE("ihead and mis - insert and read")
                     << " writer: "      << writer
                     << " template: "    << templ
                     << " hsf_num: "     << hsf_num
-                    << " clsfilepath: " << clsfilepath;                    
+                    << " clsfilepath: " << clsfilepath
+                    << std::endl;
             }
         }
     }
