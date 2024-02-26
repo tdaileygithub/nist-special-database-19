@@ -145,87 +145,58 @@ TEST_CASE("ihead and hsfpage - insert and read")
             IHEAD* head;
             unsigned char* buf;
             int width, height, bpi;
-            char* data8;            
-
-            // 6340[us]
+            char* data8;
+            const std::string tempImageFileName("temp.pct.png");
+            
             ReadBinaryRaster((char*)filepath.c_str(), &head, &buf, &bpi, &width, &height);
 
             if ((data8 = (char*)malloc(width * height * sizeof(char))) == NULL)
                 syserr("show_mis", "show_mis", "unable to allocate 8 bit space");
 
-            // 6447[us]
             bits2bytes(buf, (u_char*)data8, width * height);
 
-            // 10375 [us]
             auto image = new unsigned char[width * height * 1];
             TooJpeg::misdata_to_bwimage(data8, image, width, height, 1);
 
-            //quality   filesize kb
-            //90        1080
-            //10        312
-            const bool isRGB = false;           // true = RGB image, else false = grayscale
-            const auto quality = 10;            // compression quality: 0 = worst, 100 = best, 80 to 90 are most often used
-            const bool downsample = false;      // false = save as YCbCr444 JPEG (better quality), true = YCbCr420 (smaller file)                
-
-            std::chrono::steady_clock::time_point beginjpeg = std::chrono::steady_clock::now();
-
-            // 97638 [us]
-            TooJpeg::save_jpeg("temp.pct.jpg", image, width, height, 1, isRGB, quality, downsample, filepath);            
-
-            std::chrono::steady_clock::time_point endjpeg = std::chrono::steady_clock::now();
-            std::cout << "save_jpeg Time difference = " << std::chrono::duration_cast<std::chrono::microseconds>(endjpeg - beginjpeg).count() << "[us]" << std::endl;
-
-            std::chrono::steady_clock::time_point beginpng = std::chrono::steady_clock::now();
+            //std::chrono::steady_clock::time_point beginpng = std::chrono::steady_clock::now();
             // Now write the PNG image.
             {
                 size_t png_data_size = 0;
                 void* pPNG_data = tdefl_write_image_to_png_file_in_memory_ex(image, width, height, 1, &png_data_size, 6, MZ_FALSE);
 
                 if (!pPNG_data)
+                {   
                     fprintf(stderr, "tdefl_write_image_to_png_file_in_memory_ex() failed!\n");
+                    exit(1);
+                }
                 else
                 {
-                    FILE* pFile = fopen("temp.pct.png", "wb");
+                    FILE* pFile = fopen(tempImageFileName.c_str(), "wb");
                     fwrite(pPNG_data, 1, png_data_size, pFile);
                     fclose(pFile);
-                    printf("Wrote %s\n", "temp.pct.png");
                 }
 
                 // mz_free() is by default just an alias to free() internally, but if you've overridden miniz's allocation funcs you'll probably need to call mz_free().
                 mz_free(pPNG_data);
             }
-            std::chrono::steady_clock::time_point endpng = std::chrono::steady_clock::now();
-            std::cout << "png Time difference = " << std::chrono::duration_cast<std::chrono::microseconds>(endpng - beginpng).count() << "[us]" << std::endl;
-
+            //std::chrono::steady_clock::time_point endpng = std::chrono::steady_clock::now();
+            //std::cout << "png Time difference = " << std::chrono::duration_cast<std::chrono::microseconds>(endpng - beginpng).count() << "[us]" << std::endl;
 
             delete[] image;
-            exit(1);
+            //exit(1);
 
 
 
-
-
-
-
-
-
-
-            std::ifstream file("temp.pct.jpg", std::ios::in | std::ios::binary);
+            std::ifstream file(tempImageFileName, std::ios::in | std::ios::binary);
             if (!file) {
-                std::cerr << "An error occurred opening the file\n";                
+                exit(1);
             }
             file.seekg(0, std::ifstream::end);
-            std::streampos jpeg_size_bytes = file.tellg();
+            std::streampos image_size_bytes = file.tellg();
             file.seekg(0);
 
-            char* jpgbuffer = new char[jpeg_size_bytes];
-            file.read(jpgbuffer, jpeg_size_bytes);
-
-            //JPEG Time difference = 72270[us]
-            //     Time difference = 82867[us]
-
-            std::chrono::steady_clock::time_point end2 = std::chrono::steady_clock::now();
-            std::cout << "JPEG Time difference = " << std::chrono::duration_cast<std::chrono::microseconds>(end2 - begin).count() << "[us]" << std::endl;
+            char* imgbuffer = new char[image_size_bytes];
+            file.read(imgbuffer, image_size_bytes);
 
             tables::ihead ihead_row;
             ihead_row.created       = get_created(head);
@@ -256,19 +227,14 @@ TEST_CASE("ihead and hsfpage - insert and read")
             hsfpage_row.ihead_id            = ihead_id;
             hsfpage_row.writer_num          = std::stoi(writer);
             hsfpage_row.template_num        = std::stoi(templ);
-            hsfpage_row.image_len_bytes    = jpeg_size_bytes;
-            hsfpage_row.image              = jpgbuffer;
+            hsfpage_row.image_len_bytes     = image_size_bytes;
+            hsfpage_row.image               = imgbuffer;
 
             const int hsfpage_id = dbm.Insert(hsfpage_row);
-            delete[] jpgbuffer;
+            delete[] imgbuffer;
 
             free(data8);
             free(head);
-
-            std::chrono::steady_clock::time_point end = std::chrono::steady_clock::now();
-            //88124 release
-            //229150 debug
-            std::cout << "Time difference = " << std::chrono::duration_cast<std::chrono::microseconds>(end - begin).count() << "[us]" << std::endl;
         }
         //break;
     }
