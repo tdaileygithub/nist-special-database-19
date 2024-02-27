@@ -110,8 +110,11 @@ void ReadBinaryRaster(char* file, IHEAD** head, unsigned char** data, int* bpi, 
 			(*head)->byte_order = HILOW;
 		}
 		grp4decomp(indata, complen, *width, *height, outdata, &outbytes);
-		set_compression(ihead, UNCOMP);
-		set_complen(ihead, 0);
+		//--------------------------------------------------------------------
+		//!BUG! readmisfile() - was clearning compression after it decompresses it
+		//--------------------------------------------------------------------
+		//set_compression(ihead, UNCOMP);
+		//set_complen(ihead, 0);
 		free((char*)indata);
 		break;
 	case UNCOMP:

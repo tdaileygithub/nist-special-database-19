@@ -128,6 +128,10 @@ void process_mis_thread_callback(const MisInfo info)
         //-------------------------------------------------------------------------------------
         {
             std::lock_guard<std::mutex> guard(readbinaryrastermutex);
+
+            //--------------------------------------------------------------------
+            //!BUG! readmisfile() - was clearning compression after it decompresses it
+            //--------------------------------------------------------------------
             mis = readmisfile((char*)info.filepath.c_str());
             if (mis->misd != 1) {
                 fatalerr("show_mis", "", "incorrect entry size or depth");
