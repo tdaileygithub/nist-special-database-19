@@ -37,8 +37,8 @@ namespace sdb19db
 	{
 	public:
 		~IHead() {}
-		IHead(const std::string& dbname) : IDbRepository(
-			dbname,
+		IHead(sqlite3* db) : IDbRepository(
+			db,
 			R"SQL(
 				CREATE TABLE "ihead" (
 					"id"			INTEGER NOT NULL,

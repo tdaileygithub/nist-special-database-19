@@ -21,8 +21,8 @@ namespace sdb19db
 	{
 	public:
 		~HsfPage() {}
-		HsfPage(const std::string& dbname) : IDbRepository(
-			dbname,
+		HsfPage(sqlite3* db) : IDbRepository(
+			db,
 			R"SQL(
 				CREATE TABLE "hsf_page" (
 					"id"				INTEGER NOT NULL,

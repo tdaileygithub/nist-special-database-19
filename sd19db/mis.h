@@ -25,27 +25,27 @@ namespace sdb19db
 	{
 	public:
 		~Mis() {}
-		Mis(const std::string& dbname) : 
-			IDbRepository(dbname,
-				R"SQL(
-					CREATE TABLE "mis" (
-						"id"				INTEGER NOT NULL,
-						"field_type"		INTEGER NOT NULL,
-						"mis_sha256"		TEXT NOT NULL,
-						"hsf_num"			INTEGER NOT NULL,
-						"ihead_id"			INTEGER NOT NULL,
-						"writer_num"		INTEGER NOT NULL,
-						"template_num"		INTEGER NOT NULL,
-						"character"			TEXT NOT NULL,
-						"image_sha256"		TEXT NOT NULL,
-						"image"				BLOB NOT NULL,
-						FOREIGN KEY (ihead_id) REFERENCES ihead (id),
-						PRIMARY KEY("id" AUTOINCREMENT)
-					);
-				)SQL",
-				R"SQL(
-					INSERT INTO mis(hsf_num,ihead_id,writer_num,template_num,character,image,image_sha256,mis_sha256,field_type) VALUES (?,?,?,?,?,?,?,?,?);
-				)SQL")
+		Mis(sqlite3* db) : IDbRepository(
+			db,
+			R"SQL(
+				CREATE TABLE "mis" (
+					"id"				INTEGER NOT NULL,
+					"field_type"		INTEGER NOT NULL,
+					"mis_sha256"		TEXT NOT NULL,
+					"hsf_num"			INTEGER NOT NULL,
+					"ihead_id"			INTEGER NOT NULL,
+					"writer_num"		INTEGER NOT NULL,
+					"template_num"		INTEGER NOT NULL,
+					"character"			TEXT NOT NULL,
+					"image_sha256"		TEXT NOT NULL,
+					"image"				BLOB NOT NULL,
+					FOREIGN KEY (ihead_id) REFERENCES ihead (id),
+					PRIMARY KEY("id" AUTOINCREMENT)
+				);
+			)SQL",
+			R"SQL(
+				INSERT INTO mis(hsf_num,ihead_id,writer_num,template_num,character,image,image_sha256,mis_sha256,field_type) VALUES (?,?,?,?,?,?,?,?,?);
+			)SQL")
 		{
 		}
 

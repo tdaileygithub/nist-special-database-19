@@ -259,8 +259,7 @@ TEST_CASE("ihead and mis - insert and read")
         const std::string fileext (dirEntry.path().extension().string());
 
         // by_write\hsf_0\f0039_14\l0039_14.mis
-        if (!dirEntry.is_directory() 
-            //&& (dirEntry.path().string().find("hsf_2") != std::string::npos)
+        if (!dirEntry.is_directory()
             && (0 == fileext.compare(".mis")))
         {
             const std::string filepath(dirEntry.path().string());
