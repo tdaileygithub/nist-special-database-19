@@ -38,8 +38,6 @@
 
 #include "misprocessing.h"
 
-#include "hsfpageprocessing.h"
-
 #include "toojpeg/toojpeg_helper.h"
 
 

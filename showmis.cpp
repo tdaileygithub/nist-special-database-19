@@ -13,9 +13,10 @@
 
 using namespace std;
 
-// hardcoded a global instance
+// global instance - only want one owner and wrapped with mutex
 std::unique_ptr<sdb19db::DbManager> dbm = nullptr;
-// a global instance of std::mutex to protect global variable
+
+// global std::mutexes for sqlite3 writes and the nist group 4 decompression code
 std::mutex dbmutex;
 std::mutex readbinaryrastermutex;
 
