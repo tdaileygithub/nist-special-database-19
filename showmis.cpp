@@ -38,8 +38,10 @@
 
 using namespace std;
 
-// a global instance
-sdb19db::DbManager dbm("db.db3");
+const char DB_NAME[] = "sd19.db3";
+
+// hardcoded a global instance
+sdb19db::DbManager dbm(DB_NAME);
 // a global instance of std::mutex to protect global variable
 std::mutex dbmutex;
 std::mutex readbinaryrastermutex;
@@ -47,8 +49,7 @@ std::mutex readbinaryrastermutex;
 class Sd19Config 
 {
 private:
-    std::string _nistSd19Folder = "";
-    std::string _sqliteDbName = "";
+    std::string _nistSd19Folder = "";    
     bool _hsfPageProcessing = false;
     bool _deleteExistingDb = false;
 
@@ -60,16 +61,12 @@ public:
             exit(1);
 
         _nistSd19Folder     = std::string((pugi::xpath_query("/Sd19Db/Configs/Config[@Name='NIST_Special_Database_19']").evaluate_node_set(doc)[0]).node().text().get());
-        _sqliteDbName       = std::string((pugi::xpath_query("/Sd19Db/Configs/Config[@Name='Sqlite_Db_Name']").evaluate_node_set(doc)[0]).node().text().get());        
         _hsfPageProcessing  = (pugi::xpath_query("/Sd19Db/Configs/Config[@Name='Hsf_Page_Enable']").evaluate_node_set(doc)[0]).node().text().as_bool(true);
         _deleteExistingDb   = (pugi::xpath_query("/Sd19Db/Configs/Config[@Name='Delete_Existing_Db']").evaluate_node_set(doc)[0]).node().text().as_bool(true);
     }
 
     std::string GetNistSd19Folder() const {
         return _nistSd19Folder;
-    }
-    std::string GetSqliteDbName() const {
-        return _sqliteDbName;
     }
     bool GetHfPageProcessing() const {
         return _hsfPageProcessing;
@@ -124,13 +121,6 @@ std::vector<HsfPageInfo> GetHsfPages()
     return entries;
 }
 
-//void process_hsf_page_thread_callback(const std::filesystem::directory_entry hsf_page)
-void process_hsf_page_thread_callback(int x, std::string str)
-{
-    //std::cout << hsf_page << std::endl;
-    std::cout << "Passed Number = " << x << str << std::endl;    
-}
-
 void process_hsf_page_thread_callback3(const HsfPageInfo info)
 {
     //std::cout
@@ -150,13 +140,13 @@ void process_hsf_page_thread_callback3(const HsfPageInfo info)
     char* data8;
     
     {
-        //
-        //TODO: something in the decode code is not threadsafe
+        //-------------------------------------------------------------------------------------
+        //TODO: something down in the decode code is not threadsafe
         //      saw registers and all sorts of bit math in code so not surprising
-        //
+        //-------------------------------------------------------------------------------------
         std::lock_guard<std::mutex> guard(readbinaryrastermutex);
         ReadBinaryRaster((char*)info.filepath.c_str(), &head, &buf, &bpi, &width, &height);
-    }   
+    }
 
     if ((data8 = (char*)malloc(width * height * sizeof(char))) == NULL) {
         syserr("ReadBinaryRaster", "malloc", "unable to allocate 8 bit space");
@@ -200,7 +190,7 @@ void process_hsf_page_thread_callback3(const HsfPageInfo info)
     tables::hsfpage hsfpage_row;
     hsfpage_row.hsf_page_sha256     = info.hsfpage_sha256;
     hsfpage_row.hsf_num             = std::stoi(info.hsfdirname);
-    hsfpage_row.ihead_id            = 1; //ihead_id;
+    hsfpage_row.ihead_id            = ihead_id;
     hsfpage_row.writer_num          = std::stoi(info.writer);
     hsfpage_row.template_num        = std::stoi(info.templ);
     hsfpage_row.image_len_bytes     = png_data_size;
@@ -218,16 +208,19 @@ void process_hsf_page_thread_callback3(const HsfPageInfo info)
 int main()
 {
     Sd19Config config;
-    {
-        using namespace sdb19db;
-        DbManager dbm("db.db3");
-    }
 
     std::cout << setw(30) << "NIST_Special_Database_19: "   << setw(100) << config.GetNistSd19Folder() << std::endl;
     std::cout << setw(30) << "Sqlite_Db_Name: "             << setw(100) << config.GetNistSd19Folder() << std::endl;
     std::cout << setw(30) << "Hsf_Page_Enable: "            << setw(100) << (config.GetHfPageProcessing() ? "true" : "false") << std::endl;
     std::cout << setw(30) << "Delete_Existing_Db: "         << setw(100) << (config.GetDeleteExistingDb() ? "true" : "false") << std::endl;
     
+    if (config.GetDeleteExistingDb())
+    {
+        std::remove(DB_NAME);
+    }
+    using namespace sdb19db;
+    DbManager dbm(DB_NAME);
+
     if (config.GetHfPageProcessing())
     {
         std::vector<std::thread> vecOfThreads;
@@ -245,17 +238,14 @@ int main()
                 vecOfThreads.push_back(std::move(threadObj));
 
                 numPagesToProcess = numPagesToProcess - 1;
-                if (-1 == numPagesToProcess)
-                {
+                if (-1 == numPagesToProcess) {
                     break;
                 }
             };
-            for (int j = 0; j < vecOfThreads.size(); j++)
-            {
+            for (int j = 0; j < vecOfThreads.size(); j++) {
                 vecOfThreads[j].join();                
             }
-            if (-1 == numPagesToProcess)
-            {
+            if (-1 == numPagesToProcess) {
                 break;
             }
         }

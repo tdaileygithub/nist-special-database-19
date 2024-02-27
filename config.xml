@@ -3,5 +3,7 @@
 	<Configs>
 		<Config Name="NIST_Special_Database_19">C:\Users\tim\Documents\nist-special-database-19\out\build\x64-release</Config>
 		<Config Name="Sqlite_Db_Name">sd19.db3</Config>
+		<Config Name="Hsf_Page_Enable">yes</Config>
+		<Config Name="Delete_Existing_Db">no</Config>
 	</Configs>
 </Sd19Db>

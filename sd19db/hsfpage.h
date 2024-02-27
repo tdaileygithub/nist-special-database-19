@@ -26,7 +26,7 @@ namespace sdb19db
 			R"SQL(
 				CREATE TABLE "hsf_page" (
 					"id"				INTEGER NOT NULL,
-					"hsf_page_sha256"	TEXT NOT NULL UNIQUE,
+					"hsf_page_sha256"	TEXT NOT NULL,
 					"hsf_num"			INTEGER NOT NULL,
 					"ihead_id"			INTEGER NOT NULL,
 					"writer_num"		INTEGER NOT NULL,
