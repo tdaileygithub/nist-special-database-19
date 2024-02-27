@@ -58,6 +58,6 @@ namespace sdb19db
 
 		bool MisProcessed(const std::string sha256) const;
 
-		void WriteInMemoryToDisk() const;
+		void WriteInMemoryToDisk(const std::string backupFilename) const;
 	};
 }

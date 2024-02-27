@@ -14,7 +14,8 @@ class Sd19Config
 {
 private:
     std::string _nistSd19Folder = "";
-    std::string _dbName = "sd19.db";
+    std::string _sourceDbFile = ":memory:";
+    std::string _dbDumpFile = ":memory:";
     bool _hsfPageProcessing = false;
     bool _misProcessing = false;
     bool _deleteExistingDb = false;
@@ -32,10 +33,15 @@ public:
         _misProcessing      = (pugi::xpath_query("/Sd19Db/Configs/Config[@Name='Mis_Enable']").evaluate_node_set(doc)[0]).node().text().as_bool(true);
         _deleteExistingDb   = (pugi::xpath_query("/Sd19Db/Configs/Config[@Name='Delete_Existing_Db']").evaluate_node_set(doc)[0]).node().text().as_bool(true);
         _numberThreads      = (pugi::xpath_query("/Sd19Db/Configs/Config[@Name='Number_Threads']").evaluate_node_set(doc)[0]).node().text().as_int(0);
+        _sourceDbFile       = std::string((pugi::xpath_query("/Sd19Db/Configs/Config[@Name='Sqlite3_SourceDb']").evaluate_node_set(doc)[0]).node().text().get());
+        _dbDumpFile         = std::string((pugi::xpath_query("/Sd19Db/Configs/Config[@Name='Sqlite3_DumpFilename']").evaluate_node_set(doc)[0]).node().text().get());
     }
 
-    std::string GetDbName() const {
-        return ":memory:";
+    std::string GetSourceDbName() const {
+        return _sourceDbFile;
+    }
+    std::string GetDumpDbName() const {
+        return _dbDumpFile;
     }
     std::string GetNistSd19Folder() const {
         return _nistSd19Folder;

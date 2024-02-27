@@ -36,4 +36,20 @@ namespace sdb19db
 		//multiple mis images are present inside each mis file
 		return (ret.size() >= 1);
 	}
+
+	void DbManager::WriteInMemoryToDisk(const std::string backupFilename) const {
+		int rc;
+		sqlite3* pFile;
+		sqlite3_backup* pBackup;
+
+		rc = sqlite3_open(backupFilename.c_str(), &pFile);
+		if (rc == SQLITE_OK) {
+			pBackup = sqlite3_backup_init(pFile, "main", _dbPtr, "main");
+			if (pBackup) {
+				(void)sqlite3_backup_step(pBackup, -1);
+				(void)sqlite3_backup_finish(pBackup);
+			}
+		}
+		(void)sqlite3_close(pFile);
+	}
 }
