@@ -5,6 +5,8 @@
 
 #include "ulog/ulog.h"
 
+#include "mongoose/mongoose.h"
+
 #include "sd19db/dbmanager.h"
 
 #include "hsfpageprocessing.h"
@@ -20,8 +22,30 @@ std::unique_ptr<sdb19db::DbManager> dbm = nullptr;
 std::mutex dbmutex;
 std::mutex readbinaryrastermutex;
 
+// Connection event handler function
+static void fn(struct mg_connection* c, int ev, void* ev_data) {
+    if (ev == MG_EV_HTTP_MSG) {  // New HTTP request received
+        struct mg_http_message* hm = (struct mg_http_message*)ev_data;  // Parsed HTTP request
+        if (mg_http_match_uri(hm, "/api/hello")) {                        // REST API call?
+            mg_http_reply(c, 200, "", "{%m:%d}\n", MG_ESC("status"), 1);    // Yes. Respond JSON
+        }
+        else {
+            struct mg_http_serve_opts opts = { .root_dir = "." };  // For all other URLs,
+            mg_http_serve_dir(c, hm, &opts);                     // Serve static files
+        }
+    }
+}
+
 int main()
 {
+    struct mg_mgr mgr;  // Mongoose event manager. Holds all connections
+    mg_mgr_init(&mgr);  // Initialise event manager
+    mg_http_listen(&mgr, "http://0.0.0.0:8000", fn, NULL);  // Setup listener
+    for (;;) {
+        mg_mgr_poll(&mgr, 1000);  // Infinite event loop
+    }
+    return 0;
+
     std::chrono::steady_clock::time_point programstart = std::chrono::steady_clock::now();
 
     unsigned int NUM_THREADS = std::thread::hardware_concurrency() - 1;
