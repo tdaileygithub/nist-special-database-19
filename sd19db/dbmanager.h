@@ -50,7 +50,7 @@ namespace sdb19db
 
 		void WriteInMemoryToDisk(const std::string backupFilename) const;
 
-		int GetMisCharacterCount(std::string character) const;
+		int GetMisCharacterCount(const std::string character) const;
 
 		int GetMisCharacterCount(int field_type, int hsf_num) const;
 	};

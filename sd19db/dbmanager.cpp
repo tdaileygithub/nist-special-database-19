@@ -53,7 +53,7 @@ namespace sdb19db
 		(void)sqlite3_close(pFile);
 	}
 
-	int DbManager::GetMisCharacterCount(std::string character) const {
+	int DbManager::GetMisCharacterCount(const std::string character) const {
 		const std::string sql(std::format("select count(*) from mis where character='{}';", character));
 		const auto ret = _hsfpage->Query(sql);		
 		return std::stoi(ret.at(0).at(0));

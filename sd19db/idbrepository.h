@@ -35,12 +35,8 @@ namespace sdb19db
 			int rc = sqlite3_exec(_dbPtr, createSql.c_str(), NULL, 0, &messaggeError);
 			if (SQLITE_OK != rc) {
 				std::cerr << "Error Create Table - if database already exists then this expected" << std::endl;
-				
-				//exit(9999);
-				//std::cerr << "Error Create Table" << std::endl;
 				sqlite3_free(messaggeError);
-			}
-			
+			}			
 			const std::string lastRowSql("SELECT last_insert_rowid();");
 			rc = sqlite3_prepare_v2(_dbPtr, lastRowSql.c_str(), lastRowSql.size(), &_lastRowStatement, nullptr);
 			if (SQLITE_OK != rc) {								
@@ -58,10 +54,8 @@ namespace sdb19db
 		{
 			sqlite3_stmt* sqlstatement;			
 			int rc = sqlite3_prepare_v2(_dbPtr, sql.c_str(), sql.size(), &sqlstatement, nullptr);
-			if (SQLITE_OK != rc) {
-				
-				std::cerr << sql << " rc = " << rc << std::endl;				
-				//HandleSqliteError(rc);
+			if (SQLITE_OK != rc) {								
+				HandleSqliteError(rc);
 			}
 			
 			std::vector<std::vector<std::string>> rows(0, std::vector<std::string>(0));
@@ -69,8 +63,7 @@ namespace sdb19db
 			while (sqlite3_step(sqlstatement) == SQLITE_ROW)
 			{
 				std::vector<std::string> cols;
-				for (int i = 0; i < ncols; i++)
-				{
+				for (int i = 0; i < ncols; i++) {
 					cols.push_back(std::string(reinterpret_cast<const char*>(sqlite3_column_text(sqlstatement, i))));
 				}
 				rows.push_back(cols);
