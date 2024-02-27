@@ -12,8 +12,6 @@ namespace sdb19db
 {
 	int Mis::Insert(const tables::mis& table) const {
 
-		Log(sdb19db::to_string(table));
-
 		int rc = sqlite3_bind_int(_insertStatement, 1, table.hsf_num);
 		if (SQLITE_OK != rc) {
 			HandleSqliteError(rc);
@@ -47,6 +45,10 @@ namespace sdb19db
 			HandleSqliteError(rc);
 		}
 		rc = sqlite3_bind_int(_insertStatement, 9, table.field_type);
+		if (SQLITE_OK != rc) {
+			HandleSqliteError(rc);
+		}
+		rc = sqlite3_bind_int(_insertStatement, 10, table.entry_num);
 		if (SQLITE_OK != rc) {
 			HandleSqliteError(rc);
 		}

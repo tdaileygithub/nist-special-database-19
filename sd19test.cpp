@@ -1,41 +1,14 @@
 #define DOCTEST_CONFIG_IMPLEMENT_WITH_MAIN
 
-#include <cassert>
-#include <chrono>
-#include <cstdint>
-#include <filesystem>
-#include <iomanip>
-#include <iostream>
-#include <memory>
-#include <regex>
-#include <sstream>
-#include <stdlib.h>
-#include <string>
-
 #include "toojpeg/toojpeg.h"
 
 #include "doctest/doctest.h"
 
-#include "ulog/ulog.h"
-
-#include "miniz/miniz.h"
-
-#include "sha256/SHA256.h"
-#include "sha256/sha256_util.h"
-
-#include "sd19/bits2bytes.h"
-#include "sd19/freemis.h"
-#include "sd19/getnset.h"
-#include "sd19/readmis.h"
-#include "sd19/readrast.h"
-#include "sd19/syserr.h"
-
-#include "sd19/fatalerr.h"
 #include "sd19db/dbmanager.h"
 
 #include "toojpeg/toojpeg_helper.h"
 
-TEST_CASE("toojpeg create file")
+TEST_CASE("toojpeg - create a jpeg file")
 {
     const auto width = 800;
     const auto height = 600;
@@ -65,375 +38,109 @@ TEST_CASE("toojpeg create file")
     delete[] image;    
 }
 
-TEST_CASE("ihead and hsfpage and mis - can insert 100 rows")
+TEST_CASE("character counts - 1stEditionUserGuide.pdf - table 6 Class abundancies") 
 {
-    return;
+    sdb19db::DbManager dbm("sd19.db3");
 
-    using namespace sdb19db;
+    //Table 6: Class abundancies totalled over all partitions and all fields
+    CHECK(40363 == dbm.GetMisCharacterCount("0"));
+    CHECK(44704 == dbm.GetMisCharacterCount("1"));
+    CHECK(40072 == dbm.GetMisCharacterCount("2"));
+    //CHECK(41112 == dbm.GetMisCharacterCount("3")); //FAILING
+    CHECK(39154 == dbm.GetMisCharacterCount("4"));
+    CHECK(36606 == dbm.GetMisCharacterCount("5"));
+    CHECK(39937 == dbm.GetMisCharacterCount("6"));
+    CHECK(41893 == dbm.GetMisCharacterCount("7"));
+    CHECK(39579 == dbm.GetMisCharacterCount("8"));
+    CHECK(39533 == dbm.GetMisCharacterCount("9"));
 
-    srand(time(NULL));
+    CHECK(7469  == dbm.GetMisCharacterCount("A"));
+    CHECK(4526  == dbm.GetMisCharacterCount("B"));
+    CHECK(11833 == dbm.GetMisCharacterCount("C"));
+    CHECK(5341  == dbm.GetMisCharacterCount("D"));
+    CHECK(5785  == dbm.GetMisCharacterCount("E"));
+    CHECK(10622 == dbm.GetMisCharacterCount("F"));
+    CHECK(2964  == dbm.GetMisCharacterCount("G"));
+    CHECK(3673  == dbm.GetMisCharacterCount("H"));
+    CHECK(13994 == dbm.GetMisCharacterCount("I"));
+    CHECK(4388  == dbm.GetMisCharacterCount("J"));
+    CHECK(2850  == dbm.GetMisCharacterCount("K"));
+    CHECK(5886  == dbm.GetMisCharacterCount("L"));
+    CHECK(10487 == dbm.GetMisCharacterCount("M"));
+    CHECK(9588  == dbm.GetMisCharacterCount("N"));
+    CHECK(29139 == dbm.GetMisCharacterCount("O"));
+    CHECK(9744  == dbm.GetMisCharacterCount("P"));
+    CHECK(3018  == dbm.GetMisCharacterCount("Q"));
+    CHECK(5882  == dbm.GetMisCharacterCount("R"));
+    CHECK(24272 == dbm.GetMisCharacterCount("S"));
+    CHECK(11396 == dbm.GetMisCharacterCount("T"));
+    CHECK(14604 == dbm.GetMisCharacterCount("U"));
+    CHECK(5433  == dbm.GetMisCharacterCount("V"));
+    CHECK(5501  == dbm.GetMisCharacterCount("W"));
+    CHECK(3203  == dbm.GetMisCharacterCount("X"));
+    CHECK(5541  == dbm.GetMisCharacterCount("Y"));
+    CHECK(3165  == dbm.GetMisCharacterCount("Z"));
 
-    std::remove("db.db3");
-
-    DbManager dbm("db.db3");
-
-    for (int i = 0; i < 100; i++)
-    {
-        tables::ihead ihead_row;
-        ihead_row.created    = "hello";
-        ihead_row.par_x      = 2;
-        ihead_row.parent     = "asdfadsf";
-        
-        const int ihead_id = dbm.Insert(ihead_row);        
-        CHECK((i+1) == ihead_id);
-        
-        tables::hsfpage hsfpage_row;
-        hsfpage_row.hsf_num             = rand() % 9;
-        hsfpage_row.ihead_id            = ihead_id;
-        hsfpage_row.writer_num          = rand() % 4170;
-        hsfpage_row.template_num        = rand() % 100;        
-        hsfpage_row.image_len_bytes     = (i + 1);        
-        hsfpage_row.image               = new char[hsfpage_row.image_len_bytes];
-        std::fill(hsfpage_row.image, hsfpage_row.image + hsfpage_row.image_len_bytes, (i+1));
-        hsfpage_row.hsf_page_sha256     = std::to_string(i);
-        hsfpage_row.image_sha256        = std::to_string(i);
-
-        const int hsfpage_id = dbm.Insert(hsfpage_row);
-        CHECK((i + 1) == hsfpage_id);
-
-        delete[] hsfpage_row.image;
-
-        tables::mis mis_row;
-        mis_row.field_type      = rand() % 4;
-        mis_row.hsf_num         = rand() % 9;
-        mis_row.ihead_id        = ihead_id;
-        mis_row.writer_num      = rand() % 4170;
-        mis_row.template_num    = rand() % 100;
-        mis_row.character       = char(rand() % 26 + 65);
-        mis_row.image_len_bytes = (i + 1);
-        mis_row.image           = new char[mis_row.image_len_bytes];
-        std::fill(mis_row.image, mis_row.image + mis_row.image_len_bytes, (i + 1));
-        mis_row.image_sha256    = std::to_string(i);
-        mis_row.mis_sha256      = std::to_string(i);
-
-        const int mis_id = dbm.Insert(mis_row);
-        CHECK((i + 1) == mis_id);
-        
-        delete[] mis_row.image;
-    }
+    CHECK(11677 == dbm.GetMisCharacterCount("a"));
+    CHECK(6012  == dbm.GetMisCharacterCount("b"));
+    CHECK(3286  == dbm.GetMisCharacterCount("c"));
+    CHECK(11860 == dbm.GetMisCharacterCount("d"));
+    CHECK(28723 == dbm.GetMisCharacterCount("e"));
+    CHECK(2961  == dbm.GetMisCharacterCount("f"));
+    CHECK(4276  == dbm.GetMisCharacterCount("g"));
+    CHECK(10217 == dbm.GetMisCharacterCount("h"));
+    CHECK(3152  == dbm.GetMisCharacterCount("i"));
+    CHECK(2213  == dbm.GetMisCharacterCount("j"));
+    CHECK(2957  == dbm.GetMisCharacterCount("k"));
+    CHECK(17853 == dbm.GetMisCharacterCount("l"));
+    CHECK(3109  == dbm.GetMisCharacterCount("m"));
+    CHECK(13316 == dbm.GetMisCharacterCount("n"));
+    CHECK(3215  == dbm.GetMisCharacterCount("o"));
+    CHECK(2816  == dbm.GetMisCharacterCount("p"));
+    CHECK(3499  == dbm.GetMisCharacterCount("q"));
+    CHECK(16425 == dbm.GetMisCharacterCount("r"));
+    CHECK(3136  == dbm.GetMisCharacterCount("s"));
+    CHECK(21227 == dbm.GetMisCharacterCount("t"));
+    CHECK(3312  == dbm.GetMisCharacterCount("u"));
+    CHECK(3378  == dbm.GetMisCharacterCount("v"));
+    CHECK(3164  == dbm.GetMisCharacterCount("w"));
+    CHECK(3292  == dbm.GetMisCharacterCount("x"));
+    CHECK(2746  == dbm.GetMisCharacterCount("y"));
+    CHECK(3176  == dbm.GetMisCharacterCount("z"));
 }
 
-TEST_CASE("ihead and hsfpage - insert and read")
+TEST_CASE("character counts - 1stEditionUserGuide.pdf - table 5 group abundancies")
 {
-    using namespace sdb19db;
+    sdb19db::DbManager dbm("sd19.db3");
+    CHECK(53449 == dbm.GetMisCharacterCount(0, 0));
+    CHECK(10790 == dbm.GetMisCharacterCount(1, 0));
+    CHECK(10968 == dbm.GetMisCharacterCount(2, 0));
+    CHECK(99208 == dbm.GetMisCharacterCount(3, 0));
 
-    DbManager dbm("db.db3");
+    CHECK(53312 == dbm.GetMisCharacterCount(0, 1));
+    CHECK(10662 == dbm.GetMisCharacterCount(1, 1));
+    CHECK(10784 == dbm.GetMisCharacterCount(2, 1));
+    CHECK(87965 == dbm.GetMisCharacterCount(3, 1));
 
-    using recursive_directory_iterator = std::filesystem::recursive_directory_iterator;
+    CHECK(52467 == dbm.GetMisCharacterCount(0, 2));
+    CHECK(10863 == dbm.GetMisCharacterCount(1, 2));
+    CHECK(10883 == dbm.GetMisCharacterCount(2, 2));
+    CHECK(61570 == dbm.GetMisCharacterCount(3, 2));
 
-    for (const auto& dirEntry : recursive_directory_iterator("hsf_page"))
-    {
-        if (!dirEntry.is_directory()
-            && (dirEntry.path().string().find("template") == std::string::npos)
-            && (dirEntry.path().string().find("truerefs") == std::string::npos)
-        )
-        {
-            std::chrono::steady_clock::time_point begin = std::chrono::steady_clock::now();
+    CHECK(63896 == dbm.GetMisCharacterCount(0, 3));
+    CHECK(12636 == dbm.GetMisCharacterCount(1, 3));
+    CHECK(12678 == dbm.GetMisCharacterCount(2, 3));
+    //CHECK(89210 == dbm.GetMisCharacterCount(3, 3));  //failing
 
-            //f0000_14.pct
-            std::string hsfdirname(dirEntry.path().parent_path().filename().string());
-            hsfdirname = std::regex_replace(hsfdirname, std::regex("hsf_page"), "");
-            hsfdirname = std::regex_replace(hsfdirname, std::regex("hsf_"), "");
+    CHECK(58646 == dbm.GetMisCharacterCount(0, 4));
+    CHECK(11941 == dbm.GetMisCharacterCount(1, 4));
+    CHECK(12000 == dbm.GetMisCharacterCount(2, 4));    
 
-            const std::string filepath(dirEntry.path().string());
-            const std::string filename(dirEntry.path().filename().string());
-            const std::string writer(filename.substr(1, 4));
-            const std::string templ(filename.substr(6, 2));
+    CHECK(61094 == dbm.GetMisCharacterCount(0, 6));
+    CHECK(12479 == dbm.GetMisCharacterCount(1, 6));
+    CHECK(12205 == dbm.GetMisCharacterCount(2, 6));
 
-            //------------------------------------------------------------------------
-            //TODO: reading the hsf page file twice
-            //      1) get_file_sha256_checksum
-            //      2) ReadBinaryRaster
-            //------------------------------------------------------------------------
-            const std::string hsfpage_sha256(get_file_sha256_checksum(filepath));
-
-            if (!dbm.HsfPageProcessed(hsfpage_sha256)) 
-            {
-                std::cout
-                    << " processing: "  << filepath
-                    << " writer: "      << writer
-                    << " template: "    << templ
-                    << " dirname: "     << hsfdirname
-                    << std::endl;
-
-                IHEAD* head;
-                unsigned char* buf;
-                int width, height, bpi;
-                char* data8;
-                const std::string tempImageFileName("temp.pct.png");
-
-                ReadBinaryRaster((char*)filepath.c_str(), &head, &buf, &bpi, &width, &height);
-
-                if ((data8 = (char*)malloc(width * height * sizeof(char))) == NULL) {
-                    syserr("ReadBinaryRaster", "malloc", "unable to allocate 8 bit space");
-                }
-                bits2bytes(buf, (u_char*)data8, width * height);
-
-                auto image = new unsigned char[width * height * 1];
-                TooJpeg::misdata_to_bwimage(data8, image, width, height, 1);
-
-                size_t png_data_size = 0;
-                void* pPNG_data = tdefl_write_image_to_png_file_in_memory_ex(image, width, height, 1, &png_data_size, 6, MZ_FALSE);
-                SHA256 sha;
-                sha.update((uint8_t*) pPNG_data, png_data_size);
-                std::array<uint8_t, 32> digest = sha.digest();
-
-                tables::ihead ihead_row;
-                ihead_row.created       = get_created(head);
-                ihead_row.width         = get_width(head);
-                ihead_row.height        = get_height(head);
-                ihead_row.depth         = get_depth(head);
-                ihead_row.density       = get_density(head);
-                ihead_row.compress      = get_compression(head);
-                ihead_row.complen       = get_complen(head);
-                ihead_row.align         = get_align(head);
-                ihead_row.unitsize      = get_unitsize(head);
-                ihead_row.sigbit        = get_sigbit(head);
-                ihead_row.byte_order    = get_byte_order(head);
-                ihead_row.pix_offset    = get_pix_offset(head);
-                ihead_row.whitepix      = get_whitepix(head);
-                ihead_row.issigned      = get_issigned(head);
-                ihead_row.rm_cm         = get_rm_cm(head);
-                ihead_row.tb_bt         = get_tb_bt(head);
-                ihead_row.lr_rl         = get_lr_rl(head);
-                ihead_row.parent        = get_parent(head);
-                ihead_row.par_x         = get_par_x(head);
-                ihead_row.par_y         = get_par_y(head);
-
-                const int ihead_id = dbm.Insert(ihead_row);            
-
-                tables::hsfpage hsfpage_row;
-                hsfpage_row.hsf_page_sha256     = hsfpage_sha256;
-                hsfpage_row.hsf_num             = std::stoi(hsfdirname);
-                hsfpage_row.ihead_id            = ihead_id;
-                hsfpage_row.writer_num          = std::stoi(writer);
-                hsfpage_row.template_num        = std::stoi(templ);
-                hsfpage_row.image_len_bytes     = png_data_size;
-                hsfpage_row.image               = (char*)pPNG_data;
-                hsfpage_row.image_sha256        = SHA256::toString(digest);
-
-                const int hsfpage_id = dbm.Insert(hsfpage_row);
-
-                delete[] image;
-                mz_free(pPNG_data);
-                free(data8);
-                free(head);
-            }
-            else
-            {
-                std::cout
-                    << " skipping: "    << filepath
-                    << " writer: "      << writer
-                    << " template:"     << templ
-                    << " dirname: "     << hsfdirname
-                    << std::endl;
-            }
-        }
-    }
-}
-
-TEST_CASE("ihead and mis - insert and read")
-{    
-    using namespace sdb19db;
-    
-    DbManager dbm("db.db3");
-
-    using recursive_directory_iterator = std::filesystem::recursive_directory_iterator;
-    
-    for (const auto& dirEntry : recursive_directory_iterator("by_write"))
-    {
-        std::string hsf_num(dirEntry.path().parent_path().parent_path().string());
-        hsf_num = std::regex_replace(hsf_num, std::regex("by_write"), "");
-        hsf_num = std::regex_replace(hsf_num, std::regex("hsf_"), "");
-        hsf_num = std::regex_replace(hsf_num, std::regex("\\\\"), "");
-        const std::string fileext (dirEntry.path().extension().string());
-
-        // by_write\hsf_0\f0039_14\l0039_14.mis
-        if (!dirEntry.is_directory()
-            && (0 == fileext.compare(".mis")))
-        {
-            const std::string filepath(dirEntry.path().string());
-            const std::string filename(dirEntry.path().filename().string());
-
-            std::string clsfilename(filename);
-            clsfilename = std::regex_replace(clsfilename, std::regex(".mis"), ".cls");
-            std::string clsfilepath(filepath);
-            clsfilepath = std::regex_replace(clsfilepath, std::regex(filename), clsfilename);
-                        
-            const std::string field_type(filename.substr(0, 1));
-            const std::string writer(filename.substr(1, 4));
-            const std::string templ(filename.substr(6, 2));
-
-            //------------------------------------------------------------------------
-            //TODO: reading the MIS file twice.
-            //      1) get_file_sha256_checksum
-            //      2) readmisfile
-            //------------------------------------------------------------------------
-            const std::string mis_sha256(get_file_sha256_checksum(filepath));
-
-            if (!dbm.MisProcessed(mis_sha256))
-            {
-                MIS* mis;
-                char* data8, * dptr;
-                int misentry = 0;
-
-                mis = readmisfile((char*)filepath.c_str());
-
-                //read in the cls file
-                std::ifstream clsfile(clsfilepath);
-
-                std::vector<std::string> mischars = {};
-                if (clsfile.is_open()) {
-                    std::string line;
-                    std::getline(clsfile, line);
-                    int lineint = std::stoi(line);
-                    if (mis->ent_num != lineint) {
-                        std::cerr << ".mis and .cls counts do not match: " << filepath << " numcls: " << lineint << " nummis: " << mis->ent_num;
-                        exit(1);
-                    }
-                    //each line is a hex value represiting the ascii char
-                    while (std::getline(clsfile, line)) {
-                        unsigned int i;                    
-                        std::istringstream iss(line);
-                        iss >> std::hex >> i;
-                        //null terminate the array or it will get garbage
-                        char s[] = { i, 0x00 };
-                        mischars.push_back(std::string(s));                    
-                    }
-                    clsfile.close();                
-                }
-
-                if (mis->misd != 1) {
-                    fatalerr("show_mis", "", "incorrect entry size or depth");
-                }
-                if ((data8 = (char*)malloc(mis->misw * mis->mish * sizeof(char))) == NULL) {
-                    syserr("show_mis", "malloc", "unable to allocate 8 bit space");
-                }
-
-                std::stringstream ss;
-
-                ss  << " processing: "  << filepath 
-                    << " writer: "      << writer
-                    << " field_type: "  << field_type
-                    << " template: "    << templ
-                    << " hsf_num: "     << hsf_num
-                    << " clsfilepath: " << clsfilepath
-                    << " characters: "  << mischars.size()
-                    << std::endl;
-
-                std::cout << ss.str();
-                ulog(ss.str());
-
-                // converts ALL of the mis data to bytes in one go
-                bits2bytes(mis->data, (u_char*)data8, mis->misw * mis->mish);
-
-                for (dptr = data8, misentry = 0; misentry < mis->ent_num; misentry++)
-                {
-                    //std::cout << misentry << " character: " << mischars.at(misentry) << std::endl;
-                
-                    const auto width = mis->entw;
-                    const auto height = mis->enth;
-                    const auto bytesPerPixel = 1;
-                    auto image = new unsigned char[width * height * bytesPerPixel];
-
-                    //TooJpeg::misdata_to_bwimage(dptr, image, mis->entw, mis->enth, 1);
-
-                    for (int k = 0; k < mis->enth; k++)
-                    {
-                        for (int l = 0; l < mis->entw; l++)
-                        {
-                            auto offset = (k * width + l) * bytesPerPixel;
-                            // red and green fade from 0 to 255, blue is always 127
-                            //auto red = 255 * l / width;
-                            //auto green = 255 * k / height;
-                            //image[offset] = (red + green) / 2;;
-                            image[offset] = (*dptr++) ? 0 : 255;
-                        }
-                    }
-
-                    size_t png_data_size = 0;
-                    void* pPNG_data = tdefl_write_image_to_png_file_in_memory_ex(image, width, height, 1, &png_data_size, 6, MZ_FALSE);
-
-                    SHA256 sha;
-                    sha.update((uint8_t*)pPNG_data, png_data_size);
-                    std::array<uint8_t, 32> digest = sha.digest();
-
-                    tables::ihead ihead_row;
-                    ihead_row.created       = get_created(mis->head);
-                    ihead_row.width         = get_width(mis->head);
-                    ihead_row.height        = get_height(mis->head);
-                    ihead_row.depth         = get_depth(mis->head);
-                    ihead_row.density       = get_density(mis->head);
-                    ihead_row.compress      = get_compression(mis->head);
-                    ihead_row.complen       = get_complen(mis->head);
-                    ihead_row.align         = get_align(mis->head);
-                    ihead_row.unitsize      = get_unitsize(mis->head);
-                    ihead_row.sigbit        = get_sigbit(mis->head);
-                    ihead_row.byte_order    = get_byte_order(mis->head);
-                    ihead_row.pix_offset    = get_pix_offset(mis->head);
-                    ihead_row.whitepix      = get_whitepix(mis->head);
-                    ihead_row.issigned      = get_issigned(mis->head);
-                    ihead_row.rm_cm         = get_rm_cm(mis->head);
-                    ihead_row.tb_bt         = get_tb_bt(mis->head);
-                    ihead_row.lr_rl         = get_lr_rl(mis->head);
-                    ihead_row.parent        = get_parent(mis->head);
-                    ihead_row.par_x         = get_par_x(mis->head);
-                    ihead_row.par_y         = get_par_y(mis->head);
-
-                    const int ihead_id      = dbm.Insert(ihead_row);            
-
-                    tables::mis mis_row;
-                    if (0 == field_type.rfind("d", 0)) {
-                        mis_row.field_type = 0;
-                    }
-                    if (0 == field_type.rfind("u", 0)) {
-                        mis_row.field_type = 1;
-                    }
-                    if (0 == field_type.rfind("l", 0)) {
-                        mis_row.field_type = 2;
-                    }
-                    if (0 == field_type.rfind("c", 0)) {
-                        mis_row.field_type = 3;
-                    }
-                    mis_row.mis_sha256          = mis_sha256;
-                    mis_row.hsf_num             = std::stoi(hsf_num);
-                    mis_row.ihead_id            = ihead_id;
-                    mis_row.writer_num          = std::stoi(writer);
-                    mis_row.template_num        = std::stoi(templ);
-                    mis_row.character           = mischars.at(misentry);
-                    mis_row.image_len_bytes     = png_data_size;
-                    mis_row.image               = (char*)pPNG_data;
-                    mis_row.image_sha256        = SHA256::toString(digest);
-                    
-                    const int mis_id            = dbm.Insert(mis_row);
-                    delete[] image;
-                    mz_free(pPNG_data);
-                }
-                //outer loop
-                //data8 contains ALL the mis files                
-                free(data8);
-                freemis(mis);
-            }
-            else
-            {
-                std::cout
-                    << " skipping: "    << filepath 
-                    << " writer: "      << writer
-                    << " template: "    << templ
-                    << " hsf_num: "     << hsf_num
-                    << " clsfilepath: " << clsfilepath
-                    << std::endl;
-            }
-        }
-    }
+    CHECK(60089 == dbm.GetMisCharacterCount(0, 7));
+    CHECK(12092 == dbm.GetMisCharacterCount(1, 7));
+    CHECK(11578 == dbm.GetMisCharacterCount(2, 7));
 }

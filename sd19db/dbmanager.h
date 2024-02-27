@@ -14,23 +14,19 @@ namespace sdb19db
 	class DbManager
 	{
 	private:
-		const std::string _dbname;
+		const std::string			_dbname;
 
 		std::unique_ptr<IHead>		_ihead;
 		std::unique_ptr<HsfPage>	_hsfpage;
 		std::unique_ptr<Mis>		_mis;
 
-		//std::unique_ptr<sqlite3>	_db;
-
-		sqlite3* _dbPtr = NULL;
+		sqlite3* _dbPtr				= NULL;
 
 		void HandleSqliteError(const int ResultCode) const {
 			sqlite3_close(_dbPtr);
 			std::cerr << std::endl << "ResultCode: " << ResultCode << " " << sqlite3_errstr(ResultCode) << std::endl;
 			exit(ResultCode);
 		}
-
-
 	public:
 		DbManager(const std::string& dbname) 
 			: _dbname(dbname) 
@@ -42,12 +38,6 @@ namespace sdb19db
 			_ihead	 = std::make_unique<IHead>(_dbPtr);
 			_hsfpage = std::make_unique<HsfPage>(_dbPtr);
 			_mis	 = std::make_unique<Mis>(_dbPtr);
-
-			//rc = sqlite3_open(dbname.c_str(), &_dbPtr);
-			//if (SQLITE_OK != rc) {
-			//	HandleSqliteError(rc);
-			//}
-			//_db.reset(_dbPtr, sqlite3_close);
 		}
 
 		int Insert(const tables::ihead& table) const;
@@ -59,5 +49,9 @@ namespace sdb19db
 		bool MisProcessed(const std::string sha256) const;
 
 		void WriteInMemoryToDisk(const std::string backupFilename) const;
+
+		int GetMisCharacterCount(std::string character) const;
+
+		int GetMisCharacterCount(int field_type, int hsf_num) const;
 	};
 }

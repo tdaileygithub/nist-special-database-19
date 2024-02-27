@@ -9,6 +9,7 @@ namespace sdb19db
 		public:
 			int id = 0;
 			std::string mis_sha256 = "";
+			int entry_num = 0;
 			int field_type = 0;
 			int hsf_num = 0;
 			int ihead_id = 0;
@@ -32,6 +33,7 @@ namespace sdb19db
 					"id"				INTEGER NOT NULL,
 					"field_type"		INTEGER NOT NULL,
 					"mis_sha256"		TEXT NOT NULL,
+					"entry_num"			INTEGER NOT NULL,
 					"hsf_num"			INTEGER NOT NULL,
 					"ihead_id"			INTEGER NOT NULL,
 					"writer_num"		INTEGER NOT NULL,
@@ -44,7 +46,7 @@ namespace sdb19db
 				);
 			)SQL",
 			R"SQL(
-				INSERT INTO mis(hsf_num,ihead_id,writer_num,template_num,character,image,image_sha256,mis_sha256,field_type) VALUES (?,?,?,?,?,?,?,?,?);
+				INSERT INTO mis(hsf_num,ihead_id,writer_num,template_num,character,image,image_sha256,mis_sha256,field_type,entry_num) VALUES (?,?,?,?,?,?,?,?,?,?);
 			)SQL")
 		{
 		}

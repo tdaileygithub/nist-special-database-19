@@ -115,7 +115,7 @@ std::vector<MisInfo> GetMisFiles()
 void process_mis_thread_callback(const MisInfo info)
 {
     using namespace sdb19db;
-    
+
     ulog(to_string(info));
 
     MIS* mis;
@@ -140,7 +140,7 @@ void process_mis_thread_callback(const MisInfo info)
 
         for (dptr = data8, misentry = 0; misentry < mis->ent_num; misentry++)
         {
-            //std::cout << misentry << " character: " << mischars.at(misentry) << std::endl;
+            //std::cout << misentry << " character: " << mischars.at(misentry) << std::endl;            
                 
             const auto width = mis->entw;
             const auto height = mis->enth;
@@ -205,6 +205,7 @@ void process_mis_thread_callback(const MisInfo info)
                 mis_row.field_type = 3;
             }
             mis_row.mis_sha256          = info.mis_sha256;
+            mis_row.entry_num           = misentry;
             mis_row.hsf_num             = std::stoi(info.hsf_num);        
             mis_row.writer_num          = std::stoi(info.writer);
             mis_row.template_num        = std::stoi(info.templ);
@@ -212,7 +213,6 @@ void process_mis_thread_callback(const MisInfo info)
             mis_row.image_len_bytes     = png_data_size;
             mis_row.image               = (char*)pPNG_data;
             mis_row.image_sha256        = SHA256::toString(digest);
-
             {
                 std::lock_guard<std::mutex> guard(dbmutex);
 

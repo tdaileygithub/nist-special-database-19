@@ -7,8 +7,6 @@
 
 #include "../sqlite3/sqlite3.h"
 
-#include "../ulog/ulog.h"
-
 namespace sdb19db
 {
 	template<class T>
@@ -17,8 +15,6 @@ namespace sdb19db
 	protected:
 		sqlite3_stmt* _insertStatement;
 		sqlite3_stmt* _lastRowStatement;
-
-		//std::shared_ptr<sqlite3> _db;
 		
 		sqlite3* _dbPtr = NULL;
 
@@ -28,10 +24,6 @@ namespace sdb19db
 			exit(ResultCode);
 		}
 
-		void Log(const std::string& msg) const {
-			//ulog.val("IDbRepository:", msg);
-		}
-
 	public:
 		IDbRepository(
 			sqlite3* db,
@@ -39,16 +31,12 @@ namespace sdb19db
 			const std::string insertSql)
 			: _dbPtr(db)
 		{
-			//int rc = sqlite3_open(dbname.c_str(), &_dbPtr);
-			//if (SQLITE_OK != rc) {
-			//	HandleSqliteError(rc);
-			//}
-			//_db.reset(_dbPtr, sqlite3_close);
-
 			char* messaggeError;
 			int rc = sqlite3_exec(_dbPtr, createSql.c_str(), NULL, 0, &messaggeError);
 			if (SQLITE_OK != rc) {
-				exit(9999);
+				std::cerr << "Error Create Table - if database already exists then this expected" << std::endl;
+				
+				//exit(9999);
 				//std::cerr << "Error Create Table" << std::endl;
 				sqlite3_free(messaggeError);
 			}

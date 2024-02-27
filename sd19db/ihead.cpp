@@ -12,8 +12,6 @@ namespace sdb19db
 {
 	int IHead::Insert(const tables::ihead& table) const {
 
-		Log(sdb19db::to_string(table));
-
 		int rc = sqlite3_bind_text(_insertStatement, 1, table.created.c_str(), table.created.size(), nullptr);
 		if (SQLITE_OK != rc) {
 			HandleSqliteError(rc);

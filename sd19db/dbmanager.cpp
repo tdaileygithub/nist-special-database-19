@@ -52,4 +52,16 @@ namespace sdb19db
 		}
 		(void)sqlite3_close(pFile);
 	}
+
+	int DbManager::GetMisCharacterCount(std::string character) const {
+		const std::string sql(std::format("select count(*) from mis where character='{}';", character));
+		const auto ret = _hsfpage->Query(sql);		
+		return std::stoi(ret.at(0).at(0));
+	}
+
+	int DbManager::GetMisCharacterCount(int field_type, int hsf_num) const {
+		const std::string sql(std::format("select count(*) from mis where field_type={} and hsf_num={};", field_type, hsf_num));
+		const auto ret = _hsfpage->Query(sql);
+		return std::stoi(ret.at(0).at(0));
+	}
 }

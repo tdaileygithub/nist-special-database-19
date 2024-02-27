@@ -5,7 +5,6 @@
 #include "pugixml/pugixml.hpp"
 
 // a global instance and mutex
-//extern sdb19db::DbManager dbm;
 extern std::unique_ptr<sdb19db::DbManager> dbm;
 extern std::mutex dbmutex;
 extern std::mutex readbinaryrastermutex;
