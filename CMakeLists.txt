@@ -14,6 +14,10 @@ add_executable(sd19test)
 target_link_libraries(sd19test PUBLIC toojpeg sqlite3 sha256 ulog miniz pugixml sd19 sd19db fann )
 target_sources(sd19test PRIVATE "sd19test.cpp" )
 
+add_executable(fanntrain)
+target_link_libraries(fanntrain PUBLIC ulog pugixml fann )
+target_sources(fanntrain PRIVATE "fann.cpp" )
+
 # Include sub-projects.
 add_subdirectory ("sd19")
 add_subdirectory ("sqlite3")
