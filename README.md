@@ -30,24 +30,6 @@ The HSFs were scanned at 11.8 dots per millimeter (300 dots per inch) and contai
 - [Field 32] lower-case field
 - [Field 33] and an unconstrained Constitution text paragraph
 
-# Dr. Memory - Memory leak checker
-
-https://drmemory.org/page_running.html
-
-Install it and set compile flags.  It is very quick to identify leaks across files.
-
-## MSVC Compile Flags
-
-https://learn.microsoft.com/en-us/cpp/build/reference/z7-zi-zi-debug-information-format?view=msvc-170
-
-```
-/Zi /MT /EHsc /Oy- /Ob0
-```
-
-```cmd
-"C:\Program Files (x86)\Dr. Memory\bin\drmemory.exe" -visual_studio -- .\nist-special-database-19\out\build\x64-debug\sd19test.exe
-```
-
 # References
 
 - [Cold Case: the Lost MNIST Digits](docs/NeurIPS-2019-cold-case-the-lost-mnist-digits-Paper.pdf)
@@ -79,3 +61,5 @@ https://learn.microsoft.com/en-us/cpp/build/reference/z7-zi-zi-debug-information
 - [ulog](https://github.com/Carabasen/ulog) - Single file c++ logger
 - [mongoose](https://github.com/cesanta/mongoose) - Single file c++ http server - embedded focus
 - [FANN](https://leenissen.dk/fann/wp/) - Fast Artifical Neural Network Library in C
+- [ImGui](https://github.com/ocornut/imgui) - Immediate Mode Gui - Cross Platform
+- [Dr. Memory](https://drmemory.org/page_running.html) - Find Those malloc leaks!.  
