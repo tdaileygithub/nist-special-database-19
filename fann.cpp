@@ -134,19 +134,14 @@ void test_it()
 
 int main(int argc, char* argv[])
 {
-    for (int i = 0; i < 100; i++)
-    {
-        test_it();
-    }
-    exit(0);
-
     //https://github.com/DeLaSalleUniversity-Manila/ArtificialNeuralNetworkWithFANNonMNIST
     
     float desired_error = 0.01f;
     int max_epochs = 500;
     int epochs_between_reports = 1;
     struct fann* ann;
-    fann_train_enum learning_algorithm = FANN_TRAIN_BATCH; // Default learning_algorithm
+    // Default learning_algorithm
+    fann_train_enum learning_algorithm = FANN_TRAIN_BATCH; 
 
     //./fann --mse 0.01 --epoch 500 --train training.data --backprop-batch
 
@@ -180,5 +175,10 @@ int main(int argc, char* argv[])
 
     fann_destroy(ann);
 
-    return 0;
+    //test the newly trained network
+    for (int i = 0; i < 10; i++)
+    {
+        test_it();
+    }
+    exit(0);
 }

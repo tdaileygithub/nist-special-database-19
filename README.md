@@ -64,6 +64,10 @@ https://learn.microsoft.com/en-us/cpp/build/reference/z7-zi-zi-debug-information
 - [Visualizing CCITT Group 3 and Group 4 TIFF Documents](docs/ccott_g3_g4_tiff.pdf)
 - [FACSIMILE CODING SCHEMES AND CODING CONTROL FUNCTIONS FOR GROUP 4 FACSIMILE APPARATUS](docs/T-REC-T.6-198811-I!!PDF-E.pdf)
 
+## Neural Networks
+
+- [Implementation of a Fast Artificial Neural Network Library (fann)](docs/fann_doc_complete_1.0.pdf) Excellent 2003 NN paper with cpu considerations.  An early NN library before the industry exploded.
+
 # Libraries / Tools Used
 
 - [Sqlite3](https://www.sqlite.org/download.html) - Single file c db
@@ -74,3 +78,4 @@ https://learn.microsoft.com/en-us/cpp/build/reference/z7-zi-zi-debug-information
 - [sha256](https://github.com/System-Glitch/SHA256) - Single file c++ sha256 library
 - [ulog](https://github.com/Carabasen/ulog) - Single file c++ logger
 - [mongoose](https://github.com/cesanta/mongoose) - Single file c++ http server - embedded focus
+- [FANN](https://leenissen.dk/fann/wp/) - Fast Artifical Neural Network Library in C
