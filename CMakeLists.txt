@@ -15,14 +15,20 @@ target_link_libraries(sd19test PUBLIC toojpeg sqlite3 sha256 ulog miniz pugixml 
 target_sources(sd19test PRIVATE "sd19test.cpp" )
 
 add_executable(fanntrain)
-target_link_libraries(fanntrain PUBLIC ulog pugixml fann )
+target_link_libraries(fanntrain PRIVATE
+    d3d12.lib dxgi.lib dxguid.lib uuid.lib
+    kernel32.lib user32.lib
+    comdlg32.lib advapi32.lib shell32.lib
+    ole32.lib oleaut32.lib
+)
+target_link_libraries(fanntrain PUBLIC ulog pugixml fann imgui )
 target_sources(fanntrain PRIVATE "fann.cpp" )
 
 # Include sub-projects.
 add_subdirectory ("sd19")
 add_subdirectory ("sqlite3")
 add_subdirectory ("toojpeg")
-add_subdirectory ("doctest")
+add_subdirectory ("doctest") 
 add_subdirectory ("sd19db")
 add_subdirectory ("pugixml")
 add_subdirectory ("miniz")
@@ -30,6 +36,7 @@ add_subdirectory ("sha256")
 add_subdirectory ("ulog")
 add_subdirectory ("mongoose")
 add_subdirectory ("fann")
+add_subdirectory ("imgui")
 
 # Enable Hot Reload for MSVC compilers if supported.
 if (POLICY CMP0141)
