@@ -24,6 +24,7 @@
 
 #include "config.h"
 #include "fann.h"
+#include "parallel_fann.h"
 
 /*
  * Reads training data from a file.
@@ -239,7 +240,10 @@ FANN_EXTERNAL void FANN_API fann_train_on_data(struct fann *ann, struct fann_tra
     /*
      * train
      */
-    error = fann_train_epoch(ann, data);
+    //error = fann_train_epoch(ann, data);
+    printf("Training with %d openmp\n", 8);
+    error = fann_train_epoch_batch_parallel(ann, data,8);
+
     desired_error_reached = fann_desired_error_reached(ann, desired_error);
 
     /*

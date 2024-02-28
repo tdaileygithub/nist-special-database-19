@@ -13,12 +13,14 @@ FANN_EXTERNAL float FANN_API fann_train_epoch_batch_parallel(struct fann *ann,
                                                              const unsigned int threadnumb) {
   /*vector<struct fann *> ann_vect(threadnumb);*/
   struct fann **ann_vect = (struct fann **)malloc(threadnumb * sizeof(struct fann *));
+  
   int i = 0, j = 0;
   fann_reset_MSE(ann);
 
   // generate copies of the ann
   omp_set_dynamic(0);
   omp_set_num_threads(threadnumb);
+
 #pragma omp parallel private(j)
   {
 #pragma omp for schedule(static)
@@ -48,10 +50,12 @@ FANN_EXTERNAL float FANN_API fann_train_epoch_batch_parallel(struct fann *ann,
     const fann_type epsilon = ann->learning_rate / num_data;
     omp_set_dynamic(0);
     omp_set_num_threads(threadnumb);
+
 #pragma omp parallel
     {
 #pragma omp for schedule(static)
       for (i = first_weight; i < (int)past_end; i++) {
+          //printf("merge MSEs with %d %d openmp\n", i, past_end);
         fann_type temp_slopes = 0.0;
         unsigned int k;
         fann_type *train_slopes;
@@ -60,10 +64,11 @@ FANN_EXTERNAL float FANN_API fann_train_epoch_batch_parallel(struct fann *ann,
           temp_slopes += train_slopes[i];
           train_slopes[i] = 0.0;
         }
+        
         weights[i] += temp_slopes * epsilon;
       }
     }
-  }
+  }  
   // merge of MSEs
   for (i = 0; i < (int)threadnumb; ++i) {
     ann->MSE_value += ann_vect[i]->MSE_value;
