@@ -21,6 +21,7 @@
 #include <stdlib.h>
 #include <stdarg.h>
 #include <string.h>
+#include <thread>
 
 #include "config.h"
 #include "fann.h"
@@ -228,6 +229,8 @@ FANN_EXTERNAL void FANN_API fann_train_on_data(struct fann *ann, struct fann_tra
   unsigned int i;
   int desired_error_reached;
 
+  unsigned int NUM_THREADS = std::thread::hardware_concurrency() - 1;
+
 #ifdef DEBUG
   printf("Training with %s\n", FANN_TRAIN_NAMES[ann->training_algorithm]);
 #endif
@@ -241,8 +244,7 @@ FANN_EXTERNAL void FANN_API fann_train_on_data(struct fann *ann, struct fann_tra
      * train
      */
     //error = fann_train_epoch(ann, data);
-    printf("Training with %d openmp\n", 8);
-    error = fann_train_epoch_batch_parallel(ann, data,8);
+    error = fann_train_epoch_batch_parallel(ann, data, NUM_THREADS);
 
     desired_error_reached = fann_desired_error_reached(ann, desired_error);
 
