@@ -6,8 +6,6 @@ project(sd19)
 
 option(DR_MEMORY_LEAK_CHECK "Dr Memory Leak Check Build" OFF)
 
-set(CMAKE_CXX_STANDARD 26)
-
 add_executable(showmis)
 target_link_libraries(showmis PUBLIC toojpeg sqlite3 sha256 ulog miniz mongoose pugixml sd19 sd19db )
 target_sources(showmis PRIVATE "showmis.cpp" "sd19config.h" "misprocessing.h" "misprocessing.cpp" "hsfpageprocessing.h" "hsfpageprocessing.cpp" )
@@ -15,25 +13,6 @@ target_sources(showmis PRIVATE "showmis.cpp" "sd19config.h" "misprocessing.h" "m
 add_executable(sd19test)
 target_link_libraries(sd19test PUBLIC toojpeg sqlite3 sha256 ulog miniz pugixml sd19 sd19db )
 target_sources(sd19test PRIVATE "sd19test.cpp" )
-
-if(DR_MEMORY_LEAK_CHECK)
-  if(MSVC)
-    target_compile_options(sd19test PUBLIC /Zi /MT /EHsc /Oy- /Ob0 )
-    target_compile_options(showmis  PUBLIC /Zi /MT /EHsc /Oy- /Ob0 )
-  endif()
-else()
-  if(MSVC)
-    target_compile_options(sd19test PUBLIC /EHsc /W4 /std:c++latest /02 /Qpar /openmp /fsanitize )
-    target_compile_options(showmis  PUBLIC /EHsc /W4 /std:c++latest /02 /Qpar /openmp /fsanitize )
-  endif()
-
-# https://learn.microsoft.com/en-us/cpp/parallel/auto-parallelization-and-auto-vectorization?view=msvc-170
-# https://devblogs.microsoft.com/cppblog/using-c17-parallel-algorithms-for-better-performance/
-# compile with:
-#  debug: cl /EHsc /W4 /WX /std:c++latest /Fedebug /MDd .\program.cpp
-#  release: cl /EHsc /W4 /WX /std:c++latest /Ferelease /MD /O2 .\program.cpp
-
-endif()
 
 # Include sub-projects.
 add_subdirectory ("sd19")
