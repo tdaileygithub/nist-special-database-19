@@ -7,11 +7,11 @@ project(sd19)
 option(DR_MEMORY_LEAK_CHECK "Dr Memory Leak Check Build" OFF)
 
 add_executable(showmis)
-target_link_libraries(showmis PUBLIC toojpeg sqlite3 sha256 ulog miniz mongoose pugixml sd19 sd19db )
+target_link_libraries(showmis PUBLIC toojpeg sqlite3 sha256 ulog miniz mongoose pugixml sd19 sd19db fann )
 target_sources(showmis PRIVATE "showmis.cpp" "sd19config.h" "misprocessing.h" "misprocessing.cpp" "hsfpageprocessing.h" "hsfpageprocessing.cpp" )
  
 add_executable(sd19test)
-target_link_libraries(sd19test PUBLIC toojpeg sqlite3 sha256 ulog miniz pugixml sd19 sd19db )
+target_link_libraries(sd19test PUBLIC toojpeg sqlite3 sha256 ulog miniz pugixml sd19 sd19db fann )
 target_sources(sd19test PRIVATE "sd19test.cpp" )
 
 # Include sub-projects.
@@ -25,6 +25,7 @@ add_subdirectory ("miniz")
 add_subdirectory ("sha256")
 add_subdirectory ("ulog")
 add_subdirectory ("mongoose")
+add_subdirectory ("fann")
 
 # Enable Hot Reload for MSVC compilers if supported.
 if (POLICY CMP0141)

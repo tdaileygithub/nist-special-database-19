@@ -28,7 +28,7 @@
         "strategy": "external"
       },
       "cacheVariables": {
-        "CMAKE_CXX_FLAGS": "/Zi /MDd /EHsc /Oy- /Ob0",
+        "CMAKE_CXX_FLAGS": "/std:c++latest /openmp /Zi /MDd /EHsc /Oy- /Ob0",
         "CMAKE_BUILD_TYPE": "Debug"
       }
     },

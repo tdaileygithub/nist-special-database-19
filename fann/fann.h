@@ -122,7 +122,8 @@ extern "C" {
 #ifdef FANN_DLL_EXPORTS
 #define FANN_EXTERNAL __declspec(dllexport)
 #else /*  */
-#define FANN_EXTERNAL __declspec(dllimport)
+//#define FANN_EXTERNAL __declspec(dllimport)
+#define FANN_EXTERNAL 
 #endif /* FANN_DLL_EXPORTS*/
 #define FANN_API __stdcall
 #else /*  */
