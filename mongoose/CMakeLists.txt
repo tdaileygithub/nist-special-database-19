@@ -1,9 +1,9 @@
-target_sources(showmis PRIVATE 
-	mongoose.cpp
-	mongoose.h
-)
+cmake_minimum_required(VERSION 3.13.0)
 
-target_sources(sd19test PRIVATE 
-	mongoose.cpp
-	mongoose.h
-)
+project(mongoose)
+
+file(GLOB HEADERS *.h)
+
+file(GLOB SOURCES *.cpp)
+
+add_library(mongoose ${SOURCES} ${HEADERS})

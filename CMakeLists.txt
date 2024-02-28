@@ -6,13 +6,14 @@ project(sd19)
 
 option(DR_MEMORY_LEAK_CHECK "Dr Memory Leak Check Build" OFF)
 
-set(CMAKE_CXX_STANDARD 20)
-set(CMAKE_CXX_FLAGS "-Wall") 
+set(CMAKE_CXX_STANDARD 26)
 
 add_executable(showmis)
+target_link_libraries(showmis PUBLIC toojpeg sqlite3 sha256 ulog miniz mongoose pugixml sd19 sd19db )
 target_sources(showmis PRIVATE "showmis.cpp" "sd19config.h" "misprocessing.h" "misprocessing.cpp" "hsfpageprocessing.h" "hsfpageprocessing.cpp" )
-
+ 
 add_executable(sd19test)
+target_link_libraries(sd19test PUBLIC toojpeg sqlite3 sha256 ulog miniz pugixml sd19 sd19db )
 target_sources(sd19test PRIVATE "sd19test.cpp" )
 
 if(DR_MEMORY_LEAK_CHECK)

@@ -1,13 +1,9 @@
-target_sources(showmis PRIVATE 
-	toojpeg.h
-	toojpeg.cpp 
-	toojpeg_helper.h
-	toojpeg_helper.cpp
-)
+cmake_minimum_required(VERSION 3.13.0)
 
-target_sources(sd19test PRIVATE 
-	toojpeg.h
-	toojpeg.cpp 
-	toojpeg_helper.h
-	toojpeg_helper.cpp
-)
+project(toojpeg)
+
+file(GLOB HEADERS *.h)
+
+file(GLOB SOURCES *.cpp)
+
+add_library(toojpeg ${SOURCES} ${HEADERS})

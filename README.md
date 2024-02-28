@@ -30,11 +30,11 @@ The HSFs were scanned at 11.8 dots per millimeter (300 dots per inch) and contai
 - [Field 32] lower-case field
 - [Field 33] and an unconstrained Constitution text paragraph
 
-# Dr. Memory
+# Dr. Memory - Memory leak checker
 
 https://drmemory.org/page_running.html
 
-Excellent tool for memory leak detection.  Install it and set compile flags.  It is very quick to identify leaks across files.
+Install it and set compile flags.  It is very quick to identify leaks across files.
 
 ## MSVC Compile Flags
 
@@ -45,7 +45,7 @@ https://learn.microsoft.com/en-us/cpp/build/reference/z7-zi-zi-debug-information
 ```
 
 ```cmd
-"C:\Program Files (x86)\Dr. Memory\bin\drmemory.exe" -visual_studio -- C:\Users\tim\Documents\nist-special-database-19\out\build\x64-debug\sd19test.exe
+"C:\Program Files (x86)\Dr. Memory\bin\drmemory.exe" -visual_studio -- .\nist-special-database-19\out\build\x64-debug\sd19test.exe
 ```
 
 # References

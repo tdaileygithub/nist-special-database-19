@@ -1,11 +1,9 @@
-target_sources(showmis PRIVATE 
-	pugiconfig.hpp
-	pugixml.cpp
-	pugixml.hpp
-)
+cmake_minimum_required(VERSION 3.13.0)
 
-target_sources(sd19test PRIVATE 
-	pugiconfig.hpp
-	pugixml.cpp
-	pugixml.hpp
-)
+project(pugixml)
+
+file(GLOB HEADERS *.h)
+
+file(GLOB SOURCES *.cpp)
+
+add_library(pugixml ${SOURCES} ${HEADERS})

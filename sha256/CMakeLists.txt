@@ -1,13 +1,9 @@
-target_sources(showmis PRIVATE 
-	SHA256.h
-	SHA256.cpp
-	sha256_util.h
-	sha256_util.cpp
-)
+cmake_minimum_required(VERSION 3.13.0)
 
-target_sources(sd19test PRIVATE 
-	SHA256.h
-	SHA256.cpp
-	sha256_util.h
-	sha256_util.cpp
-)
+project(sha256)
+
+file(GLOB HEADERS *.h)
+
+file(GLOB SOURCES *.cpp)
+
+add_library(sha256 ${SOURCES} ${HEADERS})

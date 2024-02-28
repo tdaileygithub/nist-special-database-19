@@ -1,23 +1,9 @@
-target_sources(showmis PRIVATE 
-	dbmanager.h
-	dbmanager.cpp
-	ihead.h
-	ihead.cpp
-	idbrepository.h
-	hsfpage.h
-	hsfpage.cpp
-	mis.h
-	mis.cpp
-)
+cmake_minimum_required(VERSION 3.13.0)
 
-target_sources(sd19test PRIVATE 
-	dbmanager.h
-	dbmanager.cpp
-	ihead.h
-	ihead.cpp
-	idbrepository.h
-	hsfpage.h
-	hsfpage.cpp
-	mis.h
-	mis.cpp
-)
+project(sd19db)
+
+file(GLOB HEADERS *.h)
+
+file(GLOB SOURCES *.cpp)
+
+add_library(sd19db ${SOURCES} ${HEADERS})

@@ -1,9 +1,9 @@
-target_sources(showmis PRIVATE 
-	miniz.h
-	miniz.cpp
-)
+cmake_minimum_required(VERSION 3.13.0)
 
-target_sources(sd19test PRIVATE 
-	miniz.h
-	miniz.cpp
-)
+project(miniz)
+
+file(GLOB HEADERS *.h)
+
+file(GLOB SOURCES *.cpp)
+
+add_library(miniz ${SOURCES} ${HEADERS}) 
