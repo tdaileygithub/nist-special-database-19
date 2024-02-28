@@ -22,7 +22,7 @@ target_link_libraries(fanntrain PRIVATE
     ole32.lib oleaut32.lib
 )
 target_link_libraries(fanntrain PUBLIC ulog pugixml fann imgui )
-target_sources(fanntrain PRIVATE "fann.cpp" )
+target_sources(fanntrain PRIVATE "fann.cpp" "imgui_util.h" "imgui_util.cpp")
 
 # Include sub-projects.
 add_subdirectory ("sd19")
