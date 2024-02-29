@@ -20,9 +20,9 @@ target_link_libraries(fanntrain PRIVATE
     kernel32.lib user32.lib
     comdlg32.lib advapi32.lib shell32.lib
     ole32.lib oleaut32.lib
-)
-target_link_libraries(fanntrain PUBLIC ulog pugixml fann imgui )
-target_sources(fanntrain PRIVATE "fann.cpp" "imgui_util.h" "imgui_util.cpp")
+) 
+target_link_libraries(fanntrain PUBLIC ulog pugixml fann imgui flatbuff )
+target_sources(fanntrain PRIVATE "fann.cpp" "imgui_util.h" "imgui_util.cpp" "monster_generated.h" )
 
 # Include sub-projects.
 add_subdirectory ("sd19")
@@ -37,6 +37,7 @@ add_subdirectory ("ulog")
 add_subdirectory ("mongoose")
 add_subdirectory ("fann")
 add_subdirectory ("imgui")
+add_subdirectory ("flatbuffers") 
 
 # Enable Hot Reload for MSVC compilers if supported.
 if (POLICY CMP0141)
