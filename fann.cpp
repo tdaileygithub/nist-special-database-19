@@ -1,10 +1,12 @@
 #include <algorithm>
+#include <cassert> 
 #include <cstdlib> 
 #include <ctime>
 #include <fstream>
 #include <iomanip>
 #include <iostream>
 #include <stdlib.h>
+#include <thread>
 #include <time.h>
 #include <vector>
 
@@ -12,7 +14,9 @@
 
 #include "fann/fann.h"
 
-//#include "imgui_util.h"
+#include "monster_generated.h"
+
+#include "imgui_util.h"
 
 using namespace std;
 
@@ -29,28 +33,68 @@ const unsigned int num_output = 10;
 const unsigned int num_layers = 3;
 const unsigned int num_neurons_hidden = 300;
 
-static std::vector<float> x_data_epoch = {  };
-static std::vector<float> y_data_mse = {  };
+// utility structure for realtime plot
+struct ScrollingBuffer {
+    int MaxSize;
+    int Offset;
+    ImVector<ImVec2> Data;
+    ScrollingBuffer(int max_size = 2000) {
+        MaxSize = max_size;
+        Offset = 0;
+        Data.reserve(MaxSize);
+    }
+    void AddPoint(float x, float y) {
+        if (Data.size() < MaxSize)
+            Data.push_back(ImVec2(x, y));
+        else {
+            Data[Offset] = ImVec2(x, y);
+            Offset = (Offset + 1) % MaxSize;
+        }
+    }
+    void Erase() {
+        if (Data.size() > 0) {
+            Data.shrink(0);
+            Offset = 0;
+        }
+    }
+};
+// utility structure for realtime plot
+struct RollingBuffer {
+    float Span;
+    ImVector<ImVec2> Data;
+    RollingBuffer() {
+        Span = 10.0f;
+        Data.reserve(2000);
+    }
+    void AddPoint(float x, float y) {
+        float xmod = fmodf(x, Span);
+        if (!Data.empty() && xmod < Data.back().x)
+            Data.shrink(0);
+        Data.push_back(ImVec2(xmod, y));
+    }
+};
+
+static ScrollingBuffer x_data_epoch_mse_sb = {  };
+static float max_mse = 0;
 
 int FANN_API test_callback(struct fann* ann, struct fann_train_data* train,
     unsigned int max_epochs, unsigned int epochs_between_reports,
     float desired_error, unsigned int epochs)
 {
     const float mse = fann_get_MSE(ann);
-    ofstream outfile;
-    outfile.open(error_data_log.c_str(), ios::app);
-    outfile << mse << endl;
-    outfile.close();
+    if (max_mse < mse)
+        max_mse = mse;
 
     if (epochs % 50 == 0)
     {
         std::cout << "Saving Network.... " << std::endl;
         fann_save(ann, network_file.c_str());
     }
-    std::cout << setw(10) << "Epoch: " << setw(10) << epochs << setw(30) << "current mse: " << setw(10) << mse << "size " << x_data_epoch.size() << std::endl;
-
-    x_data_epoch.push_back(epochs);
-    y_data_mse.push_back(mse);
+    std::cout << setw(10)   << "Epoch: "        << setw(10) << epochs       << setw(30) 
+                            << "current mse: "  << setw(10) << mse          << setw(30)
+                            << "max mse "       << max_mse                  << setw(30) << std::endl;
+    
+    x_data_epoch_mse_sb.AddPoint((float)epochs, mse);
 
     return 0;
 }
@@ -144,13 +188,19 @@ void test_it()
     fclose(lbl_file);
 }
 
+void train_thread(fann* ann)
+{
+    float desired_error = 0.01f;
+    int max_epochs = 500;
+    int epochs_between_reports = 1;
+
+    fann_train_on_file(ann, training_file.c_str(), max_epochs, epochs_between_reports, desired_error);
+}
+
 int main(int argc, char* argv[])
 {
     //Imgui_SetupContext();
 
-    float desired_error = 0.01f;
-    int max_epochs = 500;
-    int epochs_between_reports = 1;
     struct fann* ann;
     // Default learning_algorithm
     fann_train_enum learning_algorithm = FANN_TRAIN_BATCH; 
@@ -159,8 +209,8 @@ int main(int argc, char* argv[])
 
     std::cout << setw(30) << "Training parameters: "    << setw(100) << ""                  << std::endl;
     std::cout << setw(30) << "Training File: "          << setw(100) << training_file       << std::endl;
-    std::cout << setw(30) << "Desired error: "          << setw(100) << desired_error       << std::endl;
-    std::cout << setw(30) << "Max epochs: "             << setw(100) << max_epochs          << std::endl;
+    //std::cout << setw(30) << "Desired error: "          << setw(100) << desired_error       << std::endl;
+    //std::cout << setw(30) << "Max epochs: "             << setw(100) << max_epochs          << std::endl;
     std::cout << setw(30) << "Using network file: "     << setw(100) << network_file        << std::endl;
     std::cout << setw(30) << "Learning algorithm: "     << setw(100) << learning_algorithm  << std::endl;
 
@@ -180,58 +230,49 @@ int main(int argc, char* argv[])
 
     fann_set_callback(ann, *(test_callback));
 
-    fann_train_on_file(ann, training_file.c_str(), max_epochs, epochs_between_reports, desired_error);
+    thread thread_fann(train_thread, ann);
 
-    //Imgui_SetupContext();
+    Imgui_SetupContext();
 
-    //// Our state
-    //bool show_demo_window = true;
-    //bool show_another_window = false;
-    ////ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
+    // Main loop
+    bool done = false;
+    while (!done)
+    {
+        // Poll and handle messages (inputs, window resize, etc.)
+        // See the WndProc() function below for our to dispatch events to the Win32 backend.
+        MSG msg;
+        while (::PeekMessage(&msg, nullptr, 0U, 0U, PM_REMOVE))
+        {
+            ::TranslateMessage(&msg);
+            ::DispatchMessage(&msg);
+            if (msg.message == WM_QUIT)
+                done = true;
+        }
+        if (done)
+            break;
 
-    //// Main loop
-    //bool done = false;
-    //while (!done)
-    //{
-    //    // Poll and handle messages (inputs, window resize, etc.)
-    //    // See the WndProc() function below for our to dispatch events to the Win32 backend.
-    //    MSG msg;
-    //    while (::PeekMessage(&msg, nullptr, 0U, 0U, PM_REMOVE))
-    //    {
-    //        ::TranslateMessage(&msg);
-    //        ::DispatchMessage(&msg);
-    //        if (msg.message == WM_QUIT)
-    //            done = true;
-    //    }
-    //    if (done)
-    //        break;
+        // Start the Dear ImGui frame
+        ImGui_ImplDX12_NewFrame();
+        ImGui_ImplWin32_NewFrame();
+        ImGui::NewFrame();
 
-    //    // Start the Dear ImGui frame
-    //    ImGui_ImplDX12_NewFrame();
-    //    ImGui_ImplWin32_NewFrame();
-    //    ImGui::NewFrame();
+        // 1. Show the big demo window (Most of the sample code is in ImGui::ShowDemoWindow()! You can browse its code to learn more about Dear ImGui!).
+        //ImGui::ShowDemoWindow(&show_demo_window);
 
-    //    // 1. Show the big demo window (Most of the sample code is in ImGui::ShowDemoWindow()! You can browse its code to learn more about Dear ImGui!).
-    //    if (show_demo_window)
-    //        ImGui::ShowDemoWindow(&show_demo_window);
+        static ImPlotAxisFlags flags = ImPlotAxisFlags_None;
 
-    //    int   bar_data[11] = {1,2,3,4,5,6,7,8,9,10,11};
-    //    float x_data[11] = { 1,2,3,4,5,6,7,8,9,10,11 };
-    //    float y_data[11] = { 1,2,3,4,5,6,7,8,9,10,11 };
-    //    std::random_device rd;
-    //    std::mt19937 g(rd());
-    //    std::shuffle(std::begin(y_data), std::end(y_data),g);
+        if (ImPlot::BeginPlot("My Plot")) {
+            ImPlot::SetupAxes("epoch", "MSE", flags,flags);
+            ImPlot::SetupAxisLimits(ImAxis_X1, 0, x_data_epoch_mse_sb.Data.size(), ImGuiCond_Always);
+            ImPlot::SetupAxisLimits(ImAxis_Y1, 0, max_mse, ImGuiCond_Always);
+            ImPlot::PlotLine("MSE", &x_data_epoch_mse_sb.Data[0].x, &x_data_epoch_mse_sb.Data[0].y, x_data_epoch_mse_sb.Data.size(), 0, x_data_epoch_mse_sb.Offset, 2 * sizeof(float));
+            ImPlot::EndPlot();
+        }        
+        Imgui_Render();
+    }
+    thread_fann.join();
 
-    //    
-    //    if (ImPlot::BeginPlot("My Plot")) {
-    //        ImPlot::PlotBars("My Bar Plot", bar_data, 11);
-    //        ImPlot::PlotLine("My Line Plot", x_data, y_data, 11);   
-    //        ImPlot::EndPlot();
-    //    }        
-    //    Imgui_Render();
-    //}
-
-    //Imgui_Cleanup();
+    Imgui_Cleanup();
 
     std::cout << "Complete. Saving Network.... " << std::endl;
     fann_save(ann, network_file.c_str());
