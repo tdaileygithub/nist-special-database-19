@@ -14,8 +14,6 @@
 
 #include "fann/fann.h"
 
-#include "monster_generated.h"
-
 #include "imgui_util.h"
 
 using namespace std;
@@ -33,55 +31,18 @@ const unsigned int num_output = 10;
 const unsigned int num_layers = 3;
 const unsigned int num_neurons_hidden = 300;
 
-// utility structure for realtime plot
-struct ScrollingBuffer {
-    int MaxSize;
-    int Offset;
-    ImVector<ImVec2> Data;
-    ScrollingBuffer(int max_size = 2000) {
-        MaxSize = max_size;
-        Offset = 0;
-        Data.reserve(MaxSize);
-    }
-    void AddPoint(float x, float y) {
-        if (Data.size() < MaxSize)
-            Data.push_back(ImVec2(x, y));
-        else {
-            Data[Offset] = ImVec2(x, y);
-            Offset = (Offset + 1) % MaxSize;
-        }
-    }
-    void Erase() {
-        if (Data.size() > 0) {
-            Data.shrink(0);
-            Offset = 0;
-        }
-    }
-};
-// utility structure for realtime plot
-struct RollingBuffer {
-    float Span;
-    ImVector<ImVec2> Data;
-    RollingBuffer() {
-        Span = 10.0f;
-        Data.reserve(2000);
-    }
-    void AddPoint(float x, float y) {
-        float xmod = fmodf(x, Span);
-        if (!Data.empty() && xmod < Data.back().x)
-            Data.shrink(0);
-        Data.push_back(ImVec2(xmod, y));
-    }
-};
-
 static ScrollingBuffer x_data_epoch_mse_sb = {  };
 static float max_mse = 0;
+static unsigned int epoch = 0;
+static float mse = 0.0f;
 
 int FANN_API test_callback(struct fann* ann, struct fann_train_data* train,
     unsigned int max_epochs, unsigned int epochs_between_reports,
     float desired_error, unsigned int epochs)
 {
-    const float mse = fann_get_MSE(ann);
+    epoch = epochs;
+    mse = fann_get_MSE(ann);
+    
     if (max_mse < mse)
         max_mse = mse;
 
@@ -260,14 +221,20 @@ int main(int argc, char* argv[])
         //ImGui::ShowDemoWindow(&show_demo_window);
 
         static ImPlotAxisFlags flags = ImPlotAxisFlags_None;
+        
+        ImGui::SameLine();
 
-        if (ImPlot::BeginPlot("My Plot")) {
+        const int epoch = x_data_epoch_mse_sb.Data.size();
+        if (ImPlot::BeginPlot("MSE vs Epoch")) {            
             ImPlot::SetupAxes("epoch", "MSE", flags,flags);
-            ImPlot::SetupAxisLimits(ImAxis_X1, 0, x_data_epoch_mse_sb.Data.size(), ImGuiCond_Always);
+            ImPlot::SetupAxisLimits(ImAxis_X1, 0, epoch, ImGuiCond_Always);
             ImPlot::SetupAxisLimits(ImAxis_Y1, 0, max_mse, ImGuiCond_Always);
-            ImPlot::PlotLine("MSE", &x_data_epoch_mse_sb.Data[0].x, &x_data_epoch_mse_sb.Data[0].y, x_data_epoch_mse_sb.Data.size(), 0, x_data_epoch_mse_sb.Offset, 2 * sizeof(float));
+            ImPlot::PlotLine("MSE", &x_data_epoch_mse_sb.Data[0].x, &x_data_epoch_mse_sb.Data[0].y, epoch, 0, x_data_epoch_mse_sb.Offset, 2 * sizeof(float));
             ImPlot::EndPlot();
         }        
+        ImGui::Text(std::format("Epoch {}", epoch).c_str());
+        ImGui::Text(std::format("MSE:  {}", mse).c_str());
+
         Imgui_Render();
     }
     thread_fann.join();
