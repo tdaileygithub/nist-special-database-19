@@ -17,15 +17,15 @@ std::string get_file_sha256_checksum(const std::string filepath)
     std::streampos size_bytes = file.tellg();
     file.seekg(0);
 
-    char* hsfpagebuffer = new char[size_bytes];
+    char* filebuffer = new char[size_bytes];
 
-    file.read(hsfpagebuffer, size_bytes);
+    file.read(filebuffer, size_bytes);
 
-    sha.update((unsigned char*)hsfpagebuffer, size_bytes);
+    sha.update((unsigned char*)filebuffer, size_bytes);
     
     std::array<uint8_t, 32> digest = sha.digest();
 
-    delete[] hsfpagebuffer;
+    delete[] filebuffer;
 
     return SHA256::toString(digest);
 }
