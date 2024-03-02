@@ -37,7 +37,7 @@
       "displayName": "x64 Release",
       "inherits": "x64-debug",
       "cacheVariables": {
-        "CMAKE_CXX_FLAGS": "/EHsc /W4 /std:c++latest /02 /Qpar /openmp /fsanitize",
+        "CMAKE_CXX_FLAGS": "/EHsc /std:c++latest /bigobj /permissive- /O2 /Qpar /openmp",
         "CMAKE_BUILD_TYPE": "Release"
       }
     },
