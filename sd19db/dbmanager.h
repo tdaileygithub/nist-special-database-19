@@ -2,6 +2,7 @@
 
 #include <memory>
 #include <string>
+#include <vector>
 
 #include "hsfpage.h"
 #include "ihead.h"
@@ -11,6 +12,17 @@
 
 namespace sdb19db
 {
+	struct RawImageInfo {
+		unsigned char* PixelData;
+		unsigned int Width;
+		unsigned int Height;
+	};
+
+	struct BlobData {
+		unsigned char* Data;
+		int Length;		
+	};
+
 	class DbManager
 	{
 	private:
@@ -53,5 +65,15 @@ namespace sdb19db
 		int GetMisCharacterCount(const std::string character) const;
 
 		int GetMisCharacterCount(int field_type, int hsf_num) const;
+
+		BlobData GetBlobData(const int id, const std::string table, std::string blob_column) const;
+
+		std::vector<int> GetMisIds(const std::string character) const;
+		
+		RawImageInfo GetImageAsPng(const int id, const std::string table, std::string blob_column) const;
 	};
+
+	std::ostream& operator<<(std::ostream& out, const RawImageInfo& config);
+
+	std::string to_string(const RawImageInfo& config);
 }
