@@ -5,16 +5,22 @@
 #include <fstream>
 #include <iomanip>
 #include <iostream>
-#include <stdlib.h>
+#include <map>
+#include <mutex>
 #include <thread>
-#include <time.h>
 #include <vector>
+
+#include "mnist_fann_extern.h"
 
 #include "ulog/ulog.h"
 
 #include "fann/fann.h"
 
 #include "imgui_util.h"
+
+#include "sd19db/dbmanager.h"
+
+#include "sd19config.h"
 
 using namespace std;
 
@@ -25,11 +31,8 @@ string training_file    = "training.data";
 string images_file      = "train-images-idx3-ubyte";
 string labels_file      = "train-labels-idx1-ubyte";
 
-/* network topology */
-const unsigned int num_input = 28 * 28;
-const unsigned int num_output = 10;
-const unsigned int num_layers = 3;
-const unsigned int num_neurons_hidden = 300;
+// global instance - only want one owner and wrapped with mutex
+std::unique_ptr<sdb19db::DbManager> dbm = nullptr;
 
 static ScrollingBuffer x_data_epoch_mse_sb = {  };
 static float max_mse = 0;
@@ -46,7 +49,7 @@ int FANN_API test_callback(struct fann* ann, struct fann_train_data* train,
     if (max_mse < mse)
         max_mse = mse;
 
-    if (epochs % 50 == 0)
+    if (epochs % 10 == 0)
     {
         std::cout << "Saving Network.... " << std::endl;
         fann_save(ann, network_file.c_str());
@@ -58,6 +61,47 @@ int FANN_API test_callback(struct fann* ann, struct fann_train_data* train,
     x_data_epoch_mse_sb.AddPoint((float)epochs, mse);
 
     return 0;
+}
+
+void fann_get_train_data(unsigned int num, unsigned int num_input, unsigned int num_output, fann_type* input, fann_type* output)
+{
+    //if (num % 1000 == 0)
+    //    printf("num: %d %d \n", num, num_output);
+
+    //num: 127340  id: 407781 label: 3 idx: 3    
+    const auto t        = train_dataset.at(num);
+    const char label    = std::get<0>(t);
+    const int id        = std::get<1>(t);
+    const int label_idx = label_to_index[label];
+    
+    //if (num > 250000)
+        //printf("num: %d  id: %d label: %c idx: %d\n", num, id, label,label_idx);
+
+    auto rai = dbm->GetImageAsPng(id, "mis", "image");
+
+    int ct = 0;
+    for (int i = 0; i < rai.Height; i++)
+    {
+        for (int j = 0; j < rai.Width; j++)
+        {
+            const int offset = (rai.Width * i) + j;
+            input[ct] = (float)(rai.PixelData[offset]) / 255.0;
+        }
+        ct++;
+    }       
+    for (int i = 0; i < num_output; i++)
+    {
+        if (i == label_idx) {
+            output[i] = 0.9f;
+        }
+        else {
+            output[i] = 0.1f;
+        }        
+    }
+
+    //std::cout << rai;
+
+    free(rai.PixelData);
 }
 
 void test_it()
@@ -149,52 +193,100 @@ void test_it()
     fclose(lbl_file);
 }
 
-void train_thread(fann* ann)
+void train_thread(fann* ann, const Sd19Config& config)
 {
-    float desired_error = 0.01f;
-    int max_epochs = 500;
-    int epochs_between_reports = 1;
+    int num_data = 651375;
+    
+    num_data = 2^18 -1;
+    num_data = 262000;
 
-    fann_train_on_file(ann, training_file.c_str(), max_epochs, epochs_between_reports, desired_error);
+    num_data = train_dataset.size();
+
+    std::cerr << "num_data: " << num_data << std::endl;
+
+    //exit(99);
+
+    //251000 okay
+    //260000 okay
+    
+    //351000 crash
+    //300000
+    //275000
+
+    fann_train_data* data = fann_create_train_from_callback(num_data, config.GetNumberInputs(), config.GetNumberOutputs(), fann_get_train_data);
+
+    fann_train_on_data(ann, data, config.GetMaxEpochs(), config.GetEpochsBetweenReport(), config.GetDesiredError());
 }
 
 int main(int argc, char* argv[])
 {
-    //Imgui_SetupContext();
+    Sd19Config config;
+    std::cout << config;
 
-    struct fann* ann;
-    // Default learning_algorithm
-    fann_train_enum learning_algorithm = FANN_TRAIN_BATCH; 
+    //exit(999);
+    dbm = std::make_unique< sdb19db::DbManager>("sd19.db3");
+    
+    constexpr float trainsplit = 0.8;
 
-    //./fann --mse 0.01 --epoch 500 --train training.data --backprop-batch
+    //Stratified training dataset    
+    for (int asciichar = 48; asciichar <= 122; asciichar++)
+    {
+        //0-9
+        if (asciichar >= 48 && asciichar <= 57)
+        {
+            label_to_index[(char)asciichar] = asciichar - 48;
+        }
+        //A-Z
+        else if (asciichar >= 65 && asciichar <= 90)
+        {
+            label_to_index[(char)asciichar] = asciichar - 55;
+        }
+        //a-z
+        else if (asciichar >= 97 && asciichar <= 122)
+        {
+            label_to_index[(char)asciichar] = asciichar - 61;
+        }
+        else 
+        {
+            continue;
+        }
+        //get all the mis database ids that are labeled with the asciichar
+        const auto ids          = dbm->GetMisIds(std::string(1, (char)asciichar));
+        counts_by_label[(char)asciichar] = ids.size();
 
-    std::cout << setw(30) << "Training parameters: "    << setw(100) << ""                  << std::endl;
-    std::cout << setw(30) << "Training File: "          << setw(100) << training_file       << std::endl;
-    //std::cout << setw(30) << "Desired error: "          << setw(100) << desired_error       << std::endl;
-    //std::cout << setw(30) << "Max epochs: "             << setw(100) << max_epochs          << std::endl;
-    std::cout << setw(30) << "Using network file: "     << setw(100) << network_file        << std::endl;
-    std::cout << setw(30) << "Learning algorithm: "     << setw(100) << learning_algorithm  << std::endl;
+        const auto trainbegin   = ids.cbegin();
+        const auto trainend     = ids.cbegin() + (trainsplit * ids.size());
+        const auto testbegin    = trainend;
+        const auto testend      = ids.end();
 
-    ann = fann_create_standard(num_layers, num_input, num_neurons_hidden, num_output);
+        for (auto trainid = ids.cbegin(); trainid < trainend; trainid++) {
+            train_dataset.push_back(std::make_tuple((char)asciichar, *trainid));
+        }
+        for (auto testid = testbegin; testid < testend; testid++) {
+            test_dataset.push_back(std::make_tuple((char)asciichar, *testid));
+        }
+    }
+
     //ann = fann_create_from_file(network_file.c_str());
+    struct fann* ann = fann_create_standard(config.GetNumberLayers(), config.GetNumberInputs(), config.GetNumberHidden(), config.GetNumberOutputs());
 
     // Activation functions
-    fann_set_activation_function_hidden(ann, FANN_SIGMOID);
-    fann_set_activation_function_output(ann, FANN_SIGMOID);
+    fann_set_activation_function_hidden(ann, config.GetActionFunctionHiddenEnum());
+    fann_set_activation_function_output(ann, config.GetActionFunctionOutputEnum());
 
-    fann_set_training_algorithm(ann, learning_algorithm);
+    fann_set_training_algorithm(ann, config.GetTraningAlgorithmEnum());
 
-    if (learning_algorithm != FANN_TRAIN_RPROP) {
-        fann_set_learning_momentum(ann, 0.9);
-        fann_set_learning_rate(ann, 1.3);
+    if (config.GetTraningAlgorithmEnum() != FANN_TRAIN_RPROP) {
+        fann_set_learning_momentum(ann, config.GetLearningMomemtum());
+        fann_set_learning_rate(ann, config.GetLearningRate());
     }
 
     fann_set_callback(ann, *(test_callback));
 
-    thread thread_fann(train_thread, ann);
+    thread thread_fann(train_thread, ann, config );
 
     Imgui_SetupContext();
-
+    bool show_demo_window = false;
     // Main loop
     bool done = false;
     while (!done)
@@ -231,20 +323,53 @@ int main(int argc, char* argv[])
             ImPlot::SetupAxisLimits(ImAxis_Y1, 0, max_mse, ImGuiCond_Always);
             ImPlot::PlotLine("MSE", &x_data_epoch_mse_sb.Data[0].x, &x_data_epoch_mse_sb.Data[0].y, epoch, 0, x_data_epoch_mse_sb.Offset, 2 * sizeof(float));
             ImPlot::EndPlot();
-        }        
-        ImGui::Text(std::format("Epoch {}", epoch).c_str());
-        ImGui::Text(std::format("MSE:  {}", mse).c_str());
+        }
+
+        if (ImGui::BeginTable("Information", 2))
+        {
+            ImGui::TableNextRow();
+            ImGui::TableNextColumn();
+            ImGui::Text("Epoch");
+            ImGui::TableNextColumn();
+            ImGui::Text(std::format("{}", epoch).c_str());
+            
+            ImGui::TableNextRow();
+            ImGui::TableNextColumn();
+            ImGui::Text("MSE");
+            ImGui::TableNextColumn();
+            ImGui::Text(std::format("{}", mse).c_str());
+
+            ImGui::TableNextRow();
+            ImGui::TableNextColumn();
+            ImGui::Text("# Training Set");
+            ImGui::TableNextColumn();
+            ImGui::Text(std::format("{}", train_dataset.size()).c_str());
+            ImGui::EndTable();
+        }
+
+        //if (ImGui::BeginTable("Training DataSet", 2))
+        //{
+        //    for (auto it = counts_by_label.cbegin(); it != counts_by_label.cend(); it++)
+        //    {
+        //        ImGui::TableNextRow();
+        //        ImGui::TableNextColumn();
+        //        ImGui::Text(std::format("{}", it->first).c_str());
+        //        ImGui::TableNextColumn();
+        //        ImGui::Text(std::format("{}", it->second).c_str());
+        //    }
+        //    ImGui::EndTable();
+        //}
 
         Imgui_Render();
     }
     thread_fann.join();
 
-    Imgui_Cleanup();
-
     std::cout << "Complete. Saving Network.... " << std::endl;
     fann_save(ann, network_file.c_str());
 
     fann_destroy(ann);
+
+    Imgui_Cleanup();
 
     //test the newly trained network
     for (int i = 0; i < 10; i++)
