@@ -25,7 +25,7 @@
 char* current_time()
 {
 	std::time_t result = std::time(nullptr);
-	std::cout << std::ctime(&result);
+	//std::cout << std::ctime(&result);
 
 	char buffer[32];
 	std::strncpy(buffer, std::ctime(&result), 26);
