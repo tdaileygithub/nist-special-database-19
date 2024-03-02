@@ -21,7 +21,9 @@
 #include <stdlib.h>
 #include <stdarg.h>
 #include <string.h>
+#include <syncstream>
 #include <thread>
+#include <iostream>
 
 #include "config.h"
 #include "fann.h"
@@ -717,6 +719,13 @@ FANN_EXTERNAL struct fann_train_data *FANN_API fann_create_train(unsigned int nu
     return NULL;
   }
 
+  //
+  // COMPILER BUG: vc is warning about the following - and does cause size to be impromperly calculated
+  // 
+  // data_input = (fann_type*)calloc(num_input * num_data, sizeof(fann_type));
+  //
+  const size_t num_bytes = static_cast<size_t>(num_input) * num_data;
+
   fann_init_error_data((struct fann_error *)data);
 
   data->num_data = num_data;
@@ -735,14 +744,16 @@ FANN_EXTERNAL struct fann_train_data *FANN_API fann_create_train(unsigned int nu
     fann_destroy_train(data);
     return NULL;
   }
-
-  data_input = (fann_type *)calloc(num_input * num_data, sizeof(fann_type));
+    // COMPILER BUG:
+  //data_input = (fann_type*)calloc(num_input * num_data, sizeof(fann_type));
+  data_input = (fann_type *)calloc(num_bytes, sizeof(fann_type));
+   
   if (data_input == NULL) {
     fann_error(NULL, FANN_E_CANT_ALLOCATE_MEM);
     fann_destroy_train(data);
     return NULL;
   }
-
+  
   data_output = (fann_type *)calloc(num_output * num_data, sizeof(fann_type));
   if (data_output == NULL) {
     fann_error(NULL, FANN_E_CANT_ALLOCATE_MEM);

@@ -7,6 +7,7 @@
 #include <iostream>
 #include <map>
 #include <mutex>
+#include <syncstream>
 #include <thread>
 #include <vector>
 
@@ -65,17 +66,10 @@ int FANN_API test_callback(struct fann* ann, struct fann_train_data* train,
 
 void fann_get_train_data(unsigned int num, unsigned int num_input, unsigned int num_output, fann_type* input, fann_type* output)
 {
-    //if (num % 1000 == 0)
-    //    printf("num: %d %d \n", num, num_output);
-
-    //num: 127340  id: 407781 label: 3 idx: 3    
     const auto t        = train_dataset.at(num);
     const char label    = std::get<0>(t);
     const int id        = std::get<1>(t);
     const int label_idx = label_to_index[label];
-    
-    //if (num > 250000)
-        //printf("num: %d  id: %d label: %c idx: %d\n", num, id, label,label_idx);
 
     auto rai = dbm->GetImageAsPng(id, "mis", "image");
 
@@ -85,7 +79,7 @@ void fann_get_train_data(unsigned int num, unsigned int num_input, unsigned int 
         for (int j = 0; j < rai.Width; j++)
         {
             const int offset = (rai.Width * i) + j;
-            input[ct] = (float)(rai.PixelData[offset]) / 255.0;
+            input[ct] = (float)(rai.PixelData[offset]) / 255.0f;
         }
         ct++;
     }       
@@ -98,9 +92,6 @@ void fann_get_train_data(unsigned int num, unsigned int num_input, unsigned int 
             output[i] = 0.1f;
         }        
     }
-
-    //std::cout << rai;
-
     free(rai.PixelData);
 }
 
@@ -202,7 +193,10 @@ void train_thread(fann* ann, const Sd19Config& config)
 
     num_data = train_dataset.size();
 
+    const size_t num_bytes = static_cast<size_t>(128 * 128) * num_data;
+
     std::cerr << "num_data: " << num_data << std::endl;
+    std::cerr << "size bytes num_data: " << num_bytes * sizeof(float) << std::endl;
 
     //exit(99);
 
@@ -220,11 +214,120 @@ void train_thread(fann* ann, const Sd19Config& config)
 
 int main(int argc, char* argv[])
 {
+#if 0
+    fann_type* data_input, * data_output;
+    unsigned int i;
+    struct fann_train_data* data = (struct fann_train_data*)malloc(sizeof(struct fann_train_data));
+
+    if (data == NULL) {
+        fann_error(NULL, FANN_E_CANT_ALLOCATE_MEM);
+        return NULL;
+    }
+
+    fann_init_error_data((struct fann_error*)data);
+
+    const unsigned int num_data = 330908;
+    const unsigned int num_input = 128 * 128;
+    const unsigned int num_output = 26 + 26 + 10;;
+    const size_t num_bytes = static_cast<size_t>(num_input) * num_data;
+
+    data->num_data = num_data;
+    data->num_input = num_input;
+    data->num_output = num_output;
+    data->input = (fann_type**)calloc(num_data, sizeof(fann_type*));
+
+    memset(data->input, 0xFF, num_data * 4);
+
+    if (data->input == NULL) {
+        fann_error(NULL, FANN_E_CANT_ALLOCATE_MEM);
+        fann_destroy_train(data);
+        return NULL;
+    }
+
+    data->output = (fann_type**)calloc(num_data, sizeof(fann_type*));
+    if (data->output == NULL) {
+        fann_error(NULL, FANN_E_CANT_ALLOCATE_MEM);
+        fann_destroy_train(data);
+        return NULL;
+    }
+    
+    data_input = (fann_type *)calloc(num_bytes, sizeof(fann_type));
+    if (data_input == NULL) {
+        fann_error(NULL, FANN_E_CANT_ALLOCATE_MEM);
+        fann_destroy_train(data);
+        return NULL;
+    }
+
+    data_output = (fann_type*)calloc(num_output * num_data, sizeof(fann_type));
+    if (data_output == NULL) {
+        fann_error(NULL, FANN_E_CANT_ALLOCATE_MEM);
+        fann_destroy_train(data);
+        return NULL;
+    }
+
+    for (i = 0; i != num_data; i++) {
+        //set each picture to point at the offset into the large array
+        data->input[i] = data_input;
+
+        std::fill(data->input[i], data->input[i] + num_input, (float)i );
+
+        //advance by one picture 128x128
+        data_input += num_input;
+
+        data->output[i] = data_output;
+        data_output += num_output;
+        //if (i == 275057 || i == 275056)
+        {
+            //printf("data_input:  %d %p \n", i, data_input);
+        }
+        
+    
+    }
+
+
+    printf("\n\ndata_input:       %p \n", data_input);
+    printf("data_input[n-1]:  %p \n\n", data->input[num_data - 1]);
+
+    printf("data_output:      %p \n",  data_output);
+    printf("data_output[n-1]: %p \n\n", data->output[num_data - 1]);
+
+
+    //68765
+    //float *input = data->input[20];
+
+    for (int z = 0; z != num_data; z++) 
+    {
+        if (z == 275057 || z == 275056)
+        {
+            printf("data_input:  %d %p \n", z, data->input[z]);
+        }
+
+
+        float* input = data->input[z];
+
+        
+        int ct = 0;
+        for (int i = 0; i < 128; i++)
+        {
+            for (int j = 0; j < 128; j++)
+            {
+                const int offset = (128 * i) + j;
+                input[ct] = (float)z;
+            }
+            ct++;
+        }
+    }
+
+    exit(99);
+#endif
+
     Sd19Config config;
     std::cout << config;
 
     //exit(999);
     dbm = std::make_unique< sdb19db::DbManager>("sd19.db3");
+    //auto rai = dbm->GetImageAsPng(67875, "mis", "image");
+    //std::cout << rai;
     
     constexpr float trainsplit = 0.8;
 
@@ -321,7 +424,9 @@ int main(int argc, char* argv[])
             ImPlot::SetupAxes("epoch", "MSE", flags,flags);
             ImPlot::SetupAxisLimits(ImAxis_X1, 0, epoch, ImGuiCond_Always);
             ImPlot::SetupAxisLimits(ImAxis_Y1, 0, max_mse, ImGuiCond_Always);
-            ImPlot::PlotLine("MSE", &x_data_epoch_mse_sb.Data[0].x, &x_data_epoch_mse_sb.Data[0].y, epoch, 0, x_data_epoch_mse_sb.Offset, 2 * sizeof(float));
+            if (x_data_epoch_mse_sb.Data.size() > 0 ) {
+                ImPlot::PlotLine("MSE", &x_data_epoch_mse_sb.Data[0].x, &x_data_epoch_mse_sb.Data[0].y, epoch, 0, x_data_epoch_mse_sb.Offset, 2 * sizeof(float));
+            }
             ImPlot::EndPlot();
         }
 
