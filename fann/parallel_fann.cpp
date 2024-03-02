@@ -11,6 +11,10 @@
 #include <chrono>
 #include <iostream>
 
+//std::chrono::steady_clock::time_point begin = std::chrono::steady_clock::now();
+//std::chrono::steady_clock::time_point end = std::chrono::steady_clock::now();
+//std::cout << "Time difference = " << std::chrono::duration_cast<std::chrono::microseconds>(end - begin).count() << "[µs]" << std::endl;
+
 FANN_EXTERNAL float FANN_API fann_train_epoch_batch_parallel(struct fann *ann,
                                                              struct fann_train_data *data,
                                                              const unsigned int threadnumb) {
@@ -90,6 +94,10 @@ FANN_EXTERNAL float FANN_API fann_train_epoch_irpropm_parallel(struct fann *ann,
                                                                struct fann_train_data *data,
                                                                const unsigned int threadnumb) {
   struct fann **ann_vect = (struct fann **)malloc(threadnumb * sizeof(struct fann *));
+  if (!ann_vect) {
+      std::cerr << "malloc failed for threadnumb: " << threadnumb << std::endl;
+      std::exit(1);
+  }
   int i = 0, j = 0;
 
   if (ann->prev_train_slopes == NULL) {
