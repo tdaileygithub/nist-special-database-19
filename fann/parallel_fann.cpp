@@ -8,6 +8,9 @@
 #include "config.h"
 #include "fann.h"
 
+#include <chrono>
+#include <iostream>
+
 FANN_EXTERNAL float FANN_API fann_train_epoch_batch_parallel(struct fann *ann,
                                                              struct fann_train_data *data,
                                                              const unsigned int threadnumb) {
@@ -28,9 +31,13 @@ FANN_EXTERNAL float FANN_API fann_train_epoch_batch_parallel(struct fann *ann,
       ann_vect[i] = fann_copy(ann);
     }
 
-    // parallel computing of the updates
-
+//
+// parallel computing of the updates
+// critical path
+// ALL of the processing time is inside this function
+//
 #pragma omp for schedule(static)
+
     for (i = 0; i < (int)data->num_data; i++) {
       j = omp_get_thread_num();
       fann_run(ann_vect[j], data->input[i]);
