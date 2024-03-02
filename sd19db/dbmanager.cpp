@@ -71,7 +71,7 @@ namespace sdb19db
 
 	std::vector<int> DbManager::GetMisIds(const std::string character) const {
 		std::vector<int> ids;
-		const std::string sql(std::format("select id from mis where character = '{}' LIMIT 100;", character));
+		const std::string sql(std::format("select id from mis where character = '{}' LIMIT 10000;", character));
 		const auto ret = _hsfpage->Query(sql);
 		for (auto it = ret.begin(); it < ret.end(); it++) {
 			//return first column
@@ -83,8 +83,10 @@ namespace sdb19db
 	BlobData DbManager::GetBlobData(const int id, const std::string table, std::string blob_column) const
 	{
 		BlobData bd;
-		sqlite3_stmt* sqlstatement;
-		//unsigned char* imagepixels = nullptr;
+		bd.Length = 0;
+		bd.Data = nullptr;
+
+		sqlite3_stmt* sqlstatement;		
 		const std::string sql(std::format("select id, LENGTH({}), {} from {} where id = '{}';", blob_column, blob_column, table, id));
 
 		int rc = sqlite3_prepare_v2(_dbPtr, sql.c_str(), sql.size(), &sqlstatement, nullptr);
@@ -97,8 +99,7 @@ namespace sdb19db
 			auto len		= sqlite3_column_int(sqlstatement, 1);
 			auto imgdata	= (unsigned char*)sqlite3_column_blob(sqlstatement, 2);		
 			bd.Length		= len;			
-			bd.Data			= new unsigned char[len];
-			//bd.Data = (unsigned char*)sqlite3_column_blob(sqlstatement, 2);
+			bd.Data			= new unsigned char[len];			
 			std::memcpy(bd.Data, imgdata, len);
 		}
 		rc = sqlite3_finalize(sqlstatement);
