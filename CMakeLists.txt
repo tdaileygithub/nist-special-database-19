@@ -7,11 +7,11 @@ project(sd19)
 option(DR_MEMORY_LEAK_CHECK "Dr Memory Leak Check Build" OFF)
 
 add_executable(showmis)
-target_link_libraries(showmis PUBLIC toojpeg sqlite3 sha256 ulog miniz mongoose pugixml sd19 sd19db fann )
-target_sources(showmis PRIVATE "showmis.cpp" "sd19config.h" "misprocessing.h" "misprocessing.cpp" "hsfpageprocessing.h" "hsfpageprocessing.cpp" )
+target_link_libraries(showmis PUBLIC toojpeg sqlite3 sha256 ulog miniz pugixml sd19 sd19db loadpngg fann )
+target_sources(showmis PRIVATE "showmis.cpp" "sd19config.h" "sd19config.cpp" "misprocessing.h" "misprocessing.cpp" "hsfpageprocessing.h" "hsfpageprocessing.cpp" )
  
 add_executable(sd19test)
-target_link_libraries(sd19test PUBLIC toojpeg sqlite3 sha256 ulog miniz pugixml sd19 sd19db fann )
+target_link_libraries(sd19test PUBLIC toojpeg sqlite3 sha256 ulog miniz pugixml sd19 sd19db loadpngg fann )
 target_sources(sd19test PRIVATE "sd19test.cpp" )
 
 add_executable(fanntrain)
@@ -21,8 +21,8 @@ target_link_libraries(fanntrain PRIVATE
     comdlg32.lib advapi32.lib shell32.lib
     ole32.lib oleaut32.lib
 ) 
-target_link_libraries(fanntrain PUBLIC ulog pugixml fann imgui flatbuff )
-target_sources(fanntrain PRIVATE "fann.cpp" "imgui_util.h" "imgui_util.cpp" "monster_generated.h" )
+target_link_libraries(fanntrain PUBLIC ulog pugixml fann imgui flatbuff fann sqlite3 sd19db loadpngg )
+target_sources(fanntrain PRIVATE "mnist_fann_extern.h" "mnist_fann.cpp" "fann.cpp" "sd19config.h" "sd19config.cpp" "imgui_util.h" "imgui_util.cpp"  )
 
 # Include sub-projects.
 add_subdirectory ("sd19")
@@ -38,6 +38,7 @@ add_subdirectory ("mongoose")
 add_subdirectory ("fann")
 add_subdirectory ("imgui")
 add_subdirectory ("flatbuffers") 
+add_subdirectory ("lodepng") 
 
 # Enable Hot Reload for MSVC compilers if supported.
 if (POLICY CMP0141)
