@@ -232,6 +232,7 @@ FANN_EXTERNAL void FANN_API fann_train_on_data(struct fann *ann, struct fann_tra
   int desired_error_reached;
 
   unsigned int NUM_THREADS = std::thread::hardware_concurrency() - 1;
+  NUM_THREADS = 4;
 
 #ifdef DEBUG
   printf("Training with %s\n", FANN_TRAIN_NAMES[ann->training_algorithm]);
