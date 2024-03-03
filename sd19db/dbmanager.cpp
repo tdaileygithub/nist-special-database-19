@@ -71,7 +71,7 @@ namespace sdb19db
 
 	std::vector<int> DbManager::GetMisIds(const std::string character) const {
 		std::vector<int> ids;
-		const std::string sql(std::format("select id from mis where character = '{}' LIMIT 10000;", character));
+		const std::string sql(std::format("select id from mis where character = '{}';", character));
 		const auto ret = _hsfpage->Query(sql);
 		for (auto it = ret.begin(); it < ret.end(); it++) {
 			//return first column
