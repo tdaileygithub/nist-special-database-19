@@ -9,7 +9,6 @@ https://www.nist.gov/srd/nist-special-database-19
 - 814,255 characters in the data set
 - Raw Source MIS Characters are 128x128 at 1bpp
 - 62 character classes [a-z][A-Z][0-9]
-- 
 
 ## sd19.db3 - Facts
 
@@ -17,6 +16,7 @@ https://www.nist.gov/srd/nist-special-database-19
 - sd19.db3 - 849,248,256 bytes @ 32x23 MIS characters scaled with norm_2nd_gen2\(\) with all HSF Pages
 - 3,668 hsf_page rows [Same As the stated count from NIST]
 - 814,255 mis rows [Same As the stated count from NIST]
+- db creation around 2 minutes on my desktop - 8 minutes on my laptop
 
 ## Acronymns
 

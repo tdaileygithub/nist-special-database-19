@@ -99,7 +99,7 @@ std::vector<MisInfo> GetMisFiles()
                             std::istringstream iss(line);
                             iss >> std::hex >> i;
                             //null terminate the array or it will get garbage
-                            char s[] = { i, 0x00 };
+                            char s[] = { (char)i, 0x00 };
                             mis.mischars.push_back(std::string(s));
                         }
                         clsfile.close();

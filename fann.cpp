@@ -196,14 +196,14 @@ void test_it()
 
 void train_thread(fann* ann, const Sd19Config& config)
 {
-    int num_data = train_dataset.size();
-
-    const size_t num_bytes = static_cast<size_t>(32 * 32) * num_data;
+    const unsigned int num_data = train_dataset.size();
+    const unsigned int img_dim = config.GetMisScale() ? (32 * 32) : (128 * 128);
+    const size_t num_bytes = static_cast<size_t>(img_dim) * num_data * sizeof(float);
 
     std::cerr << "num_data:   " << num_data << std::endl;
-    std::cerr << "size in MB: " << (num_bytes * sizeof(float)) / (1000 * 1000)  << std::endl;
+    std::cerr << "size in MB: " << (num_bytes) / (1000 * 1000)  << std::endl;
 
-    fann_train_data* data = fann_create_train_from_callback(num_data, config.GetNumberInputs(), config.GetNumberOutputs(), fann_get_train_data);
+    fann_train_data* data = fann_create_train_from_callback(num_data, (unsigned int )config.GetNumberInputs(), (unsigned int)config.GetNumberOutputs(), fann_get_train_data);
 
     fann_train_on_data(ann, data, config.GetMaxEpochs(), config.GetEpochsBetweenReport(), config.GetDesiredError());
 }
@@ -215,7 +215,7 @@ int main(int argc, char* argv[])
 
     dbm = std::make_unique< sdb19db::DbManager>("sd19.db3");
     
-    constexpr float trainsplit = 0.8;
+    constexpr float trainsplit = 0.8f;
 
     //Stratified training dataset    
     for (int asciichar = 48; asciichar <= 122; asciichar++)
