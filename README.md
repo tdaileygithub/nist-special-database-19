@@ -1,23 +1,29 @@
 # Overview
 
-# nist-special-database-19
+# NIST Special Database 19 - History Background
 
-NIST Special Database 19
+https://www.nist.gov/srd/nist-special-database-19
 
+- First edition 1995
+- Second edition 2016
 - 814,255 characters in the data set
-- Source characters are 128x128
+- Raw Source MIS Characters are 128x128 at 1bpp
+- 62 character classes [a-z][A-Z][0-9]
+- 
 
-[MNIST](https://en.wikipedia.org/wiki/MNIST_database)
+## sd19.db3 - Facts
 
-- 70,000 characters
-- 60k test
-- 10k train
+- sd19.db3 - 988,839,936 bytes @ 128x128 MIS characters with all HSF Pages
+- sd19.db3 - 849,248,256 bytes @ 32x23 MIS characters scaled with norm_2nd_gen2\(\) with all HSF Pages
+- 3,668 hsf_page rows [Same As the stated count from NIST]
+- 814,255 mis rows [Same As the stated count from NIST]
 
-<hr>
+## Acronymns
 
-A 10X differnce in readily available data set size is worthy of a raw import for easier parsing in 2024.
-
-<hr>
+- HSF - Handwriting Sample Form
+- MIS - Multiple Isolated Character Images
+- PCT - File with an IHEAD that contains one complete HSF form
+- CLS - Manually checked list of characters prsent inside the MIS file
 
 # Field Information
 
@@ -86,3 +92,19 @@ The HSFs were scanned at 11.8 dots per millimeter (300 dots per inch) and contai
 ## Neural Net
 
 - [FANN](https://leenissen.dk/fann/wp/) - Fast Artifical Neural Network Library in C
+
+
+
+
+
+[MNIST](https://en.wikipedia.org/wiki/MNIST_database)
+
+- 70,000 characters
+- 60k test
+- 10k train
+
+<hr>
+
+A 10X differnce in readily available data set size is worthy of a raw import for easier parsing in 2024.
+
+<hr>
