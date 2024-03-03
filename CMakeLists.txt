@@ -6,9 +6,9 @@ project(sd19)
 
 option(DR_MEMORY_LEAK_CHECK "Dr Memory Leak Check Build" OFF)
 
-add_executable(showmis)
-target_link_libraries(showmis PUBLIC toojpeg sqlite3 sha256 ulog miniz pugixml sd19 sd19db loadpngg fann )
-target_sources(showmis PRIVATE "showmis.cpp" "sd19config.h" "sd19config.cpp" "misprocessing.h" "misprocessing.cpp" "hsfpageprocessing.h" "hsfpageprocessing.cpp" )
+add_executable(dbcreate)
+target_link_libraries(dbcreate PUBLIC toojpeg sqlite3 sha256 ulog miniz pugixml sd19 sd19db loadpngg fann )
+target_sources(dbcreate PRIVATE  "mnist_fann_extern.h" "mnist_fann.cpp" "dbcreate.cpp" "sd19config.h" "sd19config.cpp" "misprocessing.h" "misprocessing.cpp" "hsfpageprocessing.h" "hsfpageprocessing.cpp" )
  
 add_executable(sd19test)
 target_link_libraries(sd19test PUBLIC toojpeg sqlite3 sha256 ulog miniz pugixml sd19 sd19db loadpngg fann )
