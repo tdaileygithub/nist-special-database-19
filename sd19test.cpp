@@ -232,8 +232,7 @@ TEST_CASE("bits2bytes - 32x32 - hsf_0.mis")
     const bool downsample = false;   // false = save as YCbCr444 JPEG (better quality), true = YCbCr420 (smaller file)    
 
     bool ret = TooJpeg::save_jpeg("bits2bytes.jpg", image, width, height, bytesPerPixel, isRGB, quality, downsample, "TooJpeg example image");
-    CHECK(ret == true);
-    //std::remove("bits2bytes.jpg");
+    CHECK(ret == true);    
 
     delete[] image;
 
@@ -287,7 +286,7 @@ TEST_CASE("norm_2nd_gen2 - 32x32 - hsf_0.mis")
     const bool isRGB = false;        // true = RGB image, else false = grayscale
     const auto quality = 100;        // compression quality: 0 = worst, 100 = best, 80 to 90 are most often used
     const bool downsample = false;   // false = save as YCbCr444 JPEG (better quality), true = YCbCr420 (smaller file)    
-    bool ret = TooJpeg::save_jpeg("norm_2nd_gen2.jpg", image, width, height, bytesPerPixel, isRGB, quality, downsample, "TooJpeg example image");
+    bool ret = TooJpeg::save_jpeg("norm_2nd_gen2.jpg", image, width, height, bytesPerPixel, isRGB, quality, downsample, "TooJpeg 32x32 normalized mis");
     CHECK(ret == true);
 
     delete[] image;

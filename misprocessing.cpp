@@ -39,6 +39,7 @@
 #include "misprocessing.h"
 
 #include "toojpeg/toojpeg_helper.h"
+#include "sd19/normalize.h"
 
 
 std::vector<MisInfo> GetMisFiles()
@@ -130,14 +131,34 @@ void process_mis_thread_callback(const MisInfo info)
             //--------------------------------------------------------------------
             //!BUG! readmisfile() - was clearning compression after it decompresses it
             //--------------------------------------------------------------------
+            
+            
             mis = readmisfile((char*)info.filepath.c_str());
             if (mis->misd != 1) {
                 fatalerr("show_mis", "", "incorrect entry size or depth");
+            }
+
+            {
+                MIS* mis2;
+                float* scal_x;
+                float* scal_y;
+                norm_2nd_gen2(&mis2, &scal_x, &scal_y, mis);
+                freemis(mis);
+                mis = mis2;
             }
             if ((data8 = (char*)malloc(mis->misw * mis->mish * sizeof(char))) == NULL) {
                 syserr("show_mis", "malloc", "unable to allocate 8 bit space");
             }
             bits2bytes(mis->data, (u_char*)data8, mis->misw * mis->mish);
+            
+            //mis = readmisfile((char*)info.filepath.c_str());
+            //if (mis->misd != 1) {
+            //    fatalerr("show_mis", "", "incorrect entry size or depth");
+            //}
+            //if ((data8 = (char*)malloc(mis->misw * mis->mish * sizeof(char))) == NULL) {
+            //    syserr("show_mis", "malloc", "unable to allocate 8 bit space");
+            //}
+            //bits2bytes(mis->data, (u_char*)data8, mis->misw * mis->mish);
         }
 
         for (dptr = data8, misentry = 0; misentry < mis->ent_num; misentry++)
@@ -148,8 +169,6 @@ void process_mis_thread_callback(const MisInfo info)
             const auto height = mis->enth;
             const auto bytesPerPixel = 1;
             auto image = new unsigned char[width * height * bytesPerPixel];
-
-            //TooJpeg::misdata_to_bwimage(dptr, image, mis->entw, mis->enth, 1);
 
             for (int k = 0; k < mis->enth; k++)
             {
