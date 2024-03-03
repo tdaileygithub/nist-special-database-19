@@ -15,6 +15,7 @@ std::ostream& operator<<(std::ostream& out, const Sd19Config& config)
         << std::setw(30) << "Delete_Existing_Db:"           << std::setw(85) << config.GetDeleteExistingDb()        << std::endl
         << std::setw(30) << "Hsf_Page_Enable:"              << std::setw(85) << config.GetHfPageProcessing()        << std::endl
         << std::setw(30) << "Mis_Enable:"                   << std::setw(85) << config.GetMisProcessing()           << std::endl
+        << std::setw(30) << "Scale_MIS:"                    << std::setw(85) << config.GetMisScale()                << std::endl
         << std::setw(30) << std::string(30, '-')            << std::setw(85) << std::string(85, '-')                << std::endl
         << std::setw(30) << "Number_Threads:"               << std::setw(85) << config.GetNumberThreads()           << std::endl        
         << std::setw(30) << std::string(30, '-')            << std::setw(85) << std::string(85, '-')                << std::endl

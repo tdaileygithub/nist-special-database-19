@@ -30,15 +30,8 @@ int main()
     NUM_THREADS = (NUM_THREADS <= 0) ? 1 : NUM_THREADS;
 
     Sd19Config config;
+    std::cout << config;
 
-    std::cout << setw(30) << "NIST_Special_Database_19: "   << setw(100) << config.GetNistSd19Folder() << std::endl;
-    std::cout << setw(30) << "Sqlite_Db_Name: "             << setw(100) << config.GetNistSd19Folder() << std::endl;
-    std::cout << setw(30) << "Hsf_Page_Enable: "            << setw(100) << (config.GetHfPageProcessing() ? "true" : "false") << std::endl;
-    std::cout << setw(30) << "Delete_Existing_Db: "         << setw(100) << (config.GetDeleteExistingDb() ? "true" : "false") << std::endl;
-    std::cout << setw(30) << "NumberThreads: "              << setw(100) << config.GetNumberThreads() << std::endl;
-    std::cout << setw(30) << "Sqlite3_SourceDb: "           << setw(100) << config.GetSourceDbName() << std::endl;
-    std::cout << setw(30) << "Sqlite3_DumpFilename: "       << setw(100) << config.GetDumpDbName() << std::endl;
-    
     if (config.GetDeleteExistingDb())
     {        
         std::remove(config.GetSourceDbName().c_str());
@@ -92,7 +85,7 @@ int main()
             std::vector<std::thread> vecOfThreads;
             for (int i = 0; i < NUM_THREADS; i++)
             {
-                std::thread threadObj(process_mis_thread_callback, misToProcess[numMisFilesToProcess]);
+                std::thread threadObj(process_mis_thread_callback, misToProcess[numMisFilesToProcess], config);
                 vecOfThreads.push_back(std::move(threadObj));
 
                 numMisFilesToProcess = numMisFilesToProcess - 1;

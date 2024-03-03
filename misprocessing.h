@@ -3,6 +3,8 @@
 #include <string>
 #include <vector>
 
+#include "sd19config.h"
+
 struct MisInfo {
     std::string filepath = "";
     std::string filename = "";
@@ -18,7 +20,7 @@ struct MisInfo {
 
 std::vector<MisInfo> GetMisFiles();
 
-void process_mis_thread_callback(const MisInfo info);
+void process_mis_thread_callback(const MisInfo info, const Sd19Config config);
 
 std::ostream& operator<<(std::ostream& out, const MisInfo& ihead_row);
 

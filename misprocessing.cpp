@@ -39,6 +39,7 @@
 #include "misprocessing.h"
 
 #include "toojpeg/toojpeg_helper.h"
+
 #include "sd19/normalize.h"
 
 
@@ -111,7 +112,7 @@ std::vector<MisInfo> GetMisFiles()
     return entries;
 }
 
-void process_mis_thread_callback(const MisInfo info)
+void process_mis_thread_callback(const MisInfo info, const Sd19Config config)
 {
     using namespace sdb19db;
 
@@ -132,12 +133,11 @@ void process_mis_thread_callback(const MisInfo info)
             //!BUG! readmisfile() - was clearning compression after it decompresses it
             //--------------------------------------------------------------------
             
-            
             mis = readmisfile((char*)info.filepath.c_str());
             if (mis->misd != 1) {
                 fatalerr("show_mis", "", "incorrect entry size or depth");
             }
-
+            if (config.GetMisScale())
             {
                 MIS* mis2;
                 float* scal_x;
@@ -150,15 +150,6 @@ void process_mis_thread_callback(const MisInfo info)
                 syserr("show_mis", "malloc", "unable to allocate 8 bit space");
             }
             bits2bytes(mis->data, (u_char*)data8, mis->misw * mis->mish);
-            
-            //mis = readmisfile((char*)info.filepath.c_str());
-            //if (mis->misd != 1) {
-            //    fatalerr("show_mis", "", "incorrect entry size or depth");
-            //}
-            //if ((data8 = (char*)malloc(mis->misw * mis->mish * sizeof(char))) == NULL) {
-            //    syserr("show_mis", "malloc", "unable to allocate 8 bit space");
-            //}
-            //bits2bytes(mis->data, (u_char*)data8, mis->misw * mis->mish);
         }
 
         for (dptr = data8, misentry = 0; misentry < mis->ent_num; misentry++)

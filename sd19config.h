@@ -13,7 +13,7 @@
 
 #include "sd19db/dbmanager.h"
 
-// a global instance and mutex
+// global instance and mutex
 extern std::unique_ptr<sdb19db::DbManager> dbm;
 extern std::mutex dbmutex;
 extern std::mutex readbinaryrastermutex;
@@ -43,6 +43,7 @@ private:
     float _desiredError = 0.0f;
     int _maxEpochs = 0;
     int _epochsBetweenReport = 0;
+    bool _scaleMisCharacters = false;
 
 public:
     Sd19Config() {
@@ -51,18 +52,19 @@ public:
         if (!doc.load_file("config.xml"))
             exit(1);
 
-        _nistSd19Folder     = std::string((pugi::xpath_query("/Sd19/Configs/Config[@Name='NIST_Special_Database_19']").evaluate_node_set(doc)[0]).node().text().get());
-        _hsfPageProcessing  = (pugi::xpath_query("/Sd19/Configs/Config[@Name='Hsf_Page_Enable']").evaluate_node_set(doc)[0]).node().text().as_bool(true);
-        _misProcessing      = (pugi::xpath_query("/Sd19/Configs/Config[@Name='Mis_Enable']").evaluate_node_set(doc)[0]).node().text().as_bool(true);
-        _deleteExistingDb   = (pugi::xpath_query("/Sd19/Configs/Config[@Name='Delete_Existing_Db']").evaluate_node_set(doc)[0]).node().text().as_bool(true);
-        _numberThreads      = (pugi::xpath_query("/Sd19/Configs/Config[@Name='Number_Threads']").evaluate_node_set(doc)[0]).node().text().as_int(0);
-        _sourceDbFile       = std::string((pugi::xpath_query("/Sd19/Configs/Config[@Name='Sqlite3_SourceDb']").evaluate_node_set(doc)[0]).node().text().get());
-        _dbDumpFile         = std::string((pugi::xpath_query("/Sd19/Configs/Config[@Name='Sqlite3_DumpFilename']").evaluate_node_set(doc)[0]).node().text().get());
+        _nistSd19Folder                 = std::string((pugi::xpath_query("/Sd19/Configs/Config[@Name='NIST_Special_Database_19']").evaluate_node_set(doc)[0]).node().text().get());
+        _hsfPageProcessing              = (pugi::xpath_query("/Sd19/Configs/Config[@Name='Hsf_Page_Enable']").evaluate_node_set(doc)[0]).node().text().as_bool(true);
+        _misProcessing                  = (pugi::xpath_query("/Sd19/Configs/Config[@Name='Mis_Enable']").evaluate_node_set(doc)[0]).node().text().as_bool(true);
+        _deleteExistingDb               = (pugi::xpath_query("/Sd19/Configs/Config[@Name='Delete_Existing_Db']").evaluate_node_set(doc)[0]).node().text().as_bool(true);
+        _numberThreads                  = (pugi::xpath_query("/Sd19/Configs/Config[@Name='Number_Threads']").evaluate_node_set(doc)[0]).node().text().as_int(0);
+        _sourceDbFile                   = std::string((pugi::xpath_query("/Sd19/Configs/Config[@Name='Sqlite3_SourceDb']").evaluate_node_set(doc)[0]).node().text().get());
+        _dbDumpFile                     = std::string((pugi::xpath_query("/Sd19/Configs/Config[@Name='Sqlite3_DumpFilename']").evaluate_node_set(doc)[0]).node().text().get());
+        _scaleMisCharacters             = (pugi::xpath_query("/Sd19/Configs/Config[@Name='Scale_MIS']").evaluate_node_set(doc)[0]).node().text().as_bool(true);
 
-        _numberInputs       = (pugi::xpath_query("/Sd19/NeuralNetConfig/Config[@Name='Number_Inputs']").evaluate_node_set(doc)[0]).node().text().as_int(0);
-        _numberOutputs      = (pugi::xpath_query("/Sd19/NeuralNetConfig/Config[@Name='Number_Outputs']").evaluate_node_set(doc)[0]).node().text().as_int(0);
-        _numberLayers       = (pugi::xpath_query("/Sd19/NeuralNetConfig/Config[@Name='Number_Layers']").evaluate_node_set(doc)[0]).node().text().as_int(0);
-        _numberHiddenLayers = (pugi::xpath_query("/Sd19/NeuralNetConfig/Config[@Name='Number_Hidden']").evaluate_node_set(doc)[0]).node().text().as_int(0);
+        _numberInputs                   = (pugi::xpath_query("/Sd19/NeuralNetConfig/Config[@Name='Number_Inputs']").evaluate_node_set(doc)[0]).node().text().as_int(0);
+        _numberOutputs                  = (pugi::xpath_query("/Sd19/NeuralNetConfig/Config[@Name='Number_Outputs']").evaluate_node_set(doc)[0]).node().text().as_int(0);
+        _numberLayers                   = (pugi::xpath_query("/Sd19/NeuralNetConfig/Config[@Name='Number_Layers']").evaluate_node_set(doc)[0]).node().text().as_int(0);
+        _numberHiddenLayers             = (pugi::xpath_query("/Sd19/NeuralNetConfig/Config[@Name='Number_Hidden']").evaluate_node_set(doc)[0]).node().text().as_int(0);
 
         _actionFunctionHiddenStr    = std::string((pugi::xpath_query("/Sd19/NeuralNetConfig/Config[@Name='Action_Function_Hidden']").evaluate_node_set(doc)[0]).node().text().get());
         _actionFunctionHidden       = fann_activation_func_to_enum[_actionFunctionHiddenStr];
@@ -105,6 +107,9 @@ public:
             return NUM_THREADS;
         }
         return _numberThreads;
+    }
+    bool GetMisScale() const {
+        return _scaleMisCharacters;
     }
 
     int GetNumberInputs() const {
