@@ -7,6 +7,8 @@
 # proc:                 the use of primary space statistics.
 */
 #include <cstdlib>
+#include <iostream>
+#include <iomanip>
 #include <math.h>
 #include <stdio.h>
 
@@ -188,6 +190,7 @@ void norm_2nd_gen2(MIS** outmis, float** scal_x, float** scal_y, MIS* inmis)
 		/* apply morphing to the scaled character image */
 		len = NORM_W * NORM_H;
 		bits2bytes(optr, ocdata, len);
+
 #if UCHAR_HACK
 		npix = pixelcnt((char*)ocdata, NORM_W, NORM_H);
 #else
@@ -234,7 +237,10 @@ void norm_2nd_gen2(MIS** outmis, float** scal_x, float** scal_y, MIS* inmis)
 				}
 			}
 		}
-		bytes2bits(rcptr, optr, len);
+		//
+		// not sure why they were converting individual items here?
+		// 
+		//bytes2bits(rcptr, optr, len);
 		optr += oesize;
 		(*outmis)->ent_num++;
 	}
