@@ -7,11 +7,22 @@ https://www.nist.gov/srd/nist-special-database-19
 - First edition 1995
 - Second edition 2016
 - 814,255 processed characters in the data set
-- Raw Source MIS Characters are 128x128 at 1bpp encoded in 
+- Raw Source MIS Characters are 128x128 at 1bpp encoded with GROUP 4 FACSIMILE [Fax Machine]
+  -	[see sd19/grp4decomp.cpp](sd19/grp4decomp.cpp)
 - 62 character classes 
   - [a-z]
   - [A-Z]
   - [0-9]
+
+Compare the original SD19 dataset to its children:
+
+https://en.wikipedia.org/wiki/MNIST_database
+- 60k train + 10k tesst
+
+https://www.itl.nist.gov/iaui/vip/cs_links/EMNIST/Readme.txt
+- 814,255 characters. 62 unbalanced classes.
+- EMNIST Balanced:  131,600 characters. 47 balanced classes.
+- Same IHEAD and MIS format - just another repackage
 
 ## Acronymns
 
@@ -24,7 +35,10 @@ https://www.nist.gov/srd/nist-special-database-19
 
 ![HSF Form Example](assets/images/hsf.png)
 
-**Example**: Sample Form #8, Writer # 4164, Template #10, HSF Page SHA256 f259c09024d451a3e73146f49603bf0af122e649ab116c89f06d91241b51cad8
+**Example**: 
+- Sample Form #8
+- Writer # 4164
+- Template #10
 
 The HSFs were scanned at 11.8 dots per millimeter (300 dots per inch) and contain 34 fields: 
 
