@@ -21,7 +21,6 @@
     <EnableUnmanagedDebugging>false</EnableUnmanagedDebugging>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="mnist.py" />
     <Compile Include="Sd19Dataset.py" />
     <Compile Include="sd19.py" />
     <Compile Include="Sd19Net.py" />
