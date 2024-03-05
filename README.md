@@ -91,10 +91,14 @@ The HSFs were scanned at 11.8 dots per millimeter (300 dots per inch) and contai
 
 ## Neural Net
 
+### FANN
+
 - [FANN](https://leenissen.dk/fann/wp/) - Fast Artifical Neural Network Library in C
 
+### PyTorch
 
-
+- [Custom Dataset Tutorial](https://pytorch.org/tutorials/beginner/data_loading_tutorial.html)
+- [Transfer Learning Tutorial](https://pytorch.org/tutorials/beginner/transfer_learning_tutorial.html) 
 
 
 [MNIST](https://en.wikipedia.org/wiki/MNIST_database)

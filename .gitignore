@@ -432,3 +432,4 @@ FodyWeavers.xsd
 
 #cmake out directory
 out/
+*.db3
