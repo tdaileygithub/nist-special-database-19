@@ -22,19 +22,15 @@ jobs:
             artifact: "Windows-MSVC.7z",
             os: windows-latest,
             cc: "cl", cxx: "cl",
+            preset: "x64-release",
             environment_script: "C:/Program Files/Microsoft Visual Studio/2022/Enterprise/VC/Auxiliary/Build/vcvars64.bat"
           }
         - {
             name: "Ubuntu Latest GCC", 
             artifact: "Linux.7z",
             os: ubuntu-latest,
-            cc: "gcc", cxx: "g++"
-          }
-        - {
-            name: "macOS Latest Clang", 
-            artifact: "macOS.7z",
-            os: macos-latest,
-            cc: "clang", cxx: "clang++"
+            cc: "gcc", cxx: "g++",
+            preset: "linux-Release"
           }
     steps:
     - uses: actions/checkout@v3
@@ -137,7 +133,7 @@ jobs:
         endif()
 
         execute_process(
-          COMMAND cmake --preset=x64-release
+          COMMAND cmake --preset=${{ matrix.config.preset }}
           RESULT_VARIABLE result
           OUTPUT_VARIABLE output
           ERROR_VARIABLE output
@@ -145,7 +141,7 @@ jobs:
         )
 
         execute_process(
-          COMMAND cmake --build out/build/x64-release --target sd19test
+          COMMAND cmake --build out/build/${{ matrix.config.preset }} --target sd19test
           RESULT_VARIABLE result
           OUTPUT_VARIABLE output
           ERROR_VARIABLE output
