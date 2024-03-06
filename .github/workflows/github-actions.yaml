@@ -25,6 +25,10 @@ jobs:
             preset: "x64-release",
             environment_script: "C:/Program Files/Microsoft Visual Studio/2022/Enterprise/VC/Auxiliary/Build/vcvars64.bat"
           }
+
+        # -- The C compiler identification is GNU 11.4.0
+        # -- The CXX compiler identification is GNU 11.4.0
+
         - {
             name: "Ubuntu Latest GCC", 
             artifact: "Linux.7z",
@@ -34,6 +38,22 @@ jobs:
           }
     steps:
     - uses: actions/checkout@v3
+  
+    - if: runner.os == 'Linux'
+      name: 'install gcc13'
+      run: |
+        sudo add-apt-repository ppa:ubuntu-toolchain-r/test
+        sudo apt update
+        sudo apt install gcc-14 g++-13
+        ll /usr/bin/gcc-13
+        ll /usr/bin/g++-13
+        update-alternatives --display gcc
+        ll /etc/alternatives/g*
+        sudo update-alternatives --remove-all gcc
+        sudo update-alternatives --remove-all g++
+        sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-13 10 --slave /usr/bin/g++ g++ /usr/bin/g++-13
+        g++ --version
+        gcc --version
 
     - name: Download Ninja and CMake
       shell: cmake -P {0}
