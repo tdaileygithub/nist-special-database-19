@@ -44,11 +44,9 @@ jobs:
     #   run: echo ${{ env.cxx }}
 
     - name: cmake --build out/build/x64-release --target sd19test
+      shell: cmd
       run: |
-        cd ${{ github.workspace }}
-
-        set && cls && "C:/Program Files/Microsoft Visual Studio/2022/Enterprise/VC/Auxiliary/Build/vcvars64.bat" && cls && set
-        
+        call "C:\Program Files (x86)\Microsoft Visual Studio\2022\Enterprise\VC\Auxiliary\Build\vcvars64.bat"
         cmake --preset=x64-release
         cmake --preset=x64-release
         cmake --build out/build/x64-release --target sd19test
