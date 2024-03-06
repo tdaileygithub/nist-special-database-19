@@ -22,6 +22,11 @@ jobs:
     runs-on: windows-latest
 
     steps:
+
+    - name: install ninja
+      run: |
+        choco install ninja
+
     - name: Checkout
       uses: actions/checkout@v1
       with:
