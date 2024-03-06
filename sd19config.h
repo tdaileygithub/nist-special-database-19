@@ -50,7 +50,11 @@ public:
         pugi::xml_document doc;
 
         if (!doc.load_file("config.xml"))
+        {
+            std::cerr << "config.xml not found" << std::endl;
             exit(1);
+        }
+            
 
         _nistSd19Folder                 = std::string((pugi::xpath_query("/Sd19/Configs/Config[@Name='NIST_Special_Database_19']").evaluate_node_set(doc)[0]).node().text().get());
         _hsfPageProcessing              = (pugi::xpath_query("/Sd19/Configs/Config[@Name='Hsf_Page_Enable']").evaluate_node_set(doc)[0]).node().text().as_bool(true);
