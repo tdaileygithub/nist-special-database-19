@@ -32,13 +32,25 @@ jobs:
       with:
           submodules: recursive
 
+    - name: set compiler ENV vars
+      run: |       
+        echo "cc=cl" | Out-File -FilePath $env:GITHUB_ENV -Append
+        echo "cxx=cl" | Out-File -FilePath $env:GITHUB_ENV -Append
+
+    - name: Show environment variable
+      run: echo ${{ env.cc }}      
+
+    - name: Show environment variable
+      run: echo ${{ env.cxx }}
+
     - name: cmake --build out/build/x64-release --target sd19test
       run: |
         cd ${{ github.workspace }}
 
-        "C:\Program Files\Microsoft Visual Studio\2022\Enterprise\Common7\Tools\VsDevCmd.bat" && cmake --preset=x64-release
-        "C:\Program Files\Microsoft Visual Studio\2022\Enterprise\Common7\Tools\VsDevCmd.bat" && cmake --preset=x64-release
-        "C:\Program Files\Microsoft Visual Studio\2022\Enterprise\Common7\Tools\VsDevCmd.bat" && cmake --build out/build/x64-release --target sd19test
+        "C:/Program Files/Microsoft Visual Studio/2022/Enterprise/VC/Auxiliary/Build/vcvars64.bat" && cmake --preset=x64-release
+        "C:/Program Files/Microsoft Visual Studio/2022/Enterprise/VC/Auxiliary/Build/vcvars64.bat" && cmake --preset=x64-release
+        "C:/Program Files/Microsoft Visual Studio/2022/Enterprise/VC/Auxiliary/Build/vcvars64.bat" && cmake --build out/build/x64-release --target sd19test
+
     # - name: Build Solution (windows)
     #   run: |
     #     cd build
