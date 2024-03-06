@@ -1,5 +1,5 @@
-﻿name: GitHub Actions Demo
-run-name: ${{ github.actor }} is testing out GitHub Actions 🚀
+﻿name: NIST Special Database 19
+run-name: ${{ github.actor }} build
 on: [push]
 jobs:
   Explore-GitHub-Actions:
@@ -32,7 +32,7 @@ jobs:
         cd ..
         git clone https://github.com/Microsoft/vcpkg.git
         cd vcpkg
-        git checkout --force 2020.01
+        git checkout --force 2024.02.14
         .\bootstrap-vcpkg.bat
         .\vcpkg.exe install cppzmq:x64-windows
 
