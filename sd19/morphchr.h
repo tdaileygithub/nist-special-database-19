@@ -1,4 +1,6 @@
 #pragma once
+#ifndef MORPHCHR_H_
+#define MORPHCHR_H_
 
 void erode_charimage(char* inp, char* out, int iw, int  ih);
 
@@ -11,3 +13,4 @@ char get_north8(char* ptr, int row, int iw);
 char get_east8(char* ptr, int col, int iw);
 
 char get_west8(char* ptr, int col);
+#endif

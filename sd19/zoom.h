@@ -1,3 +1,7 @@
+#pragma once
+#ifndef ZOOM_H_
+#define ZOOM_H_
+
 /*
 # proc: zoom - scales a binary bitmap up or down depending on the x & y factors
 # proc:        passed.
@@ -44,3 +48,4 @@ void copy_col(char* xzmdata, int zw, int  zh, int  to, char* chardata, int iw, i
 void copy_rows(char* yzmdata, int zw, int  zh, int  to1, int  to2, char* chardata, int  iw, int  ih, int  from);
 
 void copy_row(char* yzmdata, int zw, int zh, int to, char* chardata, int iw, int ih, int from);
+#endif

@@ -1,4 +1,6 @@
 #pragma once
+#ifndef GETNSET_H_
+#define GETNSET_H_
 
 /*
 # proc: get_id - get the identity attribute from an IHead structure.
@@ -177,3 +179,4 @@ int set_par_x(IHEAD* head, int par_x);
 int get_par_y(IHEAD* head);;
 
 int set_par_y(IHEAD* head, int par_y);
+#endif

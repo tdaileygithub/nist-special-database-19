@@ -1,4 +1,6 @@
 #pragma once
+#ifndef GRP4DECOMP_H_
+#define GRP4DECOMP_H_
 
 /*********************************************************************/
 /* grp4decomp.h                                                      */
@@ -85,3 +87,4 @@ void write_bits_d(unsigned short length, unsigned short color);
 void prepare_to_read_bits(char* input_pointer);
 short read_bit();
 short find_run_length_code(short unsigned color);
+#endif

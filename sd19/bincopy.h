@@ -1,5 +1,8 @@
 #pragma once
 
+#ifndef BINCOPY_H_
+#define BINCOPY_H_
+
 #include "defs.h"
 
 void binary_subimage_copy_8(
@@ -41,3 +44,5 @@ void binary_subimage_copy(
 	int cpw, int cph,
 	int dstx, int dsty
 );
+
+#endif

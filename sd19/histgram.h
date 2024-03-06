@@ -1,4 +1,6 @@
 #pragma once
+#ifndef HISTGRAM_H_
+#define HISTGRAM_H_
 
 #define X_HIST 		0
 #define Y_HIST		1
@@ -11,3 +13,4 @@ void compute_hist(unsigned char* data, int width, int height, int orient, int** 
 void compute_x_hist(unsigned char* data, int width, int height, int** bins, int* len);
 
 void compute_y_hist(unsigned char* data, int width, int height, int** bins, int* len);
+#endif
