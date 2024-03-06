@@ -35,10 +35,14 @@ jobs:
     - name: cmake --build out/build/x64-release --target sd19test
       run: |
         cd ${{ github.workspace }}
-        cmake --preset=x64-release
-        cmake --build out/build/x64-release --target sd19test
 
+        "C:\Program Files\Microsoft Visual Studio\2022\Enterprise\Common7\Tools\VsDevCmd.bat" && cmake --preset=x64-release
+        "C:\Program Files\Microsoft Visual Studio\2022\Enterprise\Common7\Tools\VsDevCmd.bat" && cmake --preset=x64-release
+        "C:\Program Files\Microsoft Visual Studio\2022\Enterprise\Common7\Tools\VsDevCmd.bat" && cmake --build out/build/x64-release --target sd19test
     # - name: Build Solution (windows)
     #   run: |
     #     cd build
     #     MSBuild.exe CMakeHelloWorld.sln
+
+
+  #https://github.com/cristianadam/HelloWorld/blob/master/.github/workflows/build_cmake.yml
