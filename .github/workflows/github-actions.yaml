@@ -27,24 +27,13 @@ jobs:
       with:
           submodules: recursive
 
-    - name: Installing vcpkg (windows)
-      run: |
-        cd ..
-        git clone https://github.com/Microsoft/vcpkg.git
-        cd vcpkg
-        git checkout --force 2024.02.14
-        .\bootstrap-vcpkg.bat
-        .\vcpkg.exe install cppzmq:x64-windows
-
-    - name: Running cmake (windows)
+    - name: cmake --build out/build/x64-release --target sd19test
       run: |
         cd ${{ github.workspace }}
-        mkdir build
-        cd build
-        cmake .. -DCMAKE_TOOLCHAIN_FILE=${{ github.workspace }}
-                  /../vcpkg/scripts/buildsystems/vcpkg.cmake
+        cmake --preset=x64-release
+        cmake --build out/build/x64-release --target sd19test
 
-    - name: Build Solution (windows)
-      run: |
-        cd build
-        MSBuild.exe CMakeHelloWorld.sln
+    # - name: Build Solution (windows)
+    #   run: |
+    #     cd build
+    #     MSBuild.exe CMakeHelloWorld.sln
