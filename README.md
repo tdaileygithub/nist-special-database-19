@@ -1,13 +1,14 @@
 # Overview
 
 
-Motivations: 
+# Motivations
 
-- It was interesting to see what the US goverment was doing in late 80's early 90's - they were thinking 15 years out!
-- I could not find any free libraries [in any language] that could read the Group 4 encoded MIS files and exports of the HSF pages.
+- Interested to see what NIST was doing in late 80's early 90's with OCR
+- Search did not produce any free libraries, in any language, that could read the Group 4 encoded MIS files and HSF pages.
   - I assumed that compiling the NIST provided C code for the group 4 decoder code provided in their cdrom distro would not be that bad.
 	- My assumption was correct. Register keyword deprecation and 16bit to 64 bit sorts of issues.
-- Curious how long it would take in 2024 to process this dataset -- and wondering how long it took in 1994!
+- Wondered how long it would take in 2024 to process their dataset 
+  - How long did it take in 1994? - those DECs must have been toasty warm!
 
 # NIST Special Database 19 - History 
 
