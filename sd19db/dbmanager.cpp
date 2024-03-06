@@ -1,3 +1,4 @@
+#include <cstring>
 #include <format>
 #include <sstream>
 #include <string>

@@ -2,7 +2,7 @@
 # proc: find_corners - determines the box bounding the black pixels within
 # proc:                a binary bitmap based on histograms and thresholds.
 */
-
+#include <algorithm>
 #include <cstdlib>
 #include <math.h>
 #include <memory.h>
@@ -37,8 +37,8 @@ void find_corners(int* tlx, int* tly, int* objw, int* objh, unsigned char* src_i
 	compute_hist(src_image, width, height, Y_HIST, &ybins, &num_y_bins);
 	find_first_thresh_forward(ybins, 0, num_y_bins, thresh, &left, &leftval);
 	find_first_thresh_backward(ybins, 0, num_y_bins, thresh, &right, &rightval);
-	right = min(right + 1, num_y_bins);
-	bottom = min(bottom + 1, num_x_bins);
+	right = std::min(right + 1, num_y_bins);
+	bottom = std::min(bottom + 1, num_x_bins);
 	(*objw) = right - left;
 	(*objh) = bottom - top;
 	(*tlx) = left;

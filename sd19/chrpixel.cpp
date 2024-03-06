@@ -15,7 +15,7 @@
 
 #include <stdio.h>
 #include <cstdlib>
-#include <string>
+#include <string.h>
 
 #include "chrpixel.h"
 

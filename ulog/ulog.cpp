@@ -28,9 +28,16 @@ namespace unm
 	constexpr int flush_interval_ms = 0;                   // interval betwen log file flush, 0 - flush every write, -1 - do not flush at all
 	constexpr int max_files = 15;                          // max log files before rotating
 	constexpr bool add_thread_names = true;                // add current thread name to each log line
-	ustring ulogger::file_path = utf8_to_native("\\Logs");  // path to store log files, if empty, then the current working directory is used // UTF8
-	ustring ulogger::file_prefix = utf8_to_native("ulog_"); // ulog file prefix UTF8
-	ustring ulogger::file_ext = utf8_to_native(".log");     // ulog file extension UTF8
+
+#ifdef _WIN32
+	ustring ulogger::file_path (L"");			// path to store log files, if empty, then the current working directory is used // UTF8
+	ustring ulogger::file_prefix (L"ulog_");	// ulog file prefix UTF8
+	ustring ulogger::file_ext (L".log");		// ulog file extension UTF8
+#else
+	ustring ulogger::file_path ("");			// path to store log files, if empty, then the current working directory is used // UTF8
+	ustring ulogger::file_prefix ("ulog_");		// ulog file prefix UTF8
+	ustring ulogger::file_ext (".log");			// ulog file extension UTF8
+#endif
 	//---------------------------------------------------------------------
 	ustring ulogger::file_name;
 
@@ -46,7 +53,7 @@ namespace unm
 	namespace fs = std::filesystem;
 
 #if __cplusplus > 201703L
-	ustring utf8_to_native(const std::u8string& istr)
+	ustring utf8_to_native(const std::string& istr)
 #else
 	ustring utf8_to_native(const std::string& istr)
 #endif

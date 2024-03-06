@@ -54,6 +54,7 @@ std::vector<MisInfo> GetMisFiles()
         hsf_num = std::regex_replace(hsf_num, std::regex("by_write"), "");
         hsf_num = std::regex_replace(hsf_num, std::regex("hsf_"), "");
         hsf_num = std::regex_replace(hsf_num, std::regex("\\\\"), "");
+        hsf_num = std::regex_replace(hsf_num, std::regex("/"), "");
         const std::string fileext (dirEntry.path().extension().string());
 
         // by_write\hsf_0\f0039_14\l0039_14.mis

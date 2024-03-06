@@ -4,10 +4,10 @@
 		<Config Name="NIST_Special_Database_19">C:\Users\tim\Documents\nist-special-database-19\out\build\x64-release</Config>
 		<Config Name="Sqlite3_SourceDb">:memory:</Config>
 		<Config Name="Sqlite3_DumpFilename">sd19.db3</Config>
-		<Config Name="Delete_Existing_Db">no</Config>
+		<Config Name="Delete_Existing_Db">yes</Config>
 		<Config Name="Hsf_Page_Enable">yes</Config>
 		<Config Name="Mis_Enable">yes</Config>
-		<Config Name="Number_Threads">4</Config>
+		<Config Name="Number_Threads">8</Config>
 		<Config Name="Scale_MIS">true</Config>
 	</Configs>
 	<NeuralNetConfig>

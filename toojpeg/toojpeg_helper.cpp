@@ -9,7 +9,7 @@
 
 namespace TooJpeg
 {
-    static std::ofstream temporary_jpeg_stream("temp.jpg", std::ios_base::out | std::ios_base::binary);
+    std::ofstream temporary_jpeg_stream("temp.jpg", std::ios_base::out | std::ios_base::binary);
     
     void write_single_jpeg_byte(unsigned char byte) {
         temporary_jpeg_stream << byte;

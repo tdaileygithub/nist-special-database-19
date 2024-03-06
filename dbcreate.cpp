@@ -1,3 +1,4 @@
+#include <filesystem>
 #include <iomanip>
 #include <iostream>
 #include <mutex>
@@ -38,6 +39,8 @@ int main()
         std::remove(config.GetDumpDbName().c_str());
     }
     dbm = std::make_unique< sdb19db::DbManager>(config.GetSourceDbName());
+
+    std::filesystem::current_path(config.GetNistSd19Folder());
 
     using namespace sdb19db;
 

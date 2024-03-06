@@ -17,6 +17,9 @@
 #define min(a, b)   ((a) < (b) ? (a) : (b))
 #define sround(x) ((int) (((x)<0) ? (x)-0.5 : (x)+0.5))
 
+#undef min
+#undef max
+
 //http://tigcc.ticalc.org/doc/values.html
 //values.h
 #define BITSPERBYTE 8
