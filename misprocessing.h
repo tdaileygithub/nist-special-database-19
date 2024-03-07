@@ -1,4 +1,6 @@
 #pragma once
+#ifndef MISPROCESSING_H_
+#define MISPROCESSING_H_
 
 #include <string>
 #include <vector>
@@ -25,3 +27,4 @@ void process_mis_thread_callback(const MisInfo info, const Sd19Config config);
 std::ostream& operator<<(std::ostream& out, const MisInfo& ihead_row);
 
 std::string to_string(const MisInfo& h);
+#endif

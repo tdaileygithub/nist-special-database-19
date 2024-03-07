@@ -1,4 +1,6 @@
 #pragma once
+#ifndef SD19CONFIG_H_
+#define SD19CONFIG_H_
 
 #include <memory>
 #include <mutex>
@@ -169,3 +171,4 @@ public:
 std::ostream& operator<<(std::ostream& out, const Sd19Config& config);
 
 std::string to_string(const Sd19Config& config);
+#endif
