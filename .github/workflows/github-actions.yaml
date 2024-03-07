@@ -16,6 +16,16 @@ env:
 
 jobs:
   build:
+    #
+    # if should be this straightforward.. but its not
+    # - name: cmake --build out/build/x64-release --target sd19test
+    #   shell: cmd
+    #   run: |
+    #     call "C:\Program Files (x86)\Microsoft Visual Studio\2022\Enterprise\VC\Auxiliary\Build\vcvars64.bat"
+    #     cmake --preset=x64-release
+    #     cmake --preset=x64-release
+    #     cmake --build out/build/x64-release --target sd19test
+
     name: ${{ matrix.config.name }}
     runs-on: ${{ matrix.config.os }}
     strategy:
@@ -177,12 +187,6 @@ jobs:
           message(FATAL_ERROR "Build failed")
         endif()
 
-    #
-    # if should be this straightforward.. but its not
-    # - name: cmake --build out/build/x64-release --target sd19test
-    #   shell: cmd
-    #   run: |
-    #     call "C:\Program Files (x86)\Microsoft Visual Studio\2022\Enterprise\VC\Auxiliary\Build\vcvars64.bat"
-    #     cmake --preset=x64-release
-    #     cmake --preset=x64-release
-    #     cmake --build out/build/x64-release --target sd19test
+    - name: unit test
+      run: |
+        out/build/${{ matrix.config.preset }}/sd19test --reporters=console
