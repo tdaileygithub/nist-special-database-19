@@ -1,5 +1,6 @@
 #include <cstring>
 #include <format>
+#include <iomanip>
 #include <sstream>
 #include <string>
 
@@ -134,19 +135,16 @@ namespace sdb19db
 	{
 		for (int i = 0; i < rai.Height; i++)
 		{
+			out << i << std::setw(2) << " | ";
 			for (int j = 0; j < rai.Width; j++)
 			{
 				int offset = 128 * i + j;
-				if (rai.PixelData[offset] == 255)
-				{
-					out << " ";
-					
+				if (rai.PixelData[offset] == 255) {
+					out << " ";					
 				}
-				else
-				{
+				else {
 					out << "*";					
-				}
-				
+				}				
 			}
 			out << std::endl;			
 		}
