@@ -187,6 +187,7 @@ jobs:
           message(FATAL_ERROR "Build failed")
         endif()
 
-    - name: unit test
-      run: |
-        out/build/${{ matrix.config.preset }}/sd19test --reporters=console
+    # requires files: [hsf_0.mis, sd19.db3]
+    # - name: unit test
+    #   run: |
+    #     out/build/${{ matrix.config.preset }}/sd19test --reporters=console
