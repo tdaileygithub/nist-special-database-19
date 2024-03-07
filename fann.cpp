@@ -2,6 +2,7 @@
 #include <cassert> 
 #include <cstdlib> 
 #include <ctime>
+#include <filesystem>
 #include <fstream>
 #include <iomanip>
 #include <iostream>
@@ -16,8 +17,6 @@
 #include "ulog/ulog.h"
 
 #include "fann/fann.h"
-
-#include "imgui_util.h"
 
 #include "sd19db/dbmanager.h"
 
@@ -35,11 +34,8 @@ string labels_file      = "train-labels-idx1-ubyte";
 // global instance - only want one owner and wrapped with mutex
 std::unique_ptr<sdb19db::DbManager> dbm = nullptr;
 
-static ScrollingBuffer x_data_epoch_mse_sb = {  };
-static float max_mse = 0;
 static unsigned int epoch = 0;
 static float mse = 0.0f;
-
 
 static std::chrono::steady_clock::time_point beginepoch = std::chrono::steady_clock::now();
 
@@ -49,9 +45,6 @@ int FANN_API test_callback(struct fann* ann, struct fann_train_data* train,
 {
     epoch = epochs;
     mse = fann_get_MSE(ann);
-    
-    if (max_mse < mse)
-        max_mse = mse;
 
     if (epochs % 10 == 0)
     {
@@ -60,16 +53,7 @@ int FANN_API test_callback(struct fann* ann, struct fann_train_data* train,
     }
     std::chrono::steady_clock::time_point endepoch = std::chrono::steady_clock::now();
     std::cout << setw(10)   << "Epoch: "        << setw(10) << epochs       << setw(30) 
-                            << "elpased : "     << setw(10) << std::chrono::duration_cast<std::chrono::milliseconds>(endepoch - beginepoch).count() << setw(30)
-                            << "current mse: "  << setw(10) << mse          << setw(30)
-                            << "max mse "       << max_mse                  << setw(30) << std::endl;
-    
-    beginepoch = std::chrono::steady_clock::now();
-    //std::chrono::steady_clock::time_point end = std::chrono::steady_clock::now();
-    //std::cout << "Time difference = " << std::chrono::duration_cast<std::chrono::microseconds>(end - begin).count() << "[µs]" << std::endl;
-
-
-    x_data_epoch_mse_sb.AddPoint((float)epochs, mse);
+                            << "current mse: "  << setw(10) << mse          << setw(30);
 
     return 0;
 }
@@ -211,11 +195,16 @@ void train_thread(fann* ann, const Sd19Config& config)
 int main(int argc, char* argv[])
 {
     Sd19Config config;
-    std::cout << config;
+    std::cout << config << std::endl << std::endl;
 
-    dbm = std::make_unique< sdb19db::DbManager>("sd19.db3");
+    if (!std::filesystem::exists(config.GetSourceDbName())) {
+        std::cerr << config.GetSourceDbName() << " not found" << std::endl;
+        exit(1);
+    }
+
+    dbm = std::make_unique< sdb19db::DbManager>(config.GetSourceDbName());
     
-    constexpr float trainsplit = 0.8f;
+    const float trainsplit = (config.GetTrainTestSplitPercent() / 100.0f);
 
     //Stratified training dataset    
     for (int asciichar = 48; asciichar <= 122; asciichar++)
@@ -273,86 +262,6 @@ int main(int argc, char* argv[])
     fann_set_callback(ann, *(test_callback));
 
     thread thread_fann(train_thread, ann, config );
-
-    Imgui_SetupContext();
-    bool show_demo_window = false;
-    // Main loop
-    bool done = false;
-    while (!done)
-    {
-        // Poll and handle messages (inputs, window resize, etc.)
-        // See the WndProc() function below for our to dispatch events to the Win32 backend.
-        MSG msg;
-        while (::PeekMessage(&msg, nullptr, 0U, 0U, PM_REMOVE))
-        {
-            ::TranslateMessage(&msg);
-            ::DispatchMessage(&msg);
-            if (msg.message == WM_QUIT)
-                done = true;
-        }
-        if (done)
-            break;
-
-        // Start the Dear ImGui frame
-        ImGui_ImplDX12_NewFrame();
-        ImGui_ImplWin32_NewFrame();
-        ImGui::NewFrame();
-
-        // 1. Show the big demo window (Most of the sample code is in ImGui::ShowDemoWindow()! You can browse its code to learn more about Dear ImGui!).
-        //ImGui::ShowDemoWindow(&show_demo_window);
-
-        static ImPlotAxisFlags flags = ImPlotAxisFlags_None;
-        
-        ImGui::SameLine();
-
-        const int epoch = x_data_epoch_mse_sb.Data.size();
-        if (ImPlot::BeginPlot("MSE vs Epoch")) {            
-            ImPlot::SetupAxes("epoch", "MSE", flags,flags);
-            ImPlot::SetupAxisLimits(ImAxis_X1, 0, epoch, ImGuiCond_Always);
-            ImPlot::SetupAxisLimits(ImAxis_Y1, 0, max_mse, ImGuiCond_Always);
-            if (x_data_epoch_mse_sb.Data.size() > 0 ) {
-                ImPlot::PlotLine("MSE", &x_data_epoch_mse_sb.Data[0].x, &x_data_epoch_mse_sb.Data[0].y, epoch, 0, x_data_epoch_mse_sb.Offset, 2 * sizeof(float));
-            }
-            ImPlot::EndPlot();
-        }
-
-        if (ImGui::BeginTable("Information", 2))
-        {
-            ImGui::TableNextRow();
-            ImGui::TableNextColumn();
-            ImGui::Text("Epoch");
-            ImGui::TableNextColumn();
-            ImGui::Text(std::format("{}", epoch).c_str());
-            
-            ImGui::TableNextRow();
-            ImGui::TableNextColumn();
-            ImGui::Text("MSE");
-            ImGui::TableNextColumn();
-            ImGui::Text(std::format("{}", mse).c_str());
-
-            ImGui::TableNextRow();
-            ImGui::TableNextColumn();
-            ImGui::Text("# Training Set");
-            ImGui::TableNextColumn();
-            ImGui::Text(std::format("{}", train_dataset.size()).c_str());
-            ImGui::EndTable();
-        }
-
-        //if (ImGui::BeginTable("Training DataSet", 2))
-        //{
-        //    for (auto it = counts_by_label.cbegin(); it != counts_by_label.cend(); it++)
-        //    {
-        //        ImGui::TableNextRow();
-        //        ImGui::TableNextColumn();
-        //        ImGui::Text(std::format("{}", it->first).c_str());
-        //        ImGui::TableNextColumn();
-        //        ImGui::Text(std::format("{}", it->second).c_str());
-        //    }
-        //    ImGui::EndTable();
-        //}
-
-        Imgui_Render();
-    }
     thread_fann.join();
 
     std::cout << "Complete. Saving Network.... " << std::endl;
@@ -360,14 +269,10 @@ int main(int argc, char* argv[])
 
     fann_destroy(ann);
 
-    Imgui_Cleanup();
-
     //test the newly trained network
     for (int i = 0; i < 10; i++)
     {
         test_it();
     }
-    exit(0);
-
     return 0;
 }

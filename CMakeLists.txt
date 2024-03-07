@@ -14,15 +14,17 @@ add_executable(sd19test)
 target_link_libraries(sd19test PUBLIC toojpeg sqlite3 sha256 ulog miniz pugixml sd19 sd19db loadpngg fann )
 target_sources(sd19test PRIVATE "sd19test.cpp" )
 
+#add_executable(fanntrain)
+#target_link_libraries(fanntrain PRIVATE
+#    d3d12.lib dxgi.lib dxguid.lib uuid.lib
+#    kernel32.lib user32.lib
+#    comdlg32.lib advapi32.lib shell32.lib
+#    ole32.lib oleaut32.lib
+#) 
+
 add_executable(fanntrain)
-target_link_libraries(fanntrain PRIVATE
-    d3d12.lib dxgi.lib dxguid.lib uuid.lib
-    kernel32.lib user32.lib
-    comdlg32.lib advapi32.lib shell32.lib
-    ole32.lib oleaut32.lib
-) 
-target_link_libraries(fanntrain PUBLIC ulog pugixml fann imgui flatbuff fann sqlite3 sd19db loadpngg )
-target_sources(fanntrain PRIVATE "mnist_fann_extern.h" "mnist_fann.cpp" "fann.cpp" "sd19config.h" "sd19config.cpp" "imgui_util.h" "imgui_util.cpp"  )
+target_link_libraries(fanntrain PUBLIC ulog pugixml fann flatbuff fann sqlite3 sd19db loadpngg )
+target_sources(fanntrain PRIVATE "mnist_fann_extern.h" "mnist_fann.cpp" "fann.cpp" "sd19config.h" "sd19config.cpp" )
 
 # Include sub-projects.
 add_subdirectory ("sd19")
