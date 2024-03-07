@@ -34,6 +34,7 @@ private:
     int _numberOutputs = 0;
     int _numberLayers = 0;
     int _numberHiddenLayers = 0;
+    float _trainTestSplit = 0.0f;
     fann_activationfunc_enum _actionFunctionHidden;
     std::string _actionFunctionHiddenStr = "";
     fann_activationfunc_enum _actionFunctionOutput;
@@ -51,12 +52,10 @@ public:
     Sd19Config() {
         pugi::xml_document doc;
 
-        if (!doc.load_file("config.xml"))
-        {
+        if (!doc.load_file("config.xml")) {
             std::cerr << "config.xml not found" << std::endl;
             exit(1);
         }
-            
 
         _nistSd19Folder                 = std::string((pugi::xpath_query("/Sd19/Configs/Config[@Name='NIST_Special_Database_19']").evaluate_node_set(doc)[0]).node().text().get());
         _hsfPageProcessing              = (pugi::xpath_query("/Sd19/Configs/Config[@Name='Hsf_Page_Enable']").evaluate_node_set(doc)[0]).node().text().as_bool(true);
@@ -72,6 +71,7 @@ public:
         _numberLayers                   = (pugi::xpath_query("/Sd19/NeuralNetConfig/Config[@Name='Number_Layers']").evaluate_node_set(doc)[0]).node().text().as_int(0);
         _numberHiddenLayers             = (pugi::xpath_query("/Sd19/NeuralNetConfig/Config[@Name='Number_Hidden']").evaluate_node_set(doc)[0]).node().text().as_int(0);
 
+        _trainTestSplit             = (pugi::xpath_query("/Sd19/NeuralNetConfig/Config[@Name='Train_Test_Split_Percent']").evaluate_node_set(doc)[0]).node().text().as_float(0);
         _actionFunctionHiddenStr    = std::string((pugi::xpath_query("/Sd19/NeuralNetConfig/Config[@Name='Action_Function_Hidden']").evaluate_node_set(doc)[0]).node().text().get());
         _actionFunctionHidden       = fann_activation_func_to_enum[_actionFunctionHiddenStr];
 
@@ -131,6 +131,9 @@ public:
         return _numberLayers;
     }
 
+    float GetTrainTestSplitPercent() const{
+        return _trainTestSplit;
+    }
     fann_activationfunc_enum GetActionFunctionHiddenEnum() const {
         return _actionFunctionHidden;
     }

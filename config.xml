@@ -11,6 +11,7 @@
 		<Config Name="Scale_MIS">true</Config>
 	</Configs>
 	<NeuralNetConfig>
+		<Config Name="Train_Test_Split_Percent">80</Config>
 		<Config Name="Action_Function_Hidden">FANN_SIGMOID</Config>
 		<Config Name="Action_Function_Output">FANN_SIGMOID</Config>
 		<Config Name="Training_Algorithm">FANN_TRAIN_BATCH</Config>
