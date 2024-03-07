@@ -8,6 +8,7 @@
 #include <iostream>
 #include <map>
 #include <mutex>
+#include <random>
 #include <syncstream>
 #include <thread>
 #include <vector>
@@ -53,7 +54,7 @@ int FANN_API test_callback(struct fann* ann, struct fann_train_data* train,
     }
     std::chrono::steady_clock::time_point endepoch = std::chrono::steady_clock::now();
     std::cout << setw(10)   << "Epoch: "        << setw(10) << epochs       << setw(30) 
-                            << "current mse: "  << setw(10) << mse          << setw(30);
+                            << "current mse: "  << setw(10) << mse          << setw(30) << std::endl;
 
     return 0;
 }
@@ -66,6 +67,8 @@ void fann_get_train_data(unsigned int num, unsigned int num_input, unsigned int 
     const int label_idx = label_to_index[label];
 
     auto rai = dbm->GetImageAsPng(id, "mis", "image");
+
+    //std::cout << rai << std::endl;
 
     int ct = 0;
     for (int i = 0; i < rai.Height; i++)
@@ -205,6 +208,7 @@ int main(int argc, char* argv[])
     dbm = std::make_unique< sdb19db::DbManager>(config.GetSourceDbName());
     
     const float trainsplit = (config.GetTrainTestSplitPercent() / 100.0f);
+    const float testsplit =  1.0f - (config.GetTrainTestSplitPercent() / 100.0f);
 
     //Stratified training dataset    
     for (int asciichar = 48; asciichar <= 122; asciichar++)
@@ -244,6 +248,25 @@ int main(int argc, char* argv[])
             test_dataset.push_back(std::make_tuple((char)asciichar, *testid));
         }
     }
+    //shuffle the test + train vectors to avoid small sets only capturing from first few hsf pages
+    std::random_device rd;
+    std::mt19937 g(rd());
+    std::shuffle(train_dataset.begin(), train_dataset.end(), g);
+    std::shuffle(test_dataset.begin(),  test_dataset.end(), g);
+
+    //prune the train and test to have at most config.GetMaxDatasetSize() entries
+    const int numTrainSplit = (int)(trainsplit * train_dataset.size());
+    const int numTestSplit = (int)(testsplit * test_dataset.size());
+    if (numTrainSplit > config.GetMaxDatasetSize()) {
+        train_dataset.erase(train_dataset.begin() + numTrainSplit, train_dataset.end());
+    }
+    if (numTestSplit > config.GetMaxDatasetSize()) {
+        test_dataset.erase(test_dataset.begin() + numTestSplit, train_dataset.end());
+    }
+
+    std::cout << "GetMaxDatasetSize:" << config.GetMaxDatasetSize() << std::endl;
+    std::cout << "Training Entries: " << train_dataset.size() << std::endl;
+    std::cout << "Test Entries:     " << test_dataset.size() << std::endl;
 
     //ann = fann_create_from_file(network_file.c_str());
     struct fann* ann = fann_create_standard(config.GetNumberLayers(), config.GetNumberInputs(), config.GetNumberHidden(), config.GetNumberOutputs());

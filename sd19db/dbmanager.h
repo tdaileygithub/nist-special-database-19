@@ -13,6 +13,7 @@
 namespace sdb19db
 {
 	struct RawImageInfo {
+		int Id;
 		unsigned char* PixelData;
 		unsigned int Width;
 		unsigned int Height;

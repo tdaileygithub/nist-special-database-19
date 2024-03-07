@@ -35,6 +35,7 @@ private:
     int _numberLayers = 0;
     int _numberHiddenLayers = 0;
     float _trainTestSplit = 0.0f;
+    int _maxDatasetSize = 60000;
     fann_activationfunc_enum _actionFunctionHidden;
     std::string _actionFunctionHiddenStr = "";
     fann_activationfunc_enum _actionFunctionOutput;
@@ -72,6 +73,7 @@ public:
         _numberHiddenLayers             = (pugi::xpath_query("/Sd19/NeuralNetConfig/Config[@Name='Number_Hidden']").evaluate_node_set(doc)[0]).node().text().as_int(0);
 
         _trainTestSplit             = (pugi::xpath_query("/Sd19/NeuralNetConfig/Config[@Name='Train_Test_Split_Percent']").evaluate_node_set(doc)[0]).node().text().as_float(0);
+        _maxDatasetSize             = (pugi::xpath_query("/Sd19/NeuralNetConfig/Config[@Name='Maximum_Dataset_Size']").evaluate_node_set(doc)[0]).node().text().as_int(0);
         _actionFunctionHiddenStr    = std::string((pugi::xpath_query("/Sd19/NeuralNetConfig/Config[@Name='Action_Function_Hidden']").evaluate_node_set(doc)[0]).node().text().get());
         _actionFunctionHidden       = fann_activation_func_to_enum[_actionFunctionHiddenStr];
 
@@ -133,6 +135,9 @@ public:
 
     float GetTrainTestSplitPercent() const{
         return _trainTestSplit;
+    }
+    int GetMaxDatasetSize() const {
+        return _maxDatasetSize;
     }
     fann_activationfunc_enum GetActionFunctionHiddenEnum() const {
         return _actionFunctionHidden;
