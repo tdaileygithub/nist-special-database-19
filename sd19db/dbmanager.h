@@ -53,6 +53,9 @@ namespace sdb19db
 			_mis	 = std::make_unique<Mis>(_dbPtr);
 		}
 
+		DbManager(const DbManager&) = delete;
+		DbManager& operator=(const DbManager&) = delete;
+
 		int Insert(const tables::ihead& table) const;
 		int Insert(const tables::hsfpage& table) const;
 		int Insert(const tables::mis& table) const;
