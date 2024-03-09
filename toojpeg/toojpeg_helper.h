@@ -22,4 +22,7 @@ namespace TooJpeg
         const bool downsample,
         const std::string comment
     );
+
+    #define MIS_BACKGROUND_PIXEL 0
+    #define MIS_FOREGROUND_PIXEL 255
 }

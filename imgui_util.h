@@ -1,4 +1,6 @@
 #pragma once
+#ifndef IMGUI_UTIL_H_
+#define IMGUI_UTIL_H_
 
 #include "imgui/imgui.h"
 #include "imgui/imgui_impl_dx12.h"
@@ -94,3 +96,4 @@ struct RollingBuffer {
         Data.push_back(ImVec2(xmod, y));
     }
 };
+#endif

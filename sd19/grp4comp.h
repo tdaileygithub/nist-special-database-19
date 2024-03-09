@@ -1,3 +1,7 @@
+#pragma once
+#ifndef GRP4COMP_H_
+#define GRP4COMP_H_
+
 /*********************************************************************/
 /* grp4comp.h                                                        */
 /* Originally compression.h                                          */
@@ -156,3 +160,4 @@ void write_bits_c(char* string_ptr);
 unsigned int flush_buffer();
 void write_run_length(SHORT length, SHORT color);
 void process_char(unsigned char data_byte, struct parameters* params);
+#endif

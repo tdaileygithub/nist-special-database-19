@@ -1,5 +1,3 @@
-cmake_minimum_required(VERSION 3.13.0)
-
 project(flatbuff)
 
 add_compile_definitions(FLATBUFFERS_MAX_64_BUFFER_SIZE=99999)

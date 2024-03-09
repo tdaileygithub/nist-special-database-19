@@ -1,4 +1,6 @@
 #pragma once
+#ifndef SD19CONFIG_H_
+#define SD19CONFIG_H_
 
 #include <memory>
 #include <mutex>
@@ -32,6 +34,9 @@ private:
     int _numberOutputs = 0;
     int _numberLayers = 0;
     int _numberHiddenLayers = 0;
+    float _trainTestSplit = 0.0f;
+    int _maxDatasetSize = 60000;
+    std::string _networkFilename = "";
     fann_activationfunc_enum _actionFunctionHidden;
     std::string _actionFunctionHiddenStr = "";
     fann_activationfunc_enum _actionFunctionOutput;
@@ -46,11 +51,14 @@ private:
     bool _scaleMisCharacters = false;
 
 public:
-    Sd19Config() {
+    Sd19Config() 
+    {
         pugi::xml_document doc;
 
-        if (!doc.load_file("config.xml"))
+        if (!doc.load_file("config.xml")) {
+            std::cerr << "config.xml not found" << std::endl;
             exit(1);
+        }
 
         _nistSd19Folder                 = std::string((pugi::xpath_query("/Sd19/Configs/Config[@Name='NIST_Special_Database_19']").evaluate_node_set(doc)[0]).node().text().get());
         _hsfPageProcessing              = (pugi::xpath_query("/Sd19/Configs/Config[@Name='Hsf_Page_Enable']").evaluate_node_set(doc)[0]).node().text().as_bool(true);
@@ -61,26 +69,29 @@ public:
         _dbDumpFile                     = std::string((pugi::xpath_query("/Sd19/Configs/Config[@Name='Sqlite3_DumpFilename']").evaluate_node_set(doc)[0]).node().text().get());
         _scaleMisCharacters             = (pugi::xpath_query("/Sd19/Configs/Config[@Name='Scale_MIS']").evaluate_node_set(doc)[0]).node().text().as_bool(true);
 
-        _numberInputs                   = (pugi::xpath_query("/Sd19/NeuralNetConfig/Config[@Name='Number_Inputs']").evaluate_node_set(doc)[0]).node().text().as_int(0);
-        _numberOutputs                  = (pugi::xpath_query("/Sd19/NeuralNetConfig/Config[@Name='Number_Outputs']").evaluate_node_set(doc)[0]).node().text().as_int(0);
-        _numberLayers                   = (pugi::xpath_query("/Sd19/NeuralNetConfig/Config[@Name='Number_Layers']").evaluate_node_set(doc)[0]).node().text().as_int(0);
-        _numberHiddenLayers             = (pugi::xpath_query("/Sd19/NeuralNetConfig/Config[@Name='Number_Hidden']").evaluate_node_set(doc)[0]).node().text().as_int(0);
+        _numberInputs                   = (pugi::xpath_query("/Sd19/FannNeuralNetConfig/Config[@Name='Number_Inputs']").evaluate_node_set(doc)[0]).node().text().as_int(0);
+        _numberOutputs                  = (pugi::xpath_query("/Sd19/FannNeuralNetConfig/Config[@Name='Number_Outputs']").evaluate_node_set(doc)[0]).node().text().as_int(0);
+        _numberLayers                   = (pugi::xpath_query("/Sd19/FannNeuralNetConfig/Config[@Name='Number_Layers']").evaluate_node_set(doc)[0]).node().text().as_int(0);
+        _numberHiddenLayers             = (pugi::xpath_query("/Sd19/FannNeuralNetConfig/Config[@Name='Number_Hidden']").evaluate_node_set(doc)[0]).node().text().as_int(0);
 
-        _actionFunctionHiddenStr    = std::string((pugi::xpath_query("/Sd19/NeuralNetConfig/Config[@Name='Action_Function_Hidden']").evaluate_node_set(doc)[0]).node().text().get());
-        _actionFunctionHidden       = fann_activation_func_to_enum[_actionFunctionHiddenStr];
+        _networkFilename                = std::string((pugi::xpath_query("/Sd19/FannNeuralNetConfig/Config[@Name='Network_Filename']").evaluate_node_set(doc)[0]).node().text().get());
+        _trainTestSplit                 = (pugi::xpath_query("/Sd19/FannNeuralNetConfig/Config[@Name='Train_Test_Split_Percent']").evaluate_node_set(doc)[0]).node().text().as_float(0);
+        _maxDatasetSize                 = (pugi::xpath_query("/Sd19/FannNeuralNetConfig/Config[@Name='Maximum_Dataset_Size']").evaluate_node_set(doc)[0]).node().text().as_int(0);
+        _actionFunctionHiddenStr        = std::string((pugi::xpath_query("/Sd19/FannNeuralNetConfig/Config[@Name='Action_Function_Hidden']").evaluate_node_set(doc)[0]).node().text().get());
+        _actionFunctionHidden           = fann_activation_func_to_enum[_actionFunctionHiddenStr];
 
-        _actionFunctionOutputStr    = std::string((pugi::xpath_query("/Sd19/NeuralNetConfig/Config[@Name='Action_Function_Output']").evaluate_node_set(doc)[0]).node().text().get());
-        _actionFunctionOutput       = fann_activation_func_to_enum[_actionFunctionOutputStr];
+        _actionFunctionOutputStr        = std::string((pugi::xpath_query("/Sd19/FannNeuralNetConfig/Config[@Name='Action_Function_Output']").evaluate_node_set(doc)[0]).node().text().get());
+        _actionFunctionOutput           = fann_activation_func_to_enum[_actionFunctionOutputStr];
 
-        _trainingAlgorithmStr       = std::string((pugi::xpath_query("/Sd19/NeuralNetConfig/Config[@Name='Training_Algorithm']").evaluate_node_set(doc)[0]).node().text().get());
-        _trainingAlgorithm          = fann_training_algo_to_enum[_trainingAlgorithmStr];
+        _trainingAlgorithmStr           = std::string((pugi::xpath_query("/Sd19/FannNeuralNetConfig/Config[@Name='Training_Algorithm']").evaluate_node_set(doc)[0]).node().text().get());
+        _trainingAlgorithm              = fann_training_algo_to_enum[_trainingAlgorithmStr];
 
-        _learningMomentum           = (pugi::xpath_query("/Sd19/NeuralNetConfig/Config[@Name='Training_Learning_Momentum']").evaluate_node_set(doc)[0]).node().text().as_float(0);
-        _learningRate               = (pugi::xpath_query("/Sd19/NeuralNetConfig/Config[@Name='Training_Learning_Rate']").evaluate_node_set(doc)[0]).node().text().as_float(0);
+        _learningMomentum               = (pugi::xpath_query("/Sd19/FannNeuralNetConfig/Config[@Name='Training_Learning_Momentum']").evaluate_node_set(doc)[0]).node().text().as_float(0);
+        _learningRate                   = (pugi::xpath_query("/Sd19/FannNeuralNetConfig/Config[@Name='Training_Learning_Rate']").evaluate_node_set(doc)[0]).node().text().as_float(0);
 
-        _desiredError               = (pugi::xpath_query("/Sd19/NeuralNetConfig/Config[@Name='Desired_Error']").evaluate_node_set(doc)[0]).node().text().as_float(0);
-        _maxEpochs                  = (pugi::xpath_query("/Sd19/NeuralNetConfig/Config[@Name='Max_Epochs']").evaluate_node_set(doc)[0]).node().text().as_int(0);
-        _epochsBetweenReport        = (pugi::xpath_query("/Sd19/NeuralNetConfig/Config[@Name='Epochs_Between_Report']").evaluate_node_set(doc)[0]).node().text().as_int(0);        
+        _desiredError                   = (pugi::xpath_query("/Sd19/FannNeuralNetConfig/Config[@Name='Desired_Error']").evaluate_node_set(doc)[0]).node().text().as_float(0);
+        _maxEpochs                      = (pugi::xpath_query("/Sd19/FannNeuralNetConfig/Config[@Name='Max_Epochs']").evaluate_node_set(doc)[0]).node().text().as_int(0);
+        _epochsBetweenReport            = (pugi::xpath_query("/Sd19/FannNeuralNetConfig/Config[@Name='Epochs_Between_Report']").evaluate_node_set(doc)[0]).node().text().as_int(0);        
     }
 
     std::string GetSourceDbName() const {
@@ -125,6 +136,15 @@ public:
         return _numberLayers;
     }
 
+    std::string GetNetworkFilename() const {
+        return _networkFilename;
+    }
+    float GetTrainTestSplitPercent() const{
+        return _trainTestSplit;
+    }
+    int GetMaxDatasetSize() const {
+        return _maxDatasetSize;
+    }
     fann_activationfunc_enum GetActionFunctionHiddenEnum() const {
         return _actionFunctionHidden;
     }
@@ -165,3 +185,4 @@ public:
 std::ostream& operator<<(std::ostream& out, const Sd19Config& config);
 
 std::string to_string(const Sd19Config& config);
+#endif

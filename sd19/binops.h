@@ -1,4 +1,6 @@
 #pragma once
+#ifndef BINOPS_H_
+#define BINOPS_H_
 
 #define BINARY_COPY	0
 #define BINARY_OR	1
@@ -7,3 +9,5 @@
 #define BINARY_INVERT	4
 #define BINARY_ZERO	5
 #define BINARY_ONE	6
+
+#endif

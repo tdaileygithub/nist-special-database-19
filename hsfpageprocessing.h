@@ -1,4 +1,6 @@
 #pragma once
+#ifndef HSFPAGEPROCESSING_H_
+#define HSFPAGEPROCESSING_H_
 
 #include <string>
 #include <vector>
@@ -19,3 +21,4 @@ void process_hsf_page_thread_callback(const HsfPageInfo info);
 std::ostream& operator<<(std::ostream& out, const HsfPageInfo& ihead_row);
 
 std::string to_string(const HsfPageInfo& h);
+#endif

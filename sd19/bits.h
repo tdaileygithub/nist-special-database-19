@@ -1,4 +1,7 @@
 #pragma once
+#ifndef BITS_H_
+#define BITS_H_
+
 /************************************************************/
 /*         File Name: Bits.h                                */
 /*         Package:   NIST Bit Manipulation Macros          */
@@ -18,3 +21,5 @@ if((_p) == 0) \
   *(_b) = (*(_b)) & (~bit_masks[(_i)]); \
 else \
   *(_b) = (*(_b)) | bit_masks[(_i)];
+
+#endif

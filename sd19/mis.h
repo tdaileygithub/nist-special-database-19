@@ -1,4 +1,6 @@
 #pragma once
+#ifndef MIS_H_
+#define MIS_H_
 
 #include "ihead.h"
 
@@ -54,3 +56,5 @@ typedef struct misstruct {
 #define PARENT		""		/* original image (not a subimage) */
 #define PAR_X		0
 #define PAR_Y		0
+
+#endif  // MIS_H_

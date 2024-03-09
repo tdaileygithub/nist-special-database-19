@@ -1,4 +1,6 @@
+#include <cstring>
 #include <format>
+#include <iomanip>
 #include <sstream>
 #include <string>
 
@@ -113,6 +115,7 @@ namespace sdb19db
 	RawImageInfo DbManager::GetImageAsPng(const int id, const std::string table, std::string blob_column) const 
 	{	
 		RawImageInfo rai;
+		rai.Id = id;
 		BlobData bd = GetBlobData(id, table, blob_column);
 
 		unsigned int width, height, error;
@@ -131,21 +134,19 @@ namespace sdb19db
 
 	std::ostream& operator<<(std::ostream& out, const RawImageInfo& rai) 
 	{
+		out << "              Id= " << rai.Id << std::endl;
 		for (int i = 0; i < rai.Height; i++)
 		{
+			out << std::setw(3) << i << std::setw(3) << " | ";
 			for (int j = 0; j < rai.Width; j++)
 			{
-				int offset = 128 * i + j;
-				if (rai.PixelData[offset] == 255)
-				{
-					out << " ";
-					
-				}
-				else
-				{
+				int offset = rai.Width * i + j;
+				if (rai.PixelData[offset] == 255) {
 					out << "*";					
 				}
-				
+				else {
+					out << " ";					
+				}				
 			}
 			out << std::endl;			
 		}

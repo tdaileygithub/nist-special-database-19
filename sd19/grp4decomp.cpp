@@ -26,7 +26,7 @@
 #endif
 #include <malloc.h>
 #include <stdlib.h>
-#include <xmemory>
+#include <cstring>
 
 //#define Debug 1
 

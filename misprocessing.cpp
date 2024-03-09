@@ -54,6 +54,7 @@ std::vector<MisInfo> GetMisFiles()
         hsf_num = std::regex_replace(hsf_num, std::regex("by_write"), "");
         hsf_num = std::regex_replace(hsf_num, std::regex("hsf_"), "");
         hsf_num = std::regex_replace(hsf_num, std::regex("\\\\"), "");
+        hsf_num = std::regex_replace(hsf_num, std::regex("/"), "");
         const std::string fileext (dirEntry.path().extension().string());
 
         // by_write\hsf_0\f0039_14\l0039_14.mis
@@ -166,11 +167,7 @@ void process_mis_thread_callback(const MisInfo info, const Sd19Config config)
                 for (int l = 0; l < mis->entw; l++)
                 {
                     auto offset = (k * width + l) * bytesPerPixel;
-                    // red and green fade from 0 to 255, blue is always 127
-                    //auto red = 255 * l / width;
-                    //auto green = 255 * k / height;
-                    //image[offset] = (red + green) / 2;;
-                    image[offset] = (*dptr++) ? 0 : 255;
+                    image[offset] = (*dptr++) ? MIS_FOREGROUND_PIXEL: MIS_BACKGROUND_PIXEL;
                 }
             }
 

@@ -4,6 +4,7 @@
 # proc: shear_char - takes a binary bitmap of a character and horizontally
 # proc:              shears it in order to straighten the character up.
 */
+#include <algorithm>
 #include <cstdlib>
 #include <stdio.h>
 
@@ -65,8 +66,8 @@ float shear_char(unsigned char* idata, unsigned char* odata, int w, int  h)
 		return(0.0);
 	}
 	/* skip potentially noisy edges */
-	toprow = min(toprow + 2, h - 1);
-	botrow = max(botrow - 2, 0);
+	toprow = std::min(toprow + 2, h - 1);
+	botrow = std::max(botrow - 2, 0);
 	if (toprow == botrow)
 		fatalerr("shear_char",
 			"top row of character should not equal bottom row of character",

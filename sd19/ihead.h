@@ -1,4 +1,6 @@
 #pragma once
+#ifndef IHEAD_H_
+#define IHEAD_H_
 
 /************************************************************/
 /*         File Name: IHead.h                               */
@@ -59,3 +61,4 @@ typedef struct ihead {
 #define RIGHT2LEFT	'1'
 
 #define BYTE_SIZE	8.0
+#endif

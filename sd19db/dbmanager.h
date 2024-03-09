@@ -13,6 +13,7 @@
 namespace sdb19db
 {
 	struct RawImageInfo {
+		int Id;
 		unsigned char* PixelData;
 		unsigned int Width;
 		unsigned int Height;
@@ -51,6 +52,9 @@ namespace sdb19db
 			_hsfpage = std::make_unique<HsfPage>(_dbPtr);
 			_mis	 = std::make_unique<Mis>(_dbPtr);
 		}
+
+		DbManager(const DbManager&) = delete;
+		DbManager& operator=(const DbManager&) = delete;
 
 		int Insert(const tables::ihead& table) const;
 		int Insert(const tables::hsfpage& table) const;
