@@ -10,7 +10,7 @@
 		<Config Name="Number_Threads">8</Config>
 		<Config Name="Scale_MIS">true</Config>
 	</Configs>
-	<NeuralNetConfig>
+	<FannNeuralNetConfig>
 		<Config Name="Train_Test_Split_Percent">80</Config>
 		<Config Name="Maximum_Dataset_Size">60000</Config>
 		<Config Name="Action_Function_Hidden">FANN_SIGMOID</Config>
@@ -25,5 +25,5 @@
 		<Config Name="Desired_Error">0.001</Config>
 		<Config Name="Max_Epochs">500</Config>
 		<Config Name="Epochs_Between_Report">1</Config>
-	</NeuralNetConfig>
+	</FannNeuralNetConfig>
 </Sd19>
