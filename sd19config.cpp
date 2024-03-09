@@ -19,6 +19,7 @@ std::ostream& operator<<(std::ostream& out, const Sd19Config& config)
         << std::setw(30) << std::string(30, '-')            << std::setw(85) << std::string(85, '-')                << std::endl
         << std::setw(30) << "Number_Threads:"               << std::setw(85) << config.GetNumberThreads()           << std::endl        
         << std::setw(30) << std::string(30, '-')            << std::setw(85) << std::string(85, '-')                << std::endl        
+        << std::setw(30) << "Network_Filename:"             << std::setw(85) << config.GetNetworkFilename()         << std::endl
         << std::setw(30) << "Train_Test_Split_Percent:"     << std::setw(85) << config.GetTrainTestSplitPercent()   << std::endl
         << std::setw(30) << "Maximum_Dataset_Size:"         << std::setw(85) << config.GetMaxDatasetSize()          << std::endl
         << std::setw(30) << "Training_Algorithm:"           << std::setw(85) << config.GetTraningAlgorithm()        << std::endl

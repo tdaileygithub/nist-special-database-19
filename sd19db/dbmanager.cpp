@@ -137,15 +137,15 @@ namespace sdb19db
 		out << "              Id= " << rai.Id << std::endl;
 		for (int i = 0; i < rai.Height; i++)
 		{
-			out << i << std::setw(2) << " | ";
+			out << std::setw(3) << i << std::setw(3) << " | ";
 			for (int j = 0; j < rai.Width; j++)
 			{
 				int offset = rai.Width * i + j;
 				if (rai.PixelData[offset] == 255) {
-					out << " ";					
+					out << "*";					
 				}
 				else {
-					out << "*";					
+					out << " ";					
 				}				
 			}
 			out << std::endl;			

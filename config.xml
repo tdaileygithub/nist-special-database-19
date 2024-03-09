@@ -11,19 +11,20 @@
 		<Config Name="Scale_MIS">true</Config>
 	</Configs>
 	<FannNeuralNetConfig>
+		<Config Name="Network_Filename">fann_network.nn</Config>
+		<Config Name="Maximum_Dataset_Size">900000</Config>
 		<Config Name="Train_Test_Split_Percent">80</Config>
-		<Config Name="Maximum_Dataset_Size">60000</Config>
 		<Config Name="Action_Function_Hidden">FANN_SIGMOID</Config>
 		<Config Name="Action_Function_Output">FANN_SIGMOID</Config>
-		<Config Name="Training_Algorithm">FANN_TRAIN_BATCH</Config>
+		<Config Name="Training_Algorithm">FANN_TRAIN_RPROP</Config>
 		<Config Name="Training_Learning_Momentum">0.9</Config>
-		<Config Name="Training_Learning_Rate">1.3</Config>
+		<Config Name="Training_Learning_Rate">0.01</Config>
 		<Config Name="Number_Inputs">1024</Config>
 		<Config Name="Number_Outputs">62</Config>
-		<Config Name="Number_Layers">5</Config>
-		<Config Name="Number_Hidden">1024</Config>
+		<Config Name="Number_Layers">3</Config>
+		<Config Name="Number_Hidden">3</Config>
 		<Config Name="Desired_Error">0.001</Config>
-		<Config Name="Max_Epochs">500</Config>
-		<Config Name="Epochs_Between_Report">1</Config>
+		<Config Name="Max_Epochs">1000</Config>
+		<Config Name="Epochs_Between_Report">10</Config>
 	</FannNeuralNetConfig>
 </Sd19>

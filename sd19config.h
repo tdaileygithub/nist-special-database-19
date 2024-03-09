@@ -36,6 +36,7 @@ private:
     int _numberHiddenLayers = 0;
     float _trainTestSplit = 0.0f;
     int _maxDatasetSize = 60000;
+    std::string _networkFilename = "";
     fann_activationfunc_enum _actionFunctionHidden;
     std::string _actionFunctionHiddenStr = "";
     fann_activationfunc_enum _actionFunctionOutput;
@@ -50,7 +51,8 @@ private:
     bool _scaleMisCharacters = false;
 
 public:
-    Sd19Config() {
+    Sd19Config() 
+    {
         pugi::xml_document doc;
 
         if (!doc.load_file("config.xml")) {
@@ -72,6 +74,7 @@ public:
         _numberLayers                   = (pugi::xpath_query("/Sd19/FannNeuralNetConfig/Config[@Name='Number_Layers']").evaluate_node_set(doc)[0]).node().text().as_int(0);
         _numberHiddenLayers             = (pugi::xpath_query("/Sd19/FannNeuralNetConfig/Config[@Name='Number_Hidden']").evaluate_node_set(doc)[0]).node().text().as_int(0);
 
+        _networkFilename                = std::string((pugi::xpath_query("/Sd19/FannNeuralNetConfig/Config[@Name='Network_Filename']").evaluate_node_set(doc)[0]).node().text().get());
         _trainTestSplit                 = (pugi::xpath_query("/Sd19/FannNeuralNetConfig/Config[@Name='Train_Test_Split_Percent']").evaluate_node_set(doc)[0]).node().text().as_float(0);
         _maxDatasetSize                 = (pugi::xpath_query("/Sd19/FannNeuralNetConfig/Config[@Name='Maximum_Dataset_Size']").evaluate_node_set(doc)[0]).node().text().as_int(0);
         _actionFunctionHiddenStr        = std::string((pugi::xpath_query("/Sd19/FannNeuralNetConfig/Config[@Name='Action_Function_Hidden']").evaluate_node_set(doc)[0]).node().text().get());
@@ -133,6 +136,9 @@ public:
         return _numberLayers;
     }
 
+    std::string GetNetworkFilename() const {
+        return _networkFilename;
+    }
     float GetTrainTestSplitPercent() const{
         return _trainTestSplit;
     }
