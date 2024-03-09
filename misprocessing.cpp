@@ -167,11 +167,7 @@ void process_mis_thread_callback(const MisInfo info, const Sd19Config config)
                 for (int l = 0; l < mis->entw; l++)
                 {
                     auto offset = (k * width + l) * bytesPerPixel;
-                    // red and green fade from 0 to 255, blue is always 127
-                    //auto red = 255 * l / width;
-                    //auto green = 255 * k / height;
-                    //image[offset] = (red + green) / 2;;
-                    image[offset] = (*dptr++) ? 0 : 255;
+                    image[offset] = (*dptr++) ? MIS_FOREGROUND_PIXEL: MIS_BACKGROUND_PIXEL;
                 }
             }
 

@@ -45,10 +45,7 @@ namespace TooJpeg
             for (int l = 0; l < width; l++)
             {
                 auto offset = (k * width + l) * bytesPerPixel;
-                // red and green fade from 0 to 255, blue is always 127
-                //auto red = 255 * l / width;
-                //auto green = 255 * k / height;
-                dptr[offset] = (*src++) ? 0 : 255;
+                dptr[offset] = (*src++) ? MIS_FOREGROUND_PIXEL : MIS_BACKGROUND_PIXEL;
             }
         }
     }
